@@ -1,3 +1,18 @@
+<script setup>  
+
+//Importaciones de sistemas y librerias
+import { ref, computed, watch, onMounted } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+// Importamos el api
+import UserAPI from "@/api/UserAPI";
+
+
+</script>
+
+
 <template>
         <div class="authincation d-flex flex-column flex-lg-row flex-column-fluid">
 		<div class="login-aside text-center d-none d-sm-flex flex-column flex-row-auto">
