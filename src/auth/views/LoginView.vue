@@ -18,11 +18,36 @@ import UserAPI from "@/api/UserAPI";
 		<div class="login-aside text-center d-none d-sm-flex flex-column flex-row-auto">
 			<div class="d-flex flex-column-auto flex-column pt-lg-40 pt-15">
 				<div class="text-center mb-4 pt-5">
-					<a href="index.html"><img src="@/assets/images/logo-full.png" class="dark-login"  alt=""></a>
-					<a href="index.html"><img src="@/assets/images/logo-full-white.png" class="light-login" alt=""></a>
+					<!-- <a href="index.html"><img src="@/assets/images/logo-full.png" class="dark-login"  alt=""></a>
+					<a href="index.html"><img src="@/assets/images/logo-full-white.png" class="light-login" alt=""></a> -->
+
+                    <a href="index.html" class="brand-logo">
+      <img
+        fetchpriority="high"
+        decoding="async"
+        width="188"
+        height="110"
+        src="@/assets/logo/acedisposal-logo.png"
+      />
+
+      <div>
+        <div class="brand-title">
+          <span
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              margin-left: 10px;
+              color: black;
+            "
+            >CoverSheet</span
+          >
+        </div>
+      </div>
+    </a>
+
 				</div>
 				<h3 class="mb-2">Welcome back!</h3>
-				<p>User Experience & Interface Design <br>Kubayar Invoicing Admin Dashboard</p>
+				<p>IT Department</p>
 			</div>
 			<div class="aside-image" style="background-image:url(images/pic1.svg);"></div>
 		</div>
@@ -33,8 +58,36 @@ import UserAPI from "@/api/UserAPI";
 						<div class="col-xl-12">
 							<div class="auth-form">
 								<div class="text-center d-block d-lg-none mb-4 pt-5">
-									<a href="index.html"><img src="@/assets/images/logo-full.png" class="dark-login"  alt=""></a>
-									<a href="index.html"><img src="@/assets/images/logo-full-white.png" class="light-login" alt=""></a>
+
+
+									<!-- <a href="index.html"><img src="@/assets/images/logo-full.png" class="dark-login"  alt=""></a>
+									<a href="index.html"><img src="@/assets/images/logo-full-white.png" class="light-login" alt=""></a>-->
+
+                                    <a href="index.html" class="brand-logo">
+      <img
+        fetchpriority="high"
+        decoding="async"
+        width="188"
+        height="110"
+        src="@/assets/logo/acedisposal-logo.png"
+      />
+
+      <div>
+        <div class="brand-title">
+          <span
+            style="
+              font-size: 20px;
+              font-weight: bold;
+              margin-left: 10px;
+              color: black;
+            "
+            >CoverSheet</span
+          >
+        </div>
+      </div>
+    </a>
+
+
 								</div>
 								
 								<h4 class="text-center mb-4">Sign in your account</h4>
@@ -53,7 +106,28 @@ import UserAPI from "@/api/UserAPI";
 											</span>
 										</div>
 									</div>
-									<div class="form-row d-flex justify-content-between mt-4 mb-2">
+
+                                    <fieldset class="mb-3">
+                                            <div class="row">
+                                                <label class="col-form-label col-sm-3 pt-0">User Rol</label>
+                                                <div class="col-sm-9">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="gridRadios" value="option1" checked>
+                                                        <label class="form-check-label">
+                                                            Driver
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="gridRadios" value="option2">
+                                                        <label class="form-check-label">
+                                                            Admin
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    
+									<!-- <div class="form-row d-flex justify-content-between mt-4 mb-2">
 										<div class="mb-3">
 										   <div class="form-check custom-checkbox ms-1">
 												<input type="checkbox" class="form-check-input" id="basic_checkbox_1">
@@ -63,14 +137,14 @@ import UserAPI from "@/api/UserAPI";
 										<div class="mb-3">
 											<a href="page-forgot-password.html">Forgot Password?</a>
 										</div>
-									</div>
+									</div> -->
 									<div class="text-center">
 										<button type="submit" class="btn btn-primary btn-block">Sign Me In</button>
 									</div>
 								</form>
-								<div class="new-account mt-3">
+								<!-- <div class="new-account mt-3">
 									<p>Don't have an account? <a class="text-primary" href="./page-register.html">Sign up</a></p>
-								</div>
+								</div> -->
                             </div>
 						</div>
 					</div>
