@@ -1,12 +1,17 @@
 import api from "@/lib/axios.js";
+import qs from "qs";
 
 export default {
 
 
   async login(values) {
-    const data = await api.post('/login', values);
+    const form = qs.stringify(values);
+    const data = await api.post("/drivers/login", form, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
     return data;
-
   },
 
   async auth() {
