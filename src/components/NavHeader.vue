@@ -13,9 +13,9 @@
         <div class="brand-title">
           <span
             style="
-              font-size: 20px;
+              font-size: 18px;
               font-weight: bold;
-              margin-left: 10px;
+              margin-left: 5px;
               color: black;
             "
             >CoverSheet</span

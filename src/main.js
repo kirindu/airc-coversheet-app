@@ -3,17 +3,37 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import { createModal } from '@kolirt/vue-modal'
+
+import ToastPlugin from "vue-toast-notification";
+import "vue-toast-notification/dist/theme-bootstrap.css";
+
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
 
 app.use(createPinia())
+app.use(ToastPlugin);
 app.use(router)
 
-// Tema oscuro por defecto
-dzSettingsOptions.version = 'dark';
+// Seleccion de temas, light, dark, auto
+dzSettingsOptions.version = 'light';
 new dzSettings(dzSettingsOptions);
-document.cookie = "version=dark"; 
+document.cookie = "version=light"; 
+
+app.use(createModal({
+    transitionTime: 200,
+    animationType: 'slideDown',
+    modalStyle: {
+      padding: '5rem 2rem',
+      align: 'center',
+      'z-index': 201
+    },
+    overlayStyle: {
+      'background-color': 'rgba(0, 0, 0, .5)',
+      'z-index': 200
+    }
+  }));
 
 app.mount('#app')

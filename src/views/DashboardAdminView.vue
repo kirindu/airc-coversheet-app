@@ -1,3 +1,16 @@
+<script setup>
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  if (!sessionStorage.getItem('page_reloaded')) {
+    sessionStorage.setItem('page_reloaded', 'true')
+    window.location.reload()
+  } else {
+    sessionStorage.removeItem('page_reloaded') // limpia para futuras visitas
+  }
+})
+</script>
+
 <template>
 
             <!-- row -->

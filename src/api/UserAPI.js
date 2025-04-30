@@ -3,14 +3,27 @@ import qs from "qs";
 
 export default {
 
+  async loginDriver(values) {
+    const data = await api.post("/drivers/login", values, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return data;
+  },
 
-  async login(values) {
-    const form = qs.stringify(values);
-    const data = await api.post("/drivers/login", form, {
+  async loginAdmin(values) {
+    const form = qs.stringify({
+      username: values.email, // 👈 el campo debe llamarse 'username'
+      password: values.password
+    });
+  
+    const data = await api.post("/users/login", form, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
+  
     return data;
   },
 

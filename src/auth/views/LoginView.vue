@@ -17,6 +17,7 @@ const { showToast } = useToastNotification();
 
 // Reactividad
 const loading = ref(false);
+const rol = ref('Driver')  // valor por defecto
 
 // Validaciones
 import { useForm } from "vee-validate";
@@ -52,12 +53,10 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
   loading.value = true;
   try {
 
-    let test = values;
-   // const { data } = await UserAPI.login(values);
-
-   const { data } = await UserAPI.login({
-    email: values.email,
-    password: values.password,
+    if (rol.value === 'Driver') {
+      const { data } = await UserAPI.loginDriver({
+      email: values.email,
+      password: values.password,
    });
 
    if(data.ok) {
@@ -65,9 +64,21 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
      router.push({name: 'dashboard'});
   }
 
-   
+    } else if (rol.value === 'Admin') {
+      const { data } = await UserAPI.loginAdmin({
+        email: values.email,
+        password: values.password,
+      });
+
+      if(data.ok) {
+        localStorage.setItem("USER", JSON.stringify(data));
+        router.push({name: 'dashboard-admin'});
+     }
+    } 
+
+
   } catch (error) {
-    const data = error.response.data.detail;
+    const data = error.response.data.msg;
     showToast({
       message: data,
       type: "error",
@@ -93,9 +104,6 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
     >
       <div class="d-flex flex-column-auto flex-column pt-lg-40 pt-15">
         <div class="text-center mb-4 pt-5">
-          <!-- <a href="index.html"><img src="@/assets/images/logo-full.png" class="dark-login"  alt=""></a>
-					<a href="index.html"><img src="@/assets/images/logo-full-white.png" class="light-login" alt=""></a> -->
-
           <a href="index.html" class="brand-logo">
             <img
               fetchpriority="high"
@@ -138,8 +146,6 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
             <div class="col-xl-12">
               <div class="auth-form">
                 <div class="text-center d-block d-lg-none mb-4 pt-5">
-                  <!-- <a href="index.html"><img src="@/assets/images/logo-full.png" class="dark-login"  alt=""></a>
-									<a href="index.html"><img src="@/assets/images/logo-full-white.png" class="light-login" alt=""></a>-->
 
                   <a href="index.html" class="brand-logo">
                     <img
@@ -192,11 +198,11 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                       <label class="col-form-label col-sm-3 pt-0">User Role</label>
                       <div class="col-sm-9">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="gridRadios" value="option1" checked />
+                          <input class="form-check-input" type="radio" v-model="rol" name="gridRadios" value="Driver" checked />
                           <label class="form-check-label"> Driver </label>
                         </div>
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="gridRadios" value="option2" />
+                          <input class="form-check-input" type="radio" v-model="rol" name="gridRadios" value="Admin" />
                           <label class="form-check-label"> Admin </label>
                         </div>
                       </div>
