@@ -1,11 +1,21 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
+// Imnportamos librerias
+import VueTimepicker from "vue3-timepicker";
+import "vue3-timepicker/dist/VueTimepicker.css";
+
+
+const timeClockIn = ref("");
+const timeLeaveYard = ref("");
+const timeBackInYard = ref("");
+const timeClockOut = ref("");
+
+
 // Importamos componentes
 import Spinner from "@/components/Spinner.vue";
-
 
 // Importamos Stores
 import { useRoutesStore } from "@/stores/routes.js";
@@ -17,23 +27,27 @@ const storeTruck = useTrucksStore();
 import { useDriversStore } from "@/stores/drivers.js";
 const storeDriver = useDriversStore();
 
-
-
 const selectedRoute = ref("");
 const selectedTruck = ref("");
 const formSubmitted = ref(false);
 
-const routes = ["A132", "B250", "J250", "X222", "A698", "C987", "F987", "R120"];
-const trucks = ["132", "250", "250", "222", "698", "987", "997", "120"];
-
 const currentDate = ref(
   new Date().toLocaleDateString("en-US", {
     weekday: "short",
-  	year: "numeric",
-  	month: "short",
-  	day: "numeric",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   })
-)
+);
+
+onMounted(() => {
+  if (!sessionStorage.getItem('page_reloaded2')) {
+    sessionStorage.setItem('page_reloaded2', 'true')
+    window.location.reload()
+  } else {
+    sessionStorage.removeItem('page_reloaded2') // limpia para futuras visitas
+  }
+})
 </script>
 
 <template>
@@ -51,9 +65,7 @@ const currentDate = ref(
     <!-- row -->
     <!-- Row starts -->
 
-	<Spinner v-if="storeRoute.loading || storeTruck.loading" />
-
-
+    <Spinner v-if="storeRoute.loading || storeTruck.loading" />
 
     <div class="col-lg-12">
       <div class="card">
@@ -62,9 +74,8 @@ const currentDate = ref(
         </div>
         <div class="card-body">
           <div class="basic-form">
-            <form>
-
-				<div class="row">
+            <form @submit="onSubmit" autocomplete="off">
+              <div class="row">
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Route #</label>
                   <v-select
@@ -94,24 +105,68 @@ const currentDate = ref(
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Current Date</label>
                   <div class="mt-2">
-                    <label class="form-label"> {{ currentDate }}</label>
+                    <label class="form-label" style="color:brown"> {{ currentDate }}</label>
                   </div>
                 </div>
               </div>
 
-			  <div class="row">
+              <div class="row">
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker">Clock In</label>
 
-                <div class="mb-3 col-md-6">
-                   <label class="form-label">Default Clock Picker</label>
-                                        <div class="input-group clockpicker">
-                                            <input type="text" class="form-control" value="09:30"><span class="input-group-text">
-											<i class="far fa-clock"></i></span>
-                                        </div>
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-clock-in"
+                      v-model="timeClockIn"
+                      format="HH:mm A"
+                    />
+                    <!-- <p>Selected Time: {{ selectedTime }}</p>
+                                         -->
+                  </div>
                 </div>
-                
+
+				<div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker">Leave Yard</label>
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-leave-yard"
+                      v-model="timeLeaveYard"
+                      format="HH:mm A"
+                    />
+                  </div>
+                </div>
+
+				<div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker">Back In Yard</label>
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-back-in-yard"
+                      v-model="timeBackInYard"
+                      format="HH:mm A"
+                    />
+                  </div>
+                </div>
+
+				<div class="mb-3 col-md-2">
+					<label class="form-label">Start Miles</label>
+                  <input type="number" class="form-control form-control-sm border border-primary"/>
+                </div>
+
+				<div class="mb-3 col-md-2">
+					<label class="form-label">End Miles</label>
+                  <input type="number" class="form-control form-control-sm border border-primary"
+                  />
+                </div>
+
+				<div class="mb-3 col-md-2">
+					<label class="form-label">Fuel (cng)</label>
+                  <input type="number" class="form-control form-control-sm border border-primary"
+                  />
+                </div>
+
+
               </div>
-
-
+<!-- 
               <div class="row">
                 <div class="mb-3 col-md-6">
                   <label class="form-label">First Name</label>
@@ -146,8 +201,6 @@ const currentDate = ref(
                 </div>
               </div>
 
-           
-
               <div class="row">
                 <div class="mb-3 col-md-4">
                   <label class="form-label">State</label>
@@ -168,8 +221,10 @@ const currentDate = ref(
                     class="form-control border border-primary"
                   />
                 </div>
-              </div>
-              <div class="mb-3">
+              </div> -->
+
+
+              <!-- <div class="mb-3">
                 <div class="form-check">
                   <input
                     class="form-check-input border border-primary"
@@ -177,8 +232,19 @@ const currentDate = ref(
                   />
                   <label class="form-check-label"> Check me out </label>
                 </div>
-              </div>
-              <button type="submit" class="btn btn-primary">Sign in</button>
+              </div> -->
+
+			  <div class="row">
+
+				<div class="mb-3 col-md-12">
+					<label class="form-label">Notes</label>
+				  <textarea class="form-control border border-primary"></textarea>
+                </div>
+
+
+			  </div>
+
+              <button type="submit" class="btn btn-primary">Next</button>
             </form>
           </div>
         </div>

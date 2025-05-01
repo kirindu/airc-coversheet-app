@@ -1,18 +1,33 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const user = ref(null)
 
-const storedUser = localStorage.getItem('USER')
+
+onMounted(() => {
+
+  const storedUser = localStorage.getItem('USER')
 
 if (storedUser) {
   try {
     const parsed = JSON.parse(storedUser)
-    user.value = parsed.data // donde está el objeto con id, name, rol, email
+
+
+    if(parsed.data.user) {
+      user.value = parsed.data.user // ADMIN
+    } else {
+      user.value = parsed.data // DRIVER
+    }
+
+    
   } catch (e) {
     console.error('Error al parsear USER desde localStorage:', e)
   }
 }
+
+});
+
+
 </script>
 
 <template>
