@@ -180,7 +180,14 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
                   <div class="mb-3">
                     <label class="mb-1 form-label" for="validationCustomEmail">Email<span class="text-danger">*</span></label>
-                    <input v-model="email" v-bind="emailAttrs" type="email" class="form-control" id="validationCustomEmail" requiredautocomplete="off"/>
+                    <!-- <input v-model="email" v-bind="emailAttrs" type="email" class="form-control" id="validationCustomEmail" requiredautocomplete="off"/> -->
+
+
+                    <div class="input-group">
+												<span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+                        <input v-model="email" v-bind="emailAttrs" type="email" class="form-control" id="validationCustomEmail" requiredautocomplete="off"/>		
+                    </div>
+
                     <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{ errors.email }}</div>
                    
                   </div>
@@ -188,7 +195,17 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                   <div class="mb-3">
                     <label class="mb-1 form-label">Password<span class="text-danger">*</span></label>
                     <div class="position-relative">
+
+
+                      
+                        <div class="input-group">
+												<span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                         <input type="password" v-model="password" v-bind="passwordAttrs" class="form-control" id="validationCustomPassword" required autocomplete="off"/>
+                    </div>
+                      
+                      
+                      
+                      
                       <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{ errors.password }}</div>
                     </div>
                   </div>

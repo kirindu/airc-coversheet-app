@@ -3,6 +3,20 @@ import qs from "qs";
 
 export default {
 
+  async all() {
+
+    const currentUser = localStorage.getItem('USER') || '';
+    const token = JSON.parse(currentUser).token;
+
+    const data = await api.get('/users/', {
+      headers: {
+        'x-token' : token
+      }
+    });
+    return data;
+
+  },
+
   async loginDriver(values) {
     const data = await api.post("/drivers/login", values, {
       headers: {
@@ -41,19 +55,7 @@ export default {
 
   },
 
-  async all() {
 
-    const currentUser = localStorage.getItem('USER') || '';
-    const token = JSON.parse(currentUser).token;
-
-    const data = await api.get('/users/', {
-      headers: {
-        'x-token' : token
-      }
-    });
-    return data;
-
-  },
 
   async add(values) {
     const currentUser = localStorage.getItem('USER') || '';

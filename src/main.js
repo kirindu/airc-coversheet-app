@@ -7,6 +7,8 @@ import { createModal } from '@kolirt/vue-modal'
 
 import ToastPlugin from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-bootstrap.css";
+import 'vue-select/dist/vue-select.css';
+
 
 import App from './App.vue'
 import router from './router'
