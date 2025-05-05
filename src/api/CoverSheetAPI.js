@@ -8,17 +8,25 @@ export default {
   
   async add(values) {
 
-    const currentUser = localStorage.getItem('USER') || '';
-    const token = JSON.parse(currentUser).token;
 
-    const data = await api.post('/coversheets/', values, {
-      headers: {
-        'x-token' : token
-      }
-    });
+    const data = await api.post('/coversheets/', values);
     return data;
 
   },
+
+  // async add(values) {
+
+  //   const currentUser = localStorage.getItem('USER') || '';
+  //   const token = JSON.parse(currentUser).token;
+
+  //   const data = await api.post('/coversheets/', values, {
+  //     headers: {
+  //       'x-token' : token
+  //     }
+  //   });
+  //   return data;
+
+  // },
 
   // async edit(idCategory, values) {
 
