@@ -118,7 +118,7 @@ onMounted(() => {
                     <VueTimepicker
                       id="time-picker-clock-in"
                       v-model="timeClockIn"
-                      format="HH:mm A"
+                      format="hh:mm A"
                     />
                     <!-- <p>Selected Time: {{ selectedTime }}</p>
                                          -->
@@ -131,7 +131,7 @@ onMounted(() => {
                     <VueTimepicker
                       id="time-picker-leave-yard"
                       v-model="timeLeaveYard"
-                      format="HH:mm A"
+                      format="hh:mm A"
                     />
                   </div>
                 </div>
@@ -142,7 +142,7 @@ onMounted(() => {
                     <VueTimepicker
                       id="time-picker-back-in-yard"
                       v-model="timeBackInYard"
-                      format="HH:mm A"
+                      format="hh:mm A"
                     />
                   </div>
                 </div>
