@@ -137,17 +137,17 @@ const onSubmit = async (event) => {
 
 const coverSheetData = {
     clockIn: timeClockIn.value,
-    leaveYard: "15:30:00",
-    backInYard: "19:30:00",
-    clockOut:"20:30:00",
-    startMiles:"23955",
-    endMiles:"23990",
-    fuel:"36.4",
-    truck_id:"66fdb4372f47815048a3fc94",
-    route_id:"6761d3599ca9ed59032e3888",
-    driver_id:"6761d3989ca9ed59032e3889",
-    date:"2025-05-11T21:00:00Z",
-    notes:"Esta es una prueba"
+    leaveYard: timeLeaveYard.value,
+    backInYard: timeBackInYard.value,
+    clockOut: timeClockOut.value,
+    startMiles: startMiles.value,
+    endMiles: endMiles.value,
+    fuel: fuel.value,
+    truck_id: selectedTruck.value,
+    route_id: selectedRoute.value,
+    driver_id: user.value.id,
+    // date:"2025-05-11T21:00:00Z",
+    notes: notes.value
 
 }
 
@@ -215,7 +215,36 @@ onMounted(() => {
     sessionStorage.removeItem('page_reloaded2') // limpia para futuras visitas
   }
 
-})
+
+// Si quieres mostrar una hora específica:
+ //timeClockIn.value = convertToDate("05:02 PM")
+
+ // Si quieres mostrar la hora actual:
+ //   const now = new Date()
+//   const formattedTime = now.toLocaleTimeString('en-US', {
+//     hour: 'numeric',
+//     minute: '2-digit',
+//     hour12: true
+//   })
+//  timeClockIn.value = formattedTime
+
+});
+
+
+const convertToDate = (timeString) => {
+  const [time, modifier] = timeString.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (modifier === 'PM' && hours < 12) hours += 12;
+  if (modifier === 'AM' && hours === 12) hours = 0;
+
+  // Construct the time string in "hh:mm A" format
+  const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+  const period = hours >= 12 ? 'PM' : 'AM';
+  return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+};
+
+
 </script>
 
 <template>
