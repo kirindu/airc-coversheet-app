@@ -117,24 +117,6 @@ const onSubmit = async (event) => {
     console.log('Enviando:', { selectedRoute: selectedRoute.value, selectedTruck: selectedTruck.value })
   }
 
-
-
-
-//   const coverSheetData = {
-//     clockIn: timeClockIn.value || "",
-//     leaveYard: timeLeaveYard.value || "",
-//     backInYard: timeBackInYard.value || "",
-//     clockOut: timeClockOut.value || "",
-//     startMiles: parseInt(startMiles.value) || 0,
-//     endMiles: parseInt(endMiles.value) || 0,
-//     fuel: parseInt(fuel.value) || 0,
-//     route_id: selectedRoute.value.id || "", // Adjust based on your route object structure
-//     truck_id: selectedTruck.value.id || "", // Adjust based on your truck object structure
-//     driver_id: user.value.id, // Adjust based on your driver store
-//     date: new Date().toISOString(),
-//     notes: notes.value || "",
-//   };
-
 const coverSheetData = {
     clockIn: timeClockIn.value,
     leaveYard: timeLeaveYard.value,
@@ -227,6 +209,16 @@ onMounted(() => {
 //     hour12: true
 //   })
 //  timeClockIn.value = formattedTime
+
+
+// Si recuperamos el objeto que viene en un select , se lo pasamos directamente para que lo muestre en el input
+// selectedRoute.value = {
+//   id: "6802a8f922dd5e9980ae8c1f",
+//   routeNumber: "100",
+//   lob: "Front Load",
+//   active: true,
+//   createdAt: "2025-04-18T19:33:13.043000"
+// };
 
 });
 
