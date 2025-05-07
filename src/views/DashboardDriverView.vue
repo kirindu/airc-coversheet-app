@@ -7,32 +7,30 @@ import "vue-select/dist/vue-select.css";
 import VueTimepicker from "vue3-timepicker";
 import "vue3-timepicker/dist/VueTimepicker.css";
 
+
+// Importamos el api
+import CoverSheetAPI from "@/api/CoverSheetAPI.js";
+import SpareTruckInfoAPI from "@/api/SpareTruckInfoAPI";
+
+// Import composables
+
+import useSweetAlert2Notification from "@/composables/useSweetAlert2";
+const { showSweetAlert, alertResult } = useSweetAlert2Notification();
+
+// Importamos componentes
+import Spinner from "@/components/Spinner.vue";
+
+// Importamos Stores
+import { useRoutesStore } from "@/stores/routes.js";
+const storeRoute = useRoutesStore();
+
+import { useTrucksStore } from "@/stores/trucks.js";
+const storeTruck = useTrucksStore();
+
+import { useDriversStore } from "@/stores/drivers.js";
+const storeDriver = useDriversStore();
+
 const user = ref(null);
-
-const selectedRoute = ref("");
-const selectedTruck = ref("");
-const formSubmitted = ref(false);
-
-const timeClockIn = ref("");
-const timeLeaveYard = ref("");
-const timeBackInYard = ref("");
-const timeClockOut = ref("");
-const startMiles = ref("");
-const endMiles = ref("");
-const fuel = ref("");
-const notes = ref("");
-
-const errors = ref({
-  route_er: "",
-  truck_er: "",
-  clockIn_er: "",
-  leaveYard_er: "",
-  backInYard_er: "",
-  clockOut_er: "",
-  startMiles_er: "",
-  endMiles_er: "",
-  fuel_er: "",
-});
 
 // Recuperamos el usuario
 const storedUser = localStorage.getItem("USER");
@@ -53,26 +51,57 @@ if (storedUser) {
 
 //
 
-// Importamos el api
-import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 
-// Import composables
+// General Info
+const selectedRoute = ref("");
+const selectedTruck = ref("");
+const timeClockIn = ref("");
+const timeLeaveYard = ref("");
+const timeBackInYard = ref("");
+const timeClockOut = ref("");
+const startMiles = ref("");
+const endMiles = ref("");
+const fuel = ref("");
+const notes = ref("");
 
-import useSweetAlert2Notification from "@/composables/useSweetAlert2";
-const { showSweetAlert, alertResult } = useSweetAlert2Notification();
 
-// Importamos componentes
-import Spinner from "@/components/Spinner.vue";
+const formSubmitted = ref(false);
 
-// Importamos Stores
-import { useRoutesStore } from "@/stores/routes.js";
-const storeRoute = useRoutesStore();
 
-import { useTrucksStore } from "@/stores/trucks.js";
-const storeTruck = useTrucksStore();
+const errors = ref({
+  route_er: "",
+  truck_er: "",
+  clockIn_er: "",
+  leaveYard_er: "",
+  backInYard_er: "",
+  clockOut_er: "",
+  startMiles_er: "",
+  endMiles_er: "",
+  fuel_er: "",
+});
 
-import { useDriversStore } from "@/stores/drivers.js";
-const storeDriver = useDriversStore();
+// Spare Truck Info
+const spareTruckSpareTruckInfo = ref("");
+const selectedRouteSpareTruckInfo = ref("");
+const timeLeaveYardSpareTruckInfo = ref("");
+const timeBackInYardSpareTruckInfo = ref("");
+const startMilesSpareTruckInfo = ref("");
+const endMilesSpareTruckInfo = ref("");
+const fuelSpareTruckInfo = ref("");
+
+const formSubmittedSpareTruckInfo = ref(false);
+
+const errorsSpareTruckInfo = ref({
+  spareTruckSpareTruckInfo_er: "",
+  routeSpareTruckInfo_er: "",
+  leaveYardSpareTruckInfo_er: "",
+  backInYardSpareTruckInfo_er: "",
+  startMilesSpareTruckInfo_er: "",
+  endMilesSpareTruckInfo_er: "",
+  fuelSpareTruckInfo_er: "",
+});
+
+
 
 const currentDate = ref(
   new Date().toLocaleDateString("en-US", {
@@ -83,7 +112,7 @@ const currentDate = ref(
   })
 );
 
-// Handle form submission
+// Handle form submission General Info
 const onSubmit = async (event) => {
   event.preventDefault();
   formSubmitted.value = true;
@@ -111,19 +140,19 @@ const onSubmit = async (event) => {
     hasError = true;
   }
 
-  if (!timeClockIn.value || timeClockIn.value.endsWith("A")) {
+  if (!timeClockIn.value || timeClockIn.value.includes("mm") || timeClockIn.value.includes("HH")) {
     errors.value.clockIn_er = "Required field";
     hasError = true;
   }
-  if (!timeLeaveYard.value || timeLeaveYard.value.endsWith("A")) {
+  if (!timeLeaveYard.value || timeLeaveYard.value.includes("mm") || timeLeaveYard.value.includes("HH")) {
     errors.value.leaveYard_er = "Required field";
     hasError = true;
   }
-  if (!timeBackInYard.value || timeBackInYard.value.endsWith("A")) {
+  if (!timeBackInYard.value || timeBackInYard.value.includes("mm") || timeBackInYard.value.includes("HH")) {
     errors.value.backInYard_er = "Required field";
     hasError = true;
   }
-  if (!timeClockOut.value || timeClockOut.value.endsWith("A")) {
+  if (!timeClockOut.value || timeClockOut.value.includes("mm") || timeClockOut.value.includes("HH")) {
     errors.value.clockOut_er = "Required field";
     hasError = true;
   }
@@ -205,6 +234,91 @@ const onSubmit = async (event) => {
   }
 };
 
+// Handle form submission Sapre Truck Info
+const onSubmitSpareTruckInfo = async (event) => {
+  event.preventDefault();
+  formSubmittedSpareTruckInfo.value = true;
+
+  // Limpiar errores anteriores
+  errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.routeSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.startMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.endMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.startMiles_er = "";
+  errorsSpareTruckInfo.value.fuelSpareTruckInfo_er = "";
+
+  let hasError = false;
+
+  if (!spareTruckSpareTruckInfo.value) {
+    errors.value.spareTruckSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if (hasError) {
+    return;
+  }
+
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+
+  const spareTruckInfo = {
+    spareTruckNumber: spareTruckSpareTruckInfo.value,
+    routeNumber: selectedRouteSpareTruckInfo.value,
+    leaveYard: timeLeaveYardSpareTruckInfo.value,
+    backInYard: timeBackInYardSpareTruckInfo.value,
+    startMiles: startMilesSpareTruckInfo.value,
+    endMiles: endMilesSpareTruckInfo.value,
+    fuel: fuelSpareTruckInfo.value,
+    coversheet_id: coversheet_id,
+  };
+
+  try {
+    // Call the API to save the Spare Truck Info
+    const response = await SpareTruckInfoAPI.add(spareTruckInfo);
+
+    if (response.data.ok) {
+    //  localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
+
+      showSweetAlert({
+        title: "Spare Truck Info saved successfully!",
+        icon: "success",
+        showDenyButton: false,
+        showCancelButton: false,
+        confirmButtonText: "Ok",
+        allowOutsideClick: false,
+      }).then(() => {
+        return;
+      });
+    } else {
+      showSweetAlert({
+        title: "Error saving Spare Truck Info!",
+        icon: "warning",
+        showDenyButton: false,
+        showCancelButton: false,
+        confirmButtonText: "Ok",
+        allowOutsideClick: false,
+      }).then(() => {
+        return;
+      });
+    }
+
+
+  } catch (error) {
+    showSweetAlert({
+      title: "Error saving Spare Truck Info!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      return;
+    });
+  }
+};
+
+
 // Reset form after successful submission
 const resetForm = () => {
   timeClockIn.value = "";
@@ -232,8 +346,7 @@ onMounted(() => {
   //borramos todos los datos del localstorage
 
   let udser_id = user.value.id;
-  let coversheet_id =
-    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
   if (udser_id !== coversheet_id) {
     localStorage.removeItem("COVERSHEET");
@@ -262,14 +375,15 @@ onMounted(() => {
   }
 
   // Si quieres mostrar una hora específica:
-  //timeClockIn.value = convertToDate("05:02 PM")
+  //timeClockIn.value = convertToDate("05:02 PM") // Para trabajajr con el formato de 12 horas
+  //timeClockIn.value ="16:02"; // Para trabajar con el formato de 24 horas
 
   // Si quieres mostrar la hora actual:
   //   const now = new Date()
   //   const formattedTime = now.toLocaleTimeString('en-US', {
   //     hour: 'numeric',
   //     minute: '2-digit',
-  //     hour12: true
+  //     hour12: true //for 12-hour format, or false for 24-hour format
   //   })
   //  timeClockIn.value = formattedTime
 
@@ -324,6 +438,7 @@ const convertToDate = (timeString) => {
         <div class="card-body">
           <div class="basic-form">
             <form @submit="onSubmit" autocomplete="off">
+
               <div class="row">
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Route #</label>
@@ -375,8 +490,7 @@ const convertToDate = (timeString) => {
                   <div class="mt-0">
                     <VueTimepicker
                       id="time-picker-clock-in"
-                      v-model="timeClockIn"
-                      format="hh:mm A"
+                      v-model="timeClockIn"  
                     />
                   </div>
                   <small v-if="errors.clockIn_er" class="text-danger">{{
@@ -392,7 +506,6 @@ const convertToDate = (timeString) => {
                     <VueTimepicker
                       id="time-picker-leave-yard"
                       v-model="timeLeaveYard"
-                      format="hh:mm A"
                     />
                   </div>
                   <small v-if="errors.leaveYard_er" class="text-danger">{{
@@ -408,7 +521,6 @@ const convertToDate = (timeString) => {
                     <VueTimepicker
                       id="time-picker-back-in-yard"
                       v-model="timeBackInYard"
-                      format="hh:mm A"
                     />
                   </div>
                   <small v-if="errors.backInYard_er" class="text-danger">{{
@@ -424,7 +536,6 @@ const convertToDate = (timeString) => {
                     <VueTimepicker
                       id="time-picker-clock-out"
                       v-model="timeClockOut"
-                      format="hh:mm A"
                     />
                   </div>
                   <small v-if="errors.clockOut_er" class="text-danger">{{
@@ -499,7 +610,8 @@ const convertToDate = (timeString) => {
         <div class="card-body">
           <div class="basic-form">
 
-            <form @submit="onSubmit2" autocomplete="off">
+            <form @submit="onSubmitSpareTruckInfo" autocomplete="off">
+
               <div class="row">
 
                 <div class="accordion accordion-primary-solid" id="accordion-two">
@@ -511,8 +623,80 @@ const convertToDate = (timeString) => {
 									</h2>
 									<div id="bordered_collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordion-two">
 									  <div class="accordion-body">
-										Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-									  </div>
+
+
+                      <div class="row">
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-clock-in"
+                    >Leave Yard</label
+                  >
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-clock-in"
+                      v-model="timeLeaveYardSpareTruckInfo"  
+                    />
+                  </div>
+                </div>
+
+                <!-- <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-leave-yard"
+                    >Leave Yard</label
+                  >
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-leave-yard"
+                      v-model="timeLeaveYard"
+                    />
+                  </div>
+                  <small v-if="errors.leaveYard_er" class="text-danger">{{
+                    errors.leaveYard_er
+                  }}</small>
+                </div>
+
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-back-in-yard"
+                    >Back In Yard</label
+                  >
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-back-in-yard"
+                      v-model="timeBackInYard"
+                    />
+                  </div>
+                  <small v-if="errors.backInYard_er" class="text-danger">{{
+                    errors.backInYard_er
+                  }}</small>
+                </div>
+
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-clock-out"
+                    >Clock Out</label
+                  >
+                  <div class="mt-0">
+                    <VueTimepicker
+                      id="time-picker-clock-out"
+                      v-model="timeClockOut"
+                    />
+                  </div>
+                  <small v-if="errors.clockOut_er" class="text-danger">{{
+                    errors.clockOut_er
+                  }}</small>
+                </div> -->
+
+              </div>
+
+
+
+
+
+
+
+
+                    
+                    
+                    
+                    
+                    </div>
 									</div>
 								  </div>
 								  <div class="accordion-item">
