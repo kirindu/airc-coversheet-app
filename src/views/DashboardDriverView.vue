@@ -7,9 +7,7 @@ import "vue-select/dist/vue-select.css";
 import VueTimepicker from "vue3-timepicker";
 import "vue3-timepicker/dist/VueTimepicker.css";
 
-const user = ref(null)
-
-
+const user = ref(null);
 
 const selectedRoute = ref("");
 const selectedTruck = ref("");
@@ -24,47 +22,44 @@ const endMiles = ref("");
 const fuel = ref("");
 const notes = ref("");
 
-
 const errors = ref({
-  route_er: '',
-  truck_er: ''
-})
+  route_er: "",
+  truck_er: "",
+  clockIn_er: "",
+  leaveYard_er: "",
+  backInYard_er: "",
+  clockOut_er: "",
+  startMiles_er: "",
+  endMiles_er: "",
+  fuel_er: "",
+});
 
-
-
-// Revcuperamos el usuario 
-const storedUser = localStorage.getItem('USER');
+// Recuperamos el usuario
+const storedUser = localStorage.getItem("USER");
 
 if (storedUser) {
   try {
-    const parsed = JSON.parse(storedUser)
+    const parsed = JSON.parse(storedUser);
 
-
-    if(parsed.data.user) {
-      user.value = parsed.data.user // ADMIN
+    if (parsed.data.user) {
+      user.value = parsed.data.user; // ADMIN
     } else {
-      user.value = parsed.data // DRIVER
+      user.value = parsed.data; // DRIVER
     }
-
   } catch (e) {
-    console.error('Error al parsear USER desde localStorage:', e)
+    console.error("Error al parsear USER desde localStorage:", e);
   }
-
 }
 
 //
 
-
 // Importamos el api
-import CoverSheetAPI from '@/api/CoverSheetAPI.js'
-
+import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 
 // Import composables
 
 import useSweetAlert2Notification from "@/composables/useSweetAlert2";
 const { showSweetAlert, alertResult } = useSweetAlert2Notification();
-
-
 
 // Importamos componentes
 import Spinner from "@/components/Spinner.vue";
@@ -78,8 +73,6 @@ const storeTruck = useTrucksStore();
 
 import { useDriversStore } from "@/stores/drivers.js";
 const storeDriver = useDriversStore();
-
-
 
 const currentDate = ref(
   new Date().toLocaleDateString("en-US", {
@@ -95,29 +88,63 @@ const onSubmit = async (event) => {
   event.preventDefault();
   formSubmitted.value = true;
 
-
-    // Limpiar errores anteriores
-    errors.value.route_er = '';
-    errors.value.truck_er = '';
+  // Limpiar errores anteriores
+  errors.value.route_er = "";
+  errors.value.truck_er = "";
+  errors.value.clockIn_er = "";
+  errors.value.leaveYard_er = "";
+  errors.value.backInYard_er = "";
+  errors.value.clockOut_er = "";
+  errors.value.startMiles_er = "";
+  errors.value.endMiles_er = "";
+  errors.value.fuel_er = "";
 
   let hasError = false;
 
   if (!selectedRoute.value) {
-    errors.value.route_er = 'Required field';
+    errors.value.route_er = "Required field";
     hasError = true;
   }
 
   if (!selectedTruck.value) {
-    errors.value.truck_er = 'Required field';
-    hasError = true
+    errors.value.truck_er = "Required field";
+    hasError = true;
   }
 
-  if (!hasError) {
-    // enviar los datos o continuar
-    console.log('Enviando:', { selectedRoute: selectedRoute.value, selectedTruck: selectedTruck.value })
+  if (!timeClockIn.value || timeClockIn.value.endsWith("A")) {
+    errors.value.clockIn_er = "Required field";
+    hasError = true;
+  }
+  if (!timeLeaveYard.value || timeLeaveYard.value.endsWith("A")) {
+    errors.value.leaveYard_er = "Required field";
+    hasError = true;
+  }
+  if (!timeBackInYard.value || timeBackInYard.value.endsWith("A")) {
+    errors.value.backInYard_er = "Required field";
+    hasError = true;
+  }
+  if (!timeClockOut.value || timeClockOut.value.endsWith("A")) {
+    errors.value.clockOut_er = "Required field";
+    hasError = true;
+  }
+  if (!startMiles.value) {
+    errors.value.startMiles_er = "Required field";
+    hasError = true;
+  }
+  if (!endMiles.value) {
+    errors.value.endMiles_er = "Required field";
+    hasError = true;
+  }
+  if (!fuel.value) {
+    errors.value.fuel_er = "Required field";
+    hasError = true;
   }
 
-const coverSheetData = {
+  if (hasError) {
+    return;
+  }
+
+  const coverSheetData = {
     clockIn: timeClockIn.value,
     leaveYard: timeLeaveYard.value,
     backInYard: timeBackInYard.value,
@@ -129,46 +156,52 @@ const coverSheetData = {
     route_id: selectedRoute.value,
     driver_id: user.value.id,
     // date:"2025-05-11T21:00:00Z",
-    notes: notes.value
-
-}
-
+    notes: notes.value,
+  };
 
   try {
     // Call the API to save the coversheet
     const response = await CoverSheetAPI.add(coverSheetData);
-    
-    if(response.data.ok) {
 
-showSweetAlert({
-  title: "General information saved successfully!",
-  icon: "success",
-  showDenyButton: false,
-  showCancelButton: false,
-  confirmButtonText: "Ok",
-  allowOutsideClick: false,
-}).then(() => {
-  return;
-});
-} else {	
-  showSweetAlert({
-  title: "Error saving General Information!",
-  icon: "warning",
-  showDenyButton: false,
-  showCancelButton: false,
-  confirmButtonText: "Ok",
-  allowOutsideClick: false,
-}).then(() => {
-  return;
-});
-}
+    if (response.data.ok) {
+      localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
 
+      showSweetAlert({
+        title: "General information saved successfully!",
+        icon: "success",
+        showDenyButton: false,
+        showCancelButton: false,
+        confirmButtonText: "Ok",
+        allowOutsideClick: false,
+      }).then(() => {
+        return;
+      });
+    } else {
+      showSweetAlert({
+        title: "Error saving General Information!",
+        icon: "warning",
+        showDenyButton: false,
+        showCancelButton: false,
+        confirmButtonText: "Ok",
+        allowOutsideClick: false,
+      }).then(() => {
+        return;
+      });
+    }
 
     // Optionally reset the form
-    resetForm();
+    //  resetForm();
   } catch (error) {
-    // console.error("Error saving coversheet:", error);
-
+    showSweetAlert({
+      title: "Error saving General Information!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      return;
+    });
   }
 };
 
@@ -187,56 +220,83 @@ const resetForm = () => {
   formSubmitted.value = false;
 };
 
-
-
 onMounted(() => {
-  if (!sessionStorage.getItem('page_reloaded2')) {
-    sessionStorage.setItem('page_reloaded2', 'true')
-    window.location.reload()
+  if (!sessionStorage.getItem("page_reloaded2")) {
+    sessionStorage.setItem("page_reloaded2", "true");
+    window.location.reload();
   } else {
-    sessionStorage.removeItem('page_reloaded2') // limpia para futuras visitas
+    sessionStorage.removeItem("page_reloaded2"); // limpia para futuras visitas
   }
 
+  // Cargamos los datos si el usuario es el mismo que el id del coversheet y si se encuentra en el mismo dia, sino
+  //borramos todos los datos del localstorage
 
-// Si quieres mostrar una hora específica:
- //timeClockIn.value = convertToDate("05:02 PM")
+  let udser_id = user.value.id;
+  let coversheet_id =
+    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
- // Si quieres mostrar la hora actual:
- //   const now = new Date()
-//   const formattedTime = now.toLocaleTimeString('en-US', {
-//     hour: 'numeric',
-//     minute: '2-digit',
-//     hour12: true
-//   })
-//  timeClockIn.value = formattedTime
+  if (udser_id !== coversheet_id) {
+    localStorage.removeItem("COVERSHEET");
+  } else {
+    const date = new Date(JSON.parse(localStorage.getItem("COVERSHEET")).date);
+    const today = new Date();
+    if (
+      date.getDate() !== today.getDate() ||
+      date.getMonth() !== today.getMonth() ||
+      date.getFullYear() !== today.getFullYear()
+    ) {
+      localStorage.removeItem("COVERSHEET");
+    } else {
+      const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+      timeClockIn.value = coversheet.clockIn;
+      timeLeaveYard.value = coversheet.leaveYard;
+      timeBackInYard.value = coversheet.backInYard;
+      timeClockOut.value = coversheet.clockOut;
+      startMiles.value = coversheet.startMiles;
+      endMiles.value = coversheet.endMiles;
+      fuel.value = coversheet.fuel;
+      notes.value = coversheet.notes;
+      selectedRoute.value = coversheet.route_id;
+      selectedTruck.value = coversheet.truck_id;
+    }
+  }
 
+  // Si quieres mostrar una hora específica:
+  //timeClockIn.value = convertToDate("05:02 PM")
 
-// Si recuperamos el objeto que viene en un select , se lo pasamos directamente para que lo muestre en el input
-// selectedRoute.value = {
-//   id: "6802a8f922dd5e9980ae8c1f",
-//   routeNumber: "100",
-//   lob: "Front Load",
-//   active: true,
-//   createdAt: "2025-04-18T19:33:13.043000"
-// };
+  // Si quieres mostrar la hora actual:
+  //   const now = new Date()
+  //   const formattedTime = now.toLocaleTimeString('en-US', {
+  //     hour: 'numeric',
+  //     minute: '2-digit',
+  //     hour12: true
+  //   })
+  //  timeClockIn.value = formattedTime
 
+  // Si recuperamos el objeto que viene en un select , se lo pasamos directamente para que lo muestre en el input
+  // selectedRoute.value = {
+  //   id: "6802a8f922dd5e9980ae8c1f",
+  //   routeNumber: "100",
+  //   lob: "Front Load",
+  //   active: true,
+  //   createdAt: "2025-04-18T19:33:13.043000"
+  // };
 });
 
-
 const convertToDate = (timeString) => {
-  const [time, modifier] = timeString.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
+  const [time, modifier] = timeString.split(" ");
+  let [hours, minutes] = time.split(":").map(Number);
 
-  if (modifier === 'PM' && hours < 12) hours += 12;
-  if (modifier === 'AM' && hours === 12) hours = 0;
+  if (modifier === "PM" && hours < 12) hours += 12;
+  if (modifier === "AM" && hours === 12) hours = 0;
 
   // Construct the time string in "hh:mm A" format
   const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-  const period = hours >= 12 ? 'PM' : 'AM';
-  return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
+  const period = hours >= 12 ? "PM" : "AM";
+  return `${formattedHours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")} ${period}`;
 };
-
-
 </script>
 
 <template>
@@ -258,14 +318,13 @@ const convertToDate = (timeString) => {
 
     <div class="col-lg-12">
       <div class="card">
-        <div class="card-header">
+        <!-- <div class="card-header">
           <h4 class="card-title">General Info</h4>
-        </div>
+        </div> -->
         <div class="card-body">
           <div class="basic-form">
             <form @submit="onSubmit" autocomplete="off">
               <div class="row">
-
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Route #</label>
                   <v-select
@@ -277,7 +336,9 @@ const convertToDate = (timeString) => {
                     class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                   />
-                  <small v-if="errors.route_er" class="text-danger">{{ errors.route_er }}</small>
+                  <small v-if="errors.route_er" class="text-danger">{{
+                    errors.route_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-4">
@@ -291,21 +352,26 @@ const convertToDate = (timeString) => {
                     class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                   />
-                  <small v-if="errors.truck_er" class="text-danger">{{ errors.truck_er }}</small>
+                  <small v-if="errors.truck_er" class="text-danger">{{
+                    errors.truck_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Current Date</label>
                   <div class="mt-2">
-                    <label class="form-label" style="color:brown"> {{ currentDate }}</label>
+                    <label class="form-label" style="color: brown">
+                      {{ currentDate }}</label
+                    >
                   </div>
                 </div>
               </div>
 
               <div class="row">
-
                 <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-clock-in">Clock In</label>
+                  <label class="form-label" for="time-picker-clock-in"
+                    >Clock In</label
+                  >
                   <div class="mt-0">
                     <VueTimepicker
                       id="time-picker-clock-in"
@@ -313,10 +379,15 @@ const convertToDate = (timeString) => {
                       format="hh:mm A"
                     />
                   </div>
+                  <small v-if="errors.clockIn_er" class="text-danger">{{
+                    errors.clockIn_er
+                  }}</small>
                 </div>
 
-				<div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-leave-yard">Leave Yard</label>
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-leave-yard"
+                    >Leave Yard</label
+                  >
                   <div class="mt-0">
                     <VueTimepicker
                       id="time-picker-leave-yard"
@@ -324,10 +395,15 @@ const convertToDate = (timeString) => {
                       format="hh:mm A"
                     />
                   </div>
+                  <small v-if="errors.leaveYard_er" class="text-danger">{{
+                    errors.leaveYard_er
+                  }}</small>
                 </div>
 
-				<div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-back-in-yard">Back In Yard</label>
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-back-in-yard"
+                    >Back In Yard</label
+                  >
                   <div class="mt-0">
                     <VueTimepicker
                       id="time-picker-back-in-yard"
@@ -335,10 +411,15 @@ const convertToDate = (timeString) => {
                       format="hh:mm A"
                     />
                   </div>
+                  <small v-if="errors.backInYard_er" class="text-danger">{{
+                    errors.backInYard_er
+                  }}</small>
                 </div>
 
-				<div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-clock-out">Clock Out</label>
+                <div class="mb-3 col-md-2">
+                  <label class="form-label" for="time-picker-clock-out"
+                    >Clock Out</label
+                  >
                   <div class="mt-0">
                     <VueTimepicker
                       id="time-picker-clock-out"
@@ -346,47 +427,63 @@ const convertToDate = (timeString) => {
                       format="hh:mm A"
                     />
                   </div>
-                </div> 
-
-	
+                  <small v-if="errors.clockOut_er" class="text-danger">{{
+                    errors.clockOut_er
+                  }}</small>
+                </div>
               </div>
 
-
-			  <div class="row">
-
-
-<div class="mb-3 col-md-2">
-	<label class="form-label">Start Miles</label>
-  <input type="number" v-model="startMiles" class="form-control form-control-sm border border-primary"/>
-</div>
-
-<div class="mb-3 col-md-2">
-	<label class="form-label">End Miles</label>
-  <input type="number" v-model="endMiles" class="form-control form-control-sm border border-primary"
-  />
-</div>
-
-<div class="mb-3 col-md-2">
-	<label class="form-label">Fuel (cng)</label>
-  <input type="number" v-model="fuel" class="form-control form-control-sm border border-primary"
-  />
-</div>
-
-
-</div>
-
-
-			  <div class="row">
-
-				<div class="mb-3 col-md-12">
-					<label class="form-label">Notes</label>
-				  <textarea v-model="notes" class="form-control border border-primary"></textarea>
+              <div class="row">
+                <div class="mb-3 col-md-2">
+                  <label class="form-label">Start Miles</label>
+                  <input
+                    type="number"
+                    v-model="startMiles"
+                    class="form-control form-control-sm border border-primary"
+                  />
+                  <small v-if="errors.startMiles_er" class="text-danger">{{
+                    errors.startMiles_er
+                  }}</small>
                 </div>
 
+                <div class="mb-3 col-md-2">
+                  <label class="form-label">End Miles</label>
+                  <input
+                    type="number"
+                    v-model="endMiles"
+                    class="form-control form-control-sm border border-primary"
+                  />
+                  <small v-if="errors.endMiles_er" class="text-danger">{{
+                    errors.endMiles_er
+                  }}</small>
+                </div>
 
-			  </div>
+                <div class="mb-3 col-md-2">
+                  <label class="form-label">Fuel (cng)</label>
+                  <input
+                    type="number"
+                    v-model="fuel"
+                    class="form-control form-control-sm border border-primary"
+                  />
+                  <small v-if="errors.fuel_er" class="text-danger">{{
+                    errors.fuel_er
+                  }}</small>
+                </div>
+              </div>
 
-              <button type="submit" class="btn btn-primary">Save CoverSheet</button>
+              <div class="row">
+                <div class="mb-3 col-md-12">
+                  <label class="form-label">Notes</label>
+                  <textarea
+                    v-model="notes"
+                    class="form-control border border-primary"
+                  ></textarea>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                Save CoverSheet
+              </button>
             </form>
           </div>
         </div>
@@ -394,6 +491,70 @@ const convertToDate = (timeString) => {
     </div>
 
     <!-- Row ends -->
+    <!-- Formulario Spare Truck Info -->
+
+    <div class="col-lg-12">
+      <div class="card">
+
+        <div class="card-body">
+          <div class="basic-form">
+
+            <form @submit="onSubmit2" autocomplete="off">
+              <div class="row">
+
+                <div class="accordion accordion-primary-solid" id="accordion-two">
+								  <div class="accordion-item">
+									<h2 class="accordion-header">
+									  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseOne">
+										Spare Truck Info
+									  </button>
+									</h2>
+									<div id="bordered_collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordion-two">
+									  <div class="accordion-body">
+										Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+									  </div>
+									</div>
+								  </div>
+								  <div class="accordion-item">
+									<h2 class="accordion-header">
+									  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseTwo">
+										Downtime
+									  </button>
+									</h2>
+									<div id="bordered_collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
+									  <div class="accordion-body">
+										 Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+									  </div>
+									</div>
+								  </div>
+								  <div class="accordion-item">
+									<h2 class="accordion-header">
+									  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
+										Load
+									  </button>
+									</h2>
+									<div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
+									  <div class="accordion-body">
+											Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+										
+									  </div>
+									</div>
+								  </div>
+								</div>
+    
+              </div>
+
+
+              <button type="submit" class="btn btn-primary">
+                Save CoverSheet
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 </template>
 

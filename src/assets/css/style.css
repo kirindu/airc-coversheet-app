@@ -13283,7 +13283,7 @@ i[class*=flaticon-] {
 }
 
 .footer {
-  padding-left: var(--dz-sidebar-width);
+  /* padding-left: var(--dz-sidebar-width); */
   background-color: var(--card);
   font-size: 0.875rem;
 }

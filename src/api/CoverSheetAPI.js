@@ -14,6 +14,14 @@ export default {
 
   },
 
+  async edit(idCoverSheet, values) {
+
+    const data = await api.put('/coversheets/' + idCoverSheet, values);
+    return data;
+
+  },
+
+
   // async add(values) {
 
   //   const currentUser = localStorage.getItem('USER') || '';
