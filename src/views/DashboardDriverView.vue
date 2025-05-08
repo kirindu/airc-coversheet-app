@@ -7,7 +7,6 @@ import "vue-select/dist/vue-select.css";
 import VueTimepicker from "vue3-timepicker";
 import "vue3-timepicker/dist/VueTimepicker.css";
 
-
 // Importamos el api
 import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 import SpareTruckInfoAPI from "@/api/SpareTruckInfoAPI";
@@ -51,7 +50,6 @@ if (storedUser) {
 
 //
 
-
 // General Info
 const selectedRoute = ref("");
 const selectedTruck = ref("");
@@ -64,9 +62,7 @@ const endMiles = ref("");
 const fuel = ref("");
 const notes = ref("");
 
-
 const formSubmitted = ref(false);
-
 
 const errors = ref({
   route_er: "",
@@ -100,8 +96,6 @@ const errorsSpareTruckInfo = ref({
   endMilesSpareTruckInfo_er: "",
   fuelSpareTruckInfo_er: "",
 });
-
-
 
 const currentDate = ref(
   new Date().toLocaleDateString("en-US", {
@@ -140,19 +134,35 @@ const onSubmit = async (event) => {
     hasError = true;
   }
 
-  if (!timeClockIn.value || timeClockIn.value.includes("mm") || timeClockIn.value.includes("HH")) {
+  if (
+    !timeClockIn.value ||
+    timeClockIn.value.includes("mm") ||
+    timeClockIn.value.includes("HH")
+  ) {
     errors.value.clockIn_er = "Required field";
     hasError = true;
   }
-  if (!timeLeaveYard.value || timeLeaveYard.value.includes("mm") || timeLeaveYard.value.includes("HH")) {
+  if (
+    !timeLeaveYard.value ||
+    timeLeaveYard.value.includes("mm") ||
+    timeLeaveYard.value.includes("HH")
+  ) {
     errors.value.leaveYard_er = "Required field";
     hasError = true;
   }
-  if (!timeBackInYard.value || timeBackInYard.value.includes("mm") || timeBackInYard.value.includes("HH")) {
+  if (
+    !timeBackInYard.value ||
+    timeBackInYard.value.includes("mm") ||
+    timeBackInYard.value.includes("HH")
+  ) {
     errors.value.backInYard_er = "Required field";
     hasError = true;
   }
-  if (!timeClockOut.value || timeClockOut.value.includes("mm") || timeClockOut.value.includes("HH")) {
+  if (
+    !timeClockOut.value ||
+    timeClockOut.value.includes("mm") ||
+    timeClockOut.value.includes("HH")
+  ) {
     errors.value.clockOut_er = "Required field";
     hasError = true;
   }
@@ -260,7 +270,8 @@ const onSubmitSpareTruckInfo = async (event) => {
     return;
   }
 
-  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let coversheet_id =
+    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
   const spareTruckInfo = {
     spareTruckNumber: spareTruckSpareTruckInfo.value,
@@ -278,7 +289,7 @@ const onSubmitSpareTruckInfo = async (event) => {
     const response = await SpareTruckInfoAPI.add(spareTruckInfo);
 
     if (response.data.ok) {
-    //  localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
+      //  localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
 
       showSweetAlert({
         title: "Spare Truck Info saved successfully!",
@@ -302,8 +313,6 @@ const onSubmitSpareTruckInfo = async (event) => {
         return;
       });
     }
-
-
   } catch (error) {
     showSweetAlert({
       title: "Error saving Spare Truck Info!",
@@ -317,7 +326,6 @@ const onSubmitSpareTruckInfo = async (event) => {
     });
   }
 };
-
 
 // Reset form after successful submission
 const resetForm = () => {
@@ -346,7 +354,8 @@ onMounted(() => {
   //borramos todos los datos del localstorage
 
   let udser_id = user.value.id;
-  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let coversheet_id =
+    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
   if (udser_id !== coversheet_id) {
     localStorage.removeItem("COVERSHEET");
@@ -438,7 +447,6 @@ const convertToDate = (timeString) => {
         <div class="card-body">
           <div class="basic-form">
             <form @submit="onSubmit" autocomplete="off">
-
               <div class="row">
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Route #</label>
@@ -490,7 +498,7 @@ const convertToDate = (timeString) => {
                   <div class="mt-0">
                     <VueTimepicker
                       id="time-picker-clock-in"
-                      v-model="timeClockIn"  
+                      v-model="timeClockIn"
                     />
                   </div>
                   <small v-if="errors.clockIn_er" class="text-danger">{{
@@ -606,128 +614,263 @@ const convertToDate = (timeString) => {
 
     <div class="col-lg-12">
       <div class="card">
-
         <div class="card-body">
           <div class="basic-form">
-
             <form @submit="onSubmitSpareTruckInfo" autocomplete="off">
-
               <div class="row">
-
-                <div class="accordion accordion-primary-solid" id="accordion-two">
-								  <div class="accordion-item">
-									<h2 class="accordion-header">
-									  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseOne">
-										Spare Truck Info
-									  </button>
-									</h2>
-									<div id="bordered_collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordion-two">
-									  <div class="accordion-body">
-
-
-                      <div class="row">
-                <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-clock-in"
-                    >Leave Yard</label
-                  >
-                  <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-clock-in"
-                      v-model="timeLeaveYardSpareTruckInfo"  
-                    />
-                  </div>
-                </div>
-
-                <!-- <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-leave-yard"
-                    >Leave Yard</label
-                  >
-                  <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-leave-yard"
-                      v-model="timeLeaveYard"
-                    />
-                  </div>
-                  <small v-if="errors.leaveYard_er" class="text-danger">{{
-                    errors.leaveYard_er
-                  }}</small>
-                </div>
-
-                <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-back-in-yard"
-                    >Back In Yard</label
-                  >
-                  <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-back-in-yard"
-                      v-model="timeBackInYard"
-                    />
-                  </div>
-                  <small v-if="errors.backInYard_er" class="text-danger">{{
-                    errors.backInYard_er
-                  }}</small>
-                </div>
-
-                <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-clock-out"
-                    >Clock Out</label
-                  >
-                  <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-clock-out"
-                      v-model="timeClockOut"
-                    />
-                  </div>
-                  <small v-if="errors.clockOut_er" class="text-danger">{{
-                    errors.clockOut_er
-                  }}</small>
-                </div> -->
-
-              </div>
+                <div
+                  class="accordion accordion-primary-solid"
+                  id="accordion-two"
+                >
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#bordered_collapseOne"
+                      >
+                        Spare Truck Info
+                      </button>
+                    </h2>
+                    <div
+                      id="bordered_collapseOne"
+                      class="accordion-collapse collapse show"
+                      data-bs-parent="#accordion-two"
+                    >
+                      <div class="accordion-body">
 
 
+                        <div class="row">
+                          <div class="mb-3 col-md-1">
+                            <label class="form-label">Spare Truck # </label>
+                            <input
+                              type="text"
+                              v-model="spareTruckSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary"
+                            />
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Route #</label>
+                            <v-select
+                              :options="storeRoute.routes"
+                              v-model="selectedRouteSpareTruckInfo"
+                              placeholder="Choose your Route"
+                              :reduce="(route) => route.id"
+                              label="routeNumber"
+                              class="form-control p-0"
+                              :class="{
+                                'is-invalid': formSubmitted && !selectedRoute,
+                              }"
+                            />
+                          </div>
+
+                          <div class="mb-3 col-md-1">
+                            <label class="form-label">Start Miles</label>
+                            <input
+                              type="number"
+                              v-model="startMilesSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary"
+                            />
+                          </div>
+
+                          <div class="mb-3 col-md-1">
+                            <label class="form-label">End Miles</label>
+                            <input
+                              type="number"
+                              v-model="endMilesSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary"
+                            />
+                          </div>
+
+                          <div class="mb-3 col-md-1">
+                            <label class="form-label">Fuel</label>
+                            <input
+                              type="number"
+                              v-model="fuelSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary"
+                            />
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label" for="time-picker-leave-yard-sti"
+                              >Leave Yard</label
+                            >
+                            <div class="mt-0">
+                              <VueTimepicker
+                                id="time-picker-leave-yard-sti"
+                                v-model="timeLeaveYardSpareTruckInfo"
+                              />
+                            </div>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label" for="time-picker-black-in-yard-sti"
+                              >Back In Yard</label
+                            >
+                            <div class="mt-0">
+                              <VueTimepicker
+                                id="time-picker-black-in-yard-sti"
+                                v-model="timeBackInYardSpareTruckInfo"
+                              />
+                            </div>
+                          </div>
+
+                          <div class="mb-4 col-md-2 align-self-end">
+                            <button
+                              type="button"
+                              class="btn btn-rounded btn-info"
+                            >
+                              <span class="btn-icon-start text-info"
+                                ><i class="fa fa-plus color-info"></i> </span
+                              >Add
+                            </button>
+                          </div>
+                        </div>
+
+<div class="row"> 
+
+<hr style="color: black;">
+
+  <div class="table-responsive">
+                                    <table class="table table-responsive-md">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:50px;">
+													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
+														<input type="checkbox" class="form-check-input" id="checkAll" required="">
+														<label class="form-check-label" for="checkAll"></label>
+													</div>
+												</th>
+                                                <th>Roll No.</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Date</th>
+                                                <th>Status</th>
+												<th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
+														<input type="checkbox" class="form-check-input" id="customCheckBox2" required="">
+														<label class="form-check-label" for="customCheckBox2"></label>
+													</div>
+												</td>
+                                                <td><strong>542</strong></td>
+                                                <td><div class="d-flex align-items-center"><img src="/src/assets/images/1.jpg" class="rounded-lg me-2" width="24" alt=""> <span class="w-space-no">Jackson</span></div></td>
+                                                <td>example@example.com	</td>
+                                                <td>01 August 2020</td>
+                                                <td><div class="d-flex align-items-center"><i class="fa fa-circle text-success me-1"></i> Successful</div></td>
+                                                <td>
+													<div>
+														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+														<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+													</div>
+												</td>
+                                            </tr>
+											<tr>
+                                                <td>
+													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
+														<input type="checkbox" class="form-check-input" id="customCheckBox3" required="">
+														<label class="form-check-label" for="customCheckBox3"></label>
+													</div>
+												</td>
+                                                <td><strong>542</strong></td>
+                                                <td><div class="d-flex align-items-center"><img src="/src/assets/images/1.jpg" class="rounded-lg me-2" width="24" alt=""> <span class="w-space-no">Jackson</span></div></td>
+                                                <td>example@example.com	</td>
+                                                <td>01 August 2020</td>
+                                                <td><div class="d-flex align-items-center"><i class="fa fa-circle text-danger me-1"></i> Canceled</div></td>
+                                                <td>
+													<div>
+														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+														<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+													</div>
+												</td>
+                                            </tr>
+											<tr>
+                                                <td>
+													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
+														<input type="checkbox" class="form-check-input" id="customCheckBox4" required="">
+														<label class="form-check-label" for="customCheckBox4"></label>
+													</div>
+												</td>
+                                                <td><strong>542</strong></td>
+                                                <td><div class="d-flex align-items-center"><img src="/src/assets/images/1.jpg" class="rounded-lg me-2" width="24" alt=""> <span class="w-space-no">Jackson</span></div></td>
+                                                <td>example@example.com	</td>
+                                                <td>01 August 2020</td>
+                                                <td><div class="d-flex align-items-center"><i class="fa fa-circle text-warning me-1"></i> Pending</div></td>
+                                                <td>
+													<div>
+														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+														<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+													</div>
+												</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
 
 
+</div>
 
 
-
-                    
-                    
-                    
-                    
+                      </div>
                     </div>
-									</div>
-								  </div>
-								  <div class="accordion-item">
-									<h2 class="accordion-header">
-									  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseTwo">
-										Downtime
-									  </button>
-									</h2>
-									<div id="bordered_collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
-									  <div class="accordion-body">
-										 Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-									  </div>
-									</div>
-								  </div>
-								  <div class="accordion-item">
-									<h2 class="accordion-header">
-									  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
-										Load
-									  </button>
-									</h2>
-									<div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
-									  <div class="accordion-body">
-											Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-										
-									  </div>
-									</div>
-								  </div>
-								</div>
-    
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#bordered_collapseTwo"
+                      >
+                        Downtime
+                      </button>
+                    </h2>
+                    <div
+                      id="bordered_collapseTwo"
+                      class="accordion-collapse collapse"
+                      data-bs-parent="#accordion-two"
+                    >
+                      <div class="accordion-body">
+                        Anim pariatur cliche reprehenderit, enim eiusmod high
+                        life accusamus terry richardson ad squid. 3 wolf moon
+                        officia aute, non cupidatat skateboard dolor brunch.
+                        Food truck quinoa nesciunt laborum eiusmod.
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#bordered_collapseThree"
+                      >
+                        Load
+                      </button>
+                    </h2>
+                    <div
+                      id="bordered_collapseThree"
+                      class="accordion-collapse collapse"
+                      data-bs-parent="#accordion-two"
+                    >
+                      <div class="accordion-body">
+                        Anim pariatur cliche reprehenderit, enim eiusmod high
+                        life accusamus terry richardson ad squid. 3 wolf moon
+                        officia aute, non cupidatat skateboard dolor brunch.
+                        Food truck quinoa nesciunt laborum eiusmod.
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-
 
               <button type="submit" class="btn btn-primary">
                 Save CoverSheet
@@ -737,8 +880,6 @@ const convertToDate = (timeString) => {
         </div>
       </div>
     </div>
-
-
   </div>
 </template>
 
