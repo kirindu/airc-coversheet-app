@@ -17,7 +17,7 @@ const router = createRouter({
       path: '/',
       name: 'general',
       component: DefaultDriverLayout,
-      redirect: '/',
+      redirect: '/auth/login',
       meta: {requiresAuth: true},
       children: [
         {
@@ -66,6 +66,48 @@ const router = createRouter({
   ]
 
 })
+
+
+router.beforeEach((to, from, next) => {
+  const userRaw = localStorage.getItem('USER');
+  const requiresAuth = to.matched.some(route => route.meta.requiresAuth);
+
+  if (requiresAuth && !userRaw) {
+    return next({ name: 'login' });
+  }
+
+  if (userRaw) {
+    let user;
+    try {
+      user = JSON.parse(userRaw);
+    } catch (e) {
+      localStorage.removeItem('USER');
+      return next({ name: 'login' });
+    }
+
+    let role =''
+
+    if(user.data.rol) {
+      role = user.data.rol;
+    } else {
+      role = user.data.user.rol;
+    }
+
+    // Redirección inteligente si accede al root o rutas incorrectas
+    if (to.name === 'general' || to.path === '/') {
+      if (role === 'Admin' && to.name !== 'dashboard-admin') {
+        return next({ name: 'dashboard-admin' });
+      } else if (role === 'Driver' && to.name !== 'dashboard') {
+        return next({ name: 'dashboard' });
+      }
+    }
+  }
+
+  return next();
+});
+
+
+
 
 // router.beforeEach(async (to, from, next) => { // En cada cambio de paginas que requieren autencicaion , checara el user sino, lo manda al login
 
