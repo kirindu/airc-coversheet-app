@@ -48,7 +48,9 @@ if (storedUser) {
   }
 }
 
-//
+// Modo de edición de la informaciongeneral para el coversheet
+
+const isEditMode = ref(false);
 
 // General Info
 const selectedRoute = ref("");
@@ -199,40 +201,88 @@ const onSubmit = async (event) => {
   };
 
   try {
-    // Call the API to save the coversheet
+
+    if (!isEditMode.value) {
+
+          // Call the API to save the coversheet
     const response = await CoverSheetAPI.add(coverSheetData);
 
-    if (response.data.ok) {
-      localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
+if (response.data.ok) {
+  localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
 
-      showSweetAlert({
-        title: "General information saved successfully!",
-        icon: "success",
-        showDenyButton: false,
-        showCancelButton: false,
-        confirmButtonText: "Ok",
-        allowOutsideClick: false,
-      }).then(() => {
-        return;
-      });
+  const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+  selectedRouteSpareTruckInfo.value = coversheet.route_id;
+
+  isEditMode.value = true;
+
+  showSweetAlert({
+    title: "General information saved successfully!",
+    icon: "success",
+    showDenyButton: false,
+    showCancelButton: false,
+    confirmButtonText: "Ok",
+    allowOutsideClick: false,
+  }).then(() => {
+    return;
+  });
+} else {
+  showSweetAlert({
+    title: "Error saving General Information!",
+    icon: "warning",
+    showDenyButton: false,
+    showCancelButton: false,
+    confirmButtonText: "Ok",
+    allowOutsideClick: false,
+  }).then(() => {
+    return;
+  });
+}
+
+
     } else {
-      showSweetAlert({
-        title: "Error saving General Information!",
-        icon: "warning",
-        showDenyButton: false,
-        showCancelButton: false,
-        confirmButtonText: "Ok",
-        allowOutsideClick: false,
-      }).then(() => {
-        return;
-      });
+          // Call the API to edit the coversheet
+    let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+    const response = await CoverSheetAPI.edit(coversheet_id,coverSheetData);
+
+if (response.data.ok) {
+  localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
+
+  const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+  selectedRouteSpareTruckInfo.value = coversheet.route_id;
+
+  showSweetAlert({
+    title: "General information edited successfully!",
+    icon: "success",
+    showDenyButton: false,
+    showCancelButton: false,
+    confirmButtonText: "Ok",
+    allowOutsideClick: false,
+  }).then(() => {
+    return;
+  });
+} else {
+  showSweetAlert({
+    title: "Error editing General Information!",
+    icon: "warning",
+    showDenyButton: false,
+    showCancelButton: false,
+    confirmButtonText: "Ok",
+    allowOutsideClick: false,
+  }).then(() => {
+    return;
+  });
+}
+
     }
+
+
+
 
     // Optionally reset the form
     //  resetForm();
   } catch (error) {
     showSweetAlert({
-      title: "Error saving General Information!",
+      title: "Error editing General Information!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
@@ -245,9 +295,9 @@ const onSubmit = async (event) => {
 };
 
 // Handle form submission Sapre Truck Info
-const onSubmitSpareTruckInfo = async (event) => {
+const HandleSpareTruckInfo = async (event) => {
   event.preventDefault();
-  formSubmittedSpareTruckInfo.value = true;
+
 
   // Limpiar errores anteriores
   errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "";
@@ -262,20 +312,50 @@ const onSubmitSpareTruckInfo = async (event) => {
   let hasError = false;
 
   if (!spareTruckSpareTruckInfo.value) {
-    errors.value.spareTruckSpareTruckInfo_er = "Required field";
+    errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "Required field";
     hasError = true;
   }
+
+  if (!selectedRouteSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.routeSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+  
+  if (!startMilesSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.startMilesSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if( !endMilesSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.endMilesSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if(!fuelSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.fuelSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if(!timeLeaveYardSpareTruckInfo.value || timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH")) {
+    errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if(!timeBackInYardSpareTruckInfo.value || timeBackInYardSpareTruckInfo.value.includes("mm") || timeBackInYardSpareTruckInfo.value.includes("HH")) {
+    errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
 
   if (hasError) {
     return;
   }
 
-  let coversheet_id =
-    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
   const spareTruckInfo = {
     spareTruckNumber: spareTruckSpareTruckInfo.value,
-    routeNumber: selectedRouteSpareTruckInfo.value,
+    route_id: selectedRouteSpareTruckInfo.value,
     leaveYard: timeLeaveYardSpareTruckInfo.value,
     backInYard: timeBackInYardSpareTruckInfo.value,
     startMiles: startMilesSpareTruckInfo.value,
@@ -283,6 +363,7 @@ const onSubmitSpareTruckInfo = async (event) => {
     fuel: fuelSpareTruckInfo.value,
     coversheet_id: coversheet_id,
   };
+
 
   try {
     // Call the API to save the Spare Truck Info
@@ -354,10 +435,9 @@ onMounted(() => {
   //borramos todos los datos del localstorage
 
   let udser_id = user.value.id;
-  let coversheet_id =
-    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
-  if (udser_id !== coversheet_id) {
+  if (udser_id !== coversheet_driver_id) {
     localStorage.removeItem("COVERSHEET");
   } else {
     const date = new Date(JSON.parse(localStorage.getItem("COVERSHEET")).date);
@@ -369,6 +449,9 @@ onMounted(() => {
     ) {
       localStorage.removeItem("COVERSHEET");
     } else {
+
+      isEditMode.value = true;
+      
       const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
       timeClockIn.value = coversheet.clockIn;
       timeLeaveYard.value = coversheet.leaveYard;
@@ -380,6 +463,10 @@ onMounted(() => {
       notes.value = coversheet.notes;
       selectedRoute.value = coversheet.route_id;
       selectedTruck.value = coversheet.truck_id;
+
+      // Cargamos la ruta en el spare truck info
+
+      selectedRouteSpareTruckInfo.value = coversheet.route_id;
     }
   }
 
@@ -459,9 +546,7 @@ const convertToDate = (timeString) => {
                     class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                   />
-                  <small v-if="errors.route_er" class="text-danger">{{
-                    errors.route_er
-                  }}</small>
+                  <small v-if="errors.route_er" class="text-danger">{{errors.route_er}}</small>
                 </div>
 
                 <div class="mb-3 col-md-4">
@@ -601,7 +686,7 @@ const convertToDate = (timeString) => {
               </div>
 
               <button type="submit" class="btn btn-primary">
-                Save CoverSheet
+                {{ isEditMode ? 'Update CoverSheet' : 'Save CoverSheet' }}
               </button>
             </form>
           </div>
@@ -616,7 +701,7 @@ const convertToDate = (timeString) => {
       <div class="card">
         <div class="card-body">
           <div class="basic-form">
-            <form @submit="onSubmitSpareTruckInfo" autocomplete="off">
+            <form autocomplete="off">
               <div class="row">
                 <div
                   class="accordion accordion-primary-solid"
@@ -643,12 +728,13 @@ const convertToDate = (timeString) => {
 
                         <div class="row">
                           <div class="mb-3 col-md-1">
-                            <label class="form-label">Spare Truck # </label>
+                            <label class="form-label">Spare # </label>
                             <input
                               type="text"
                               v-model="spareTruckSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
+                            <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.spareTruckSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -664,6 +750,7 @@ const convertToDate = (timeString) => {
                                 'is-invalid': formSubmitted && !selectedRoute,
                               }"
                             />
+                            <small v-if="errorsSpareTruckInfo.routeSpareTruckInfo_er " class="text-danger">{{errorsSpareTruckInfo.routeSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-1">
@@ -673,6 +760,7 @@ const convertToDate = (timeString) => {
                               v-model="startMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
+                            <small v-if="errorsSpareTruckInfo.startMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.startMilesSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-1">
@@ -682,6 +770,7 @@ const convertToDate = (timeString) => {
                               v-model="endMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
+                            <small v-if="errorsSpareTruckInfo.endMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.endMilesSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-1">
@@ -691,6 +780,7 @@ const convertToDate = (timeString) => {
                               v-model="fuelSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
+                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.fuelSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -703,6 +793,7 @@ const convertToDate = (timeString) => {
                                 v-model="timeLeaveYardSpareTruckInfo"
                               />
                             </div>
+                            <small v-if="errorsSpareTruckInfo.leaveYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.leaveYardSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -711,14 +802,16 @@ const convertToDate = (timeString) => {
                             >
                             <div class="mt-0">
                               <VueTimepicker
-                                id="time-picker-black-in-yard-sti"
+                                id="time-picker-black-in-yard-sti"s
                                 v-model="timeBackInYardSpareTruckInfo"
-                              />
+                              />   
                             </div>
+                            <small v-if="errorsSpareTruckInfo.backInYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.backInYardSpareTruckInfo_er}}</small>
                           </div>
 
                           <div class="mb-4 col-md-2 align-self-end">
                             <button
+                            @click="HandleSpareTruckInfo"
                               type="button"
                               class="btn btn-rounded btn-info"
                             >
@@ -738,32 +831,30 @@ const convertToDate = (timeString) => {
                                         <thead>
                                             <tr>
                                                 <th style="width:50px;">
-													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
-														<input type="checkbox" class="form-check-input" id="checkAll" required="">
-														<label class="form-check-label" for="checkAll"></label>
-													</div>
+								
 												</th>
-                                                <th>Roll No.</th>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-												<th>Action</th>
+                                                <th>Spare #.</th>
+                                                <th>Route #</th>
+                                                <th>Start Miles</th>
+                                                <th>End Miles</th>
+                                                <th>Fuel</th>
+                                                <th>Leave Yard</th>
+                                                <th>Back in Yard</th>
+												                        <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
                                                 <td>
-													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
-														<input type="checkbox" class="form-check-input" id="customCheckBox2" required="">
-														<label class="form-check-label" for="customCheckBox2"></label>
-													</div>
+										
 												</td>
-                                                <td><strong>542</strong></td>
-                                                <td><div class="d-flex align-items-center"><img src="/src/assets/images/1.jpg" class="rounded-lg me-2" width="24" alt=""> <span class="w-space-no">Jackson</span></div></td>
-                                                <td>example@example.com	</td>
-                                                <td>01 August 2020</td>
-                                                <td><div class="d-flex align-items-center"><i class="fa fa-circle text-success me-1"></i> Successful</div></td>
+                                                <td class="td">542</td>
+                                                <td class="td">390	</td>                                                
+                                                <td class="td">390	</td>      
+                                                <td class="td">390	</td>  
+                                                <td class="td">390	</td>
+                                                <td class="td">390	</td>     
+                                                <td class="td">390	</td>    
                                                 <td>
 													<div>
 														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
@@ -771,44 +862,9 @@ const convertToDate = (timeString) => {
 													</div>
 												</td>
                                             </tr>
-											<tr>
-                                                <td>
-													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
-														<input type="checkbox" class="form-check-input" id="customCheckBox3" required="">
-														<label class="form-check-label" for="customCheckBox3"></label>
-													</div>
-												</td>
-                                                <td><strong>542</strong></td>
-                                                <td><div class="d-flex align-items-center"><img src="/src/assets/images/1.jpg" class="rounded-lg me-2" width="24" alt=""> <span class="w-space-no">Jackson</span></div></td>
-                                                <td>example@example.com	</td>
-                                                <td>01 August 2020</td>
-                                                <td><div class="d-flex align-items-center"><i class="fa fa-circle text-danger me-1"></i> Canceled</div></td>
-                                                <td>
-													<div>
-														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
-														<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
-													</div>
-												</td>
-                                            </tr>
-											<tr>
-                                                <td>
-													<div class="form-check custom-checkbox checkbox-primary check-lg me-3">
-														<input type="checkbox" class="form-check-input" id="customCheckBox4" required="">
-														<label class="form-check-label" for="customCheckBox4"></label>
-													</div>
-												</td>
-                                                <td><strong>542</strong></td>
-                                                <td><div class="d-flex align-items-center"><img src="/src/assets/images/1.jpg" class="rounded-lg me-2" width="24" alt=""> <span class="w-space-no">Jackson</span></div></td>
-                                                <td>example@example.com	</td>
-                                                <td>01 August 2020</td>
-                                                <td><div class="d-flex align-items-center"><i class="fa fa-circle text-warning me-1"></i> Pending</div></td>
-                                                <td>
-													<div>
-														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
-														<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
-													</div>
-												</td>
-                                            </tr>
+											
+                      
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -921,5 +977,9 @@ const convertToDate = (timeString) => {
 .text-danger {
   color: red;
   font-size: 0.75rem; /* letras pequeñas */
+}
+
+.td {
+  color:black;
 }
 </style>
