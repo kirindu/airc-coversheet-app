@@ -382,6 +382,13 @@ const HandleSpareTruckInfo = async (event) => {
       }).then(() => {
         return;
       });
+
+      // Crear la logica para que la tabla muestyre los datos de la spare truck info
+
+
+
+
+
     } else {
       showSweetAlert({
         title: "Error saving Spare Truck Info!",
@@ -435,6 +442,12 @@ onMounted(() => {
   //borramos todos los datos del localstorage
 
   let udser_id = user.value.id;
+
+  // Chekamos antes de todo si hay un coversheet en el localstorage
+  // let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+  //
+
+
   let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
   if (udser_id !== coversheet_driver_id) {
@@ -467,6 +480,10 @@ onMounted(() => {
       // Cargamos la ruta en el spare truck info
 
       selectedRouteSpareTruckInfo.value = coversheet.route_id;
+
+      // Cargamos los datos de la spare truck info si existen
+
+
     }
   }
 

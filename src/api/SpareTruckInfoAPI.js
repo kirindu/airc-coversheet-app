@@ -5,6 +5,10 @@ export default {
  async all() {
     return api.get("/sparetruckinfo/");
   },
+
+  async getByID(id) {
+    return api.get("/sparetruckinfo/" + id);
+  },
   
   async add(values) {
 
