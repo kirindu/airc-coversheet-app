@@ -30,6 +30,25 @@ import { useDriversStore } from "@/stores/drivers.js";
 const storeDriver = useDriversStore();
 
 const user = ref(null);
+const spareTruckList = ref([]);
+
+
+
+const isEditing = ref(false) // para saber si estamos editando en el boton del spare truck info
+const selectedSpareTruckId = ref(null) // para saber que id de spare truck info estamos editando
+
+const spareTruckSelected = ref({
+  spareTruckNumber: '',
+  route_id: '',
+  routeNumber: '',
+  leaveYard: '',
+  backInYard: '',
+  startMiles: '',
+  bacendMileskInYard: '',
+  fuel: '',
+})
+
+
 
 // Recuperamos el usuario
 const storedUser = localStorage.getItem("USER");
@@ -136,50 +155,40 @@ const onSubmit = async (event) => {
     hasError = true;
   }
 
-  if (
-    !timeClockIn.value ||
-    timeClockIn.value.includes("mm") ||
-    timeClockIn.value.includes("HH")
-  ) {
+  if (!timeClockIn.value || timeClockIn.value.includes("mm") || timeClockIn.value.includes("HH")) {
     errors.value.clockIn_er = "Required field";
     hasError = true;
   }
-  if (
-    !timeLeaveYard.value ||
-    timeLeaveYard.value.includes("mm") ||
-    timeLeaveYard.value.includes("HH")
-  ) {
-    errors.value.leaveYard_er = "Required field";
+
+  if (timeLeaveYard.value && (timeLeaveYard.value.includes("mm") || timeLeaveYard.value.includes("HH"))) {
+    errors.value.leaveYard_er = "Wrong format";
     hasError = true;
   }
-  if (
-    !timeBackInYard.value ||
-    timeBackInYard.value.includes("mm") ||
-    timeBackInYard.value.includes("HH")
-  ) {
-    errors.value.backInYard_er = "Required field";
+
+  if (timeBackInYard.value && (timeBackInYard.value.includes("mm") || timeBackInYard.value.includes("HH"))) {
+    errors.value.backInYard_er = "Wrong format";
     hasError = true;
   }
-  if (
-    !timeClockOut.value ||
-    timeClockOut.value.includes("mm") ||
-    timeClockOut.value.includes("HH")
-  ) {
-    errors.value.clockOut_er = "Required field";
+
+  if (timeClockOut.value && (timeClockOut.value.includes("mm") || timeClockOut.value.includes("HH"))) {
+    errors.value.clockOut_er = "Wrong format";
     hasError = true;
   }
-  if (!startMiles.value) {
-    errors.value.startMiles_er = "Required field";
-    hasError = true;
-  }
-  if (!endMiles.value) {
-    errors.value.endMiles_er = "Required field";
-    hasError = true;
-  }
-  if (!fuel.value) {
-    errors.value.fuel_er = "Required field";
-    hasError = true;
-  }
+
+  // if (!startMiles.value) {
+  //   errors.value.startMiles_er = "Required field";
+  //   hasError = true;
+  // }
+
+  // if (!endMiles.value) {
+  //   errors.value.endMiles_er = "Required field";
+  //   hasError = true;
+  // }
+  
+  // if (!fuel.value) {
+  //   errors.value.fuel_er = "Required field";
+  //   hasError = true;
+  // }
 
   if (hasError) {
     return;
@@ -187,12 +196,14 @@ const onSubmit = async (event) => {
 
   const coverSheetData = {
     clockIn: timeClockIn.value,
-    leaveYard: timeLeaveYard.value,
-    backInYard: timeBackInYard.value,
-    clockOut: timeClockOut.value,
-    startMiles: startMiles.value,
-    endMiles: endMiles.value,
-    fuel: fuel.value,
+
+    leaveYard: timeLeaveYard.value || '',
+    backInYard: timeBackInYard.value || '',
+    clockOut: timeClockOut.value || '',
+    startMiles: startMiles.value.toString() || '',
+    endMiles: endMiles.value.toString() || '',
+    fuel: fuel.value.toString() || '',
+
     truck_id: selectedTruck.value,
     route_id: selectedRoute.value,
     driver_id: user.value.id,
@@ -326,23 +337,23 @@ const HandleSpareTruckInfo = async (event) => {
     hasError = true;
   }
 
-  if( !endMilesSpareTruckInfo.value) {
-    errorsSpareTruckInfo.value.endMilesSpareTruckInfo_er = "Required field";
+  // if( !endMilesSpareTruckInfo.value) {
+  //   errorsSpareTruckInfo.value.endMilesSpareTruckInfo_er = "Required field";
+  //   hasError = true;
+  // }
+
+  // if(!fuelSpareTruckInfo.value) {
+  //   errorsSpareTruckInfo.value.fuelSpareTruckInfo_er = "Required field";
+  //   hasError = true;
+  // }
+
+  if(timeLeaveYardSpareTruckInfo.value && (timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH"))) {
+    errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Wrong format";
     hasError = true;
   }
 
-  if(!fuelSpareTruckInfo.value) {
-    errorsSpareTruckInfo.value.fuelSpareTruckInfo_er = "Required field";
-    hasError = true;
-  }
-
-  if(!timeLeaveYardSpareTruckInfo.value || timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH")) {
-    errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Required field";
-    hasError = true;
-  }
-
-  if(!timeBackInYardSpareTruckInfo.value || timeBackInYardSpareTruckInfo.value.includes("mm") || timeBackInYardSpareTruckInfo.value.includes("HH")) {
-    errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "Required field";
+  if(timeBackInYardSpareTruckInfo.value && (timeBackInYardSpareTruckInfo.value.includes("mm") || timeBackInYardSpareTruckInfo.value.includes("HH"))) {
+    errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "Wrong format";
     hasError = true;
   }
 
@@ -356,13 +367,26 @@ const HandleSpareTruckInfo = async (event) => {
   const spareTruckInfo = {
     spareTruckNumber: spareTruckSpareTruckInfo.value,
     route_id: selectedRouteSpareTruckInfo.value,
-    leaveYard: timeLeaveYardSpareTruckInfo.value,
-    backInYard: timeBackInYardSpareTruckInfo.value,
-    startMiles: startMilesSpareTruckInfo.value,
-    endMiles: endMilesSpareTruckInfo.value,
-    fuel: fuelSpareTruckInfo.value,
+    leaveYard: timeLeaveYardSpareTruckInfo.value || '',
+    backInYard: timeBackInYardSpareTruckInfo.value || '',
+    startMiles: startMilesSpareTruckInfo.value.toString() || '',
+    endMiles: endMilesSpareTruckInfo.value.toString() || '',
+    fuel: fuelSpareTruckInfo.value.toString() || '',
     coversheet_id: coversheet_id,
   };
+
+
+
+  const resetSpareTruckInfo = () => {
+    spareTruckSpareTruckInfo.value = "";
+
+    timeLeaveYardSpareTruckInfo.value = "";
+
+    timeBackInYardSpareTruckInfo.value = "";
+    startMilesSpareTruckInfo.value = "";
+    endMilesSpareTruckInfo.value = "";
+    fuelSpareTruckInfo.value = "";
+};
 
 
   try {
@@ -380,6 +404,9 @@ const HandleSpareTruckInfo = async (event) => {
         confirmButtonText: "Ok",
         allowOutsideClick: false,
       }).then(() => {
+
+        loadSpareTruckInfo();
+        resetSpareTruckInfo();
         return;
       });
 
@@ -477,11 +504,13 @@ onMounted(() => {
       selectedRoute.value = coversheet.route_id;
       selectedTruck.value = coversheet.truck_id;
 
-      // Cargamos la ruta en el spare truck info
+      // Cargamos la ruta en el spare truck info propveniente de el coversheet
 
       selectedRouteSpareTruckInfo.value = coversheet.route_id;
 
       // Cargamos los datos de la spare truck info si existen
+
+      loadSpareTruckInfo();
 
 
     }
@@ -509,6 +538,26 @@ onMounted(() => {
   //   createdAt: "2025-04-18T19:33:13.043000"
   // };
 });
+
+
+// Metodos
+
+const loadSpareTruckInfo = async () => {
+  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  if (!rawCoverSheet) return;
+
+  const coverSheet = JSON.parse(rawCoverSheet);
+  const coverSheetId = coverSheet?.id || coverSheet?._id;
+
+  if (!coverSheetId) return;
+
+  try {
+    const response = await CoverSheetAPI.getSpareTruckInfo(coverSheetId);
+    spareTruckList.value = response.data.data || []; // depende de tu estructura
+  } catch (error) {
+    console.error("Error al obtener SpareTruckInfo:", error);
+  }
+};
 
 const convertToDate = (timeString) => {
   const [time, modifier] = timeString.split(" ");
@@ -680,7 +729,7 @@ const convertToDate = (timeString) => {
                 </div>
 
                 <div class="mb-3 col-md-2">
-                  <label class="form-label">Fuel (cng)</label>
+                  <label class="form-label">Fuel</label>
                   <input
                     type="number"
                     v-model="fuel"
@@ -844,8 +893,8 @@ const convertToDate = (timeString) => {
 <hr style="color: black;">
 
   <div class="table-responsive">
-                                    <table class="table table-responsive-md">
-                                        <thead>
+                                    <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                                        <thead class="thead-primary">
                                             <tr>
                                                 <th style="width:50px;">
 								
@@ -861,21 +910,21 @@ const convertToDate = (timeString) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
+                                          <tr v-for="(item, index) in spareTruckList" :key="index">
                                                 <td>
 										
 												</td>
-                                                <td class="td">542</td>
-                                                <td class="td">390	</td>                                                
-                                                <td class="td">390	</td>      
-                                                <td class="td">390	</td>  
-                                                <td class="td">390	</td>
-                                                <td class="td">390	</td>     
-                                                <td class="td">390	</td>    
+                                                <td class="td">{{ item.spareTruckNumber }}</td>
+                                                <td class="td">{{ item.routeNumber  }}</td>                                                
+                                                <td class="td">{{ item.startMiles }}</td>      
+                                                <td class="td">{{ item.endMiles }}</td>  
+                                                <td class="td">{{ item.fuel }}</td>
+                                                <td class="td">{{ item.leaveYard }}</td>     
+                                                <td class="td">{{ item.backInYard }}</td>    
                                                 <td>
 													<div>
 														<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
-														<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+														<!-- <a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a> -->
 													</div>
 												</td>
                                             </tr>

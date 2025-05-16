@@ -21,6 +21,13 @@ export default {
 
   },
 
+  async getSpareTruckInfo(idCoverSheet) {
+
+    const data = await api.get('/coversheets/' + idCoverSheet + '/sparetruckinfo', {});
+    return data;
+
+  },
+
 
   // async add(values) {
 
