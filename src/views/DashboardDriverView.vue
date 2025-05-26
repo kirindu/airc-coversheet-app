@@ -285,9 +285,7 @@ const resetSpareTruckInfo = () => {
   spareTruckSpareTruckInfo.value = "";
 
 
-  timeLeaveYardSpareTruckInfo.value = null;
-
-
+  timeLeaveYardSpareTruckInfo.value = "";
   timeBackInYardSpareTruckInfo.value = "";
 
 
@@ -332,10 +330,16 @@ const HandleSpareTruckInfo = async (event) => {
     hasError = true;
   }
 
-  if (timeLeaveYardSpareTruckInfo.value && (timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH"))) {
+
+        if (timeBackInYardSpareTruckInfo.value &&(timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH"))) {
     errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Wrong format";
     hasError = true;
   }
+
+
+
+    
+
 
   if (timeBackInYardSpareTruckInfo.value && (timeBackInYardSpareTruckInfo.value.includes("mm") || timeBackInYardSpareTruckInfo.value.includes("HH"))) {
     errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "Wrong format";
@@ -426,11 +430,38 @@ const HandleSpareTruckInfo = async (event) => {
 };
 
 // Edit Spare Truck Info
+
+
+function toDateFromTimeString(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return null;
+  const [hours, minutes] = timeStr.split(':');
+  const date = new Date();
+  date.setHours(+hours);
+  date.setMinutes(+minutes);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
+}
+
+
+
 const EditSpareTruckInfo = (item) => {
   // Populate the form with the selected Spare Truck Info
   spareTruckSpareTruckInfo.value = item.spareTruckNumber;
   selectedRouteSpareTruckInfo.value = item.route_id;
-  timeLeaveYardSpareTruckInfo.value = item.leaveYard;
+
+
+//  timeLeaveYardSpareTruckInfo.value = item.leaveYard;
+
+const parseTime = (timeString) => {
+    if (!timeString) return { HH: "", mm: "" };
+    const [hours, minutes] = timeString.split(":");
+    return { HH: hours.padStart(2, "0"), mm: minutes.padStart(2, "0") };
+  };
+
+  timeLeaveYardSpareTruckInfo.value = parseTime(item.leaveYard || "10:06"); //
+
+
   timeBackInYardSpareTruckInfo.value = item.backInYard;
   startMilesSpareTruckInfo.value = item.startMiles;
   endMilesSpareTruckInfo.value = item.endMiles;
@@ -478,6 +509,7 @@ onMounted(() => {
       selectedTruck.value = coversheet.truck_id;
 
       selectedRouteSpareTruckInfo.value = coversheet.route_id;
+
       loadSpareTruckInfo();
     }
   }
@@ -696,6 +728,7 @@ const convertToDate = (timeString) => {
       <div class="card">
         <div class="card-body">
           <div class="basic-form">
+
             <form autocomplete="off">
               <div class="row">
                 <div class="accordion accordion-primary-solid" id="accordion-two">
@@ -723,6 +756,8 @@ const convertToDate = (timeString) => {
                               type="text"
                               v-model="spareTruckSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
+
+
                             />
                             <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.spareTruckSpareTruckInfo_er}}</small>
                           </div>
@@ -834,7 +869,7 @@ const convertToDate = (timeString) => {
                                   <td class="td">{{ item.backInYard }}</td>
                                   <td>
                                     <div>
-                                      <a href="#" @click.prevent="EditSpareTruckInfo(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+                                      <a href="#" @click="EditSpareTruckInfo(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
                                     </div>
                                   </td>
                                 </tr>
