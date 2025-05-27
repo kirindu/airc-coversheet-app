@@ -356,10 +356,10 @@ const HandleSpareTruckInfo = async (event) => {
   }
 
 
-        if (timeBackInYardSpareTruckInfo.value &&(timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH"))) {
-    errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Wrong format";
-    hasError = true;
-  }
+  //       if (timeLeaveYardSpareTruckInfo.value &&(timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH"))) {
+  //   errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Wrong format";
+  //   hasError = true;
+  // }
 
 
 
@@ -380,7 +380,12 @@ const HandleSpareTruckInfo = async (event) => {
   const spareTruckInfo = {
     spareTruckNumber: spareTruckSpareTruckInfo.value,
     route_id: selectedRouteSpareTruckInfo.value,
-    leaveYard: timeLeaveYardSpareTruckInfo.value || '',
+
+   // leaveYard: timeLeaveYardSpareTruckInfo.value || '',
+
+    leaveYard: timeBackInYardSpareTruckInfo.value || '',
+
+
     backInYard: timeBackInYardSpareTruckInfo.value || '',
     startMiles: startMilesSpareTruckInfo.value.toString() || '',
     endMiles: endMilesSpareTruckInfo.value.toString() || '',
@@ -478,16 +483,15 @@ const EditSpareTruckInfo = (item) => {
 
 //  timeLeaveYardSpareTruckInfo.value = item.leaveYard;
 
-const parseTime = (timeString) => {
-    if (!timeString) return { HH: "", mm: "" };
-    const [hours, minutes] = timeString.split(":");
-    return { HH: hours.padStart(2, "0"), mm: minutes.padStart(2, "0") };
-  };
+ // timeLeaveYardSpareTruckInfo.value = item.backInYard;
 
-  timeLeaveYardSpareTruckInfo.value = parseTime(item.leaveYard || "10:06"); //
+
 
 
   timeBackInYardSpareTruckInfo.value = item.backInYard;
+
+
+
   startMilesSpareTruckInfo.value = item.startMiles;
   endMilesSpareTruckInfo.value = item.endMiles;
   fuelSpareTruckInfo.value = item.fuel;
@@ -498,23 +502,23 @@ const parseTime = (timeString) => {
 };
 
 onMounted(() => {
-  // if (!sessionStorage.getItem("page_reloaded2")) {
-  //   sessionStorage.setItem("page_reloaded2", "true");
-  //   window.location.reload();
-  // } else {
-  //   sessionStorage.removeItem("page_reloaded2");
-  // }
-
-    if (!sessionStorage.getItem("page_reloaded2")) {
+  if (!sessionStorage.getItem("page_reloaded2")) {
     sessionStorage.setItem("page_reloaded2", "true");
-
-    // Espera un poco antes de recargar, por si hay cosas en localStorage que aún se están escribiendo
-    setTimeout(() => {
-      window.location.reload();
-    }, 200);
+    window.location.reload();
   } else {
     sessionStorage.removeItem("page_reloaded2");
   }
+
+  //   if (!sessionStorage.getItem("page_reloaded2")) {
+  //   sessionStorage.setItem("page_reloaded2", "true");
+
+  //   // Espera un poco antes de recargar, por si hay cosas en localStorage que aún se están escribiendo
+  //   setTimeout(() => {
+  //     window.location.reload();
+  //   }, 200);
+  // } else {
+  //   sessionStorage.removeItem("page_reloaded2");
+  // }
 
   let udser_id = user.value.id;
   let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
@@ -842,7 +846,7 @@ const convertToDate = (timeString) => {
                             <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.fuelSpareTruckInfo_er}}</small>
                           </div>
 
-                          <div class="mb-3 col-md-2">
+                          <!-- <div class="mb-3 col-md-2">
                             <label class="form-label" for="time-picker-leave-yard-sti">Leave Yard</label>
                             <div class="mt-0">
                               <VueTimepicker
@@ -851,7 +855,7 @@ const convertToDate = (timeString) => {
                               />
                             </div>
                             <small v-if="errorsSpareTruckInfo.leaveYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.leaveYardSpareTruckInfo_er}}</small>
-                          </div>
+                          </div> -->
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label" for="time-picker-black-in-yard-sti">Back In Yard</label>
