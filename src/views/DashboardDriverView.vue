@@ -185,6 +185,7 @@ const onSubmit = async (event) => {
     route_id: selectedRoute.value,
     driver_id: user.value.id,
     notes: notes.value,
+    date: getDenverTimeAsUTCISOString(),
   };
 
   try {
@@ -264,6 +265,30 @@ const onSubmit = async (event) => {
     });
   }
 };
+
+const getDenverTimeAsUTCISOString= () =>{
+  const now = new Date();
+  
+  // Obtiene la diferencia entre Denver y UTC en milisegundos
+  const options = { timeZone: 'America/Denver' };
+  const parts = Intl.DateTimeFormat('en-US', {
+    ...options,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).formatToParts(now);
+
+  const extract = (type) => parts.find(p => p.type === type)?.value;
+  const formattedString = `${extract('year')}-${extract('month')}-${extract('day')}T${extract('hour')}:${extract('minute')}:${extract('second')}`;
+  
+  // Convertimos ese string a Date y sacamos su ISO (que es UTC)
+  const localDenverDate = new Date(formattedString);
+  return localDenverDate.toISOString(); // <-- esto lo mandas al backend
+}
 
 // Reset form after successful submission
 const resetForm = () => {
@@ -473,9 +498,20 @@ const parseTime = (timeString) => {
 };
 
 onMounted(() => {
-  if (!sessionStorage.getItem("page_reloaded2")) {
+  // if (!sessionStorage.getItem("page_reloaded2")) {
+  //   sessionStorage.setItem("page_reloaded2", "true");
+  //   window.location.reload();
+  // } else {
+  //   sessionStorage.removeItem("page_reloaded2");
+  // }
+
+    if (!sessionStorage.getItem("page_reloaded2")) {
     sessionStorage.setItem("page_reloaded2", "true");
-    window.location.reload();
+
+    // Espera un poco antes de recargar, por si hay cosas en localStorage que aún se están escribiendo
+    setTimeout(() => {
+      window.location.reload();
+    }, 200);
   } else {
     sessionStorage.removeItem("page_reloaded2");
   }

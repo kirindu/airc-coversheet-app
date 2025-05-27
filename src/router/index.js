@@ -13,20 +13,19 @@ const router = createRouter({
   linkActiveClass: 'active',
   routes: [
     // Rutas Protegidas
+{
+  path: '/',
+  name: 'general',
+  component: DefaultDriverLayout,
+  meta: { requiresAuth: true },
+  children: [
     {
       path: '/',
-      name: 'general',
-      component: DefaultDriverLayout,
-      redirect: '/auth/login',
-      meta: {requiresAuth: true},
-      children: [
-        {
-          path: '/',
-          name: 'dashboard',
-          component: () => import('../views/DashboardDriverView.vue'),
-        },
-      ]
+      name: 'dashboard',
+      component: () => import('../views/DashboardDriverView.vue'),
     },
+  ]
+},
     {
       path: '/admin',
       name: 'general-admin',
@@ -72,10 +71,12 @@ router.beforeEach((to, from, next) => {
   const userRaw = localStorage.getItem('USER');
   const requiresAuth = to.matched.some(route => route.meta.requiresAuth);
 
+  // Si la ruta requiere autenticación y no hay usuario, redirigir al login
   if (requiresAuth && !userRaw) {
     return next({ name: 'login' });
   }
 
+  // Si hay un usuario autenticado, parsearlo y verificar el rol
   if (userRaw) {
     let user;
     try {
@@ -85,27 +86,39 @@ router.beforeEach((to, from, next) => {
       return next({ name: 'login' });
     }
 
-    let role =''
-
-    if(user.data.rol) {
+    let role = '';
+    if (user?.data?.rol) {
       role = user.data.rol;
-    } else {
+    } else if (user?.data?.user?.rol) {
       role = user.data.user.rol;
+    } else {
+      console.warn('No se encontró un rol válido en el objeto USER');
+      localStorage.removeItem('USER');
+      return next({ name: 'login' });
     }
 
-    // Redirección inteligente si accede al root o rutas incorrectas
-    if (to.name === 'general' || to.path === '/') {
-      if (role === 'Admin' && to.name !== 'dashboard-admin') {
+    // Evitar que un usuario autenticado acceda a rutas de autenticación
+    if (to.name === 'login' || to.name === 'register') {
+      if (role === 'Admin') {
         return next({ name: 'dashboard-admin' });
-      } else if (role === 'Driver' && to.name !== 'dashboard') {
+      } else if (role === 'Driver') {
+        return next({ name: 'dashboard' });
+      }
+    }
+
+    // Redirección inteligente solo si el usuario está yendo a la ruta 'general'
+    if (requiresAuth && to.name === 'general') {
+      if (role === 'Admin') {
+        return next({ name: 'dashboard-admin' });
+      } else if (role === 'Driver') {
         return next({ name: 'dashboard' });
       }
     }
   }
 
+  // Si no hay conflictos, continuar con la navegación
   return next();
 });
-
 
 
 
