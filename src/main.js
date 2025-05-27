@@ -10,6 +10,9 @@ import "vue-toast-notification/dist/theme-bootstrap.css";
 import 'vue-select/dist/vue-select.css';
 
 
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+
 import App from './App.vue'
 import router from './router'
 
@@ -37,5 +40,7 @@ app.use(createModal({
       'z-index': 200
     }
   }));
+
+app.component('VueDatePicker', VueDatePicker);
 
 app.mount('#app')

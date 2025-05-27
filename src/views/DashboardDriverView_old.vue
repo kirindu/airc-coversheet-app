@@ -3,9 +3,7 @@ import { ref, onMounted } from "vue";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-// Imnportamos librerias
-import VueTimepicker from "vue3-timepicker";
-import "vue3-timepicker/dist/VueTimepicker.css";
+
 
 const user = ref(null)
 

@@ -3,10 +3,6 @@ import { ref, onMounted } from "vue";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-// Importamos librerias
-import VueTimepicker from "vue3-timepicker";
-import "vue3-timepicker/dist/VueTimepicker.css";
-
 // Importamos el api
 import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 import SpareTruckInfoAPI from "@/api/SpareTruckInfoAPI";
@@ -35,14 +31,14 @@ const isEditing = ref(false); // To track if we are editing a spare truck record
 const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
 
 const spareTruckSelected = ref({
-  spareTruckNumber: '',
-  route_id: '',
-  routeNumber: '',
-  leaveYard: '',
-  backInYard: '',
-  startMiles: '',
-  bacendMileskInYard: '',
-  fuel: '',
+  spareTruckNumber: "",
+  route_id: "",
+  routeNumber: "",
+  leaveYard: "",
+  backInYard: "",
+  startMiles: "",
+  bacendMileskInYard: "",
+  fuel: "",
 });
 
 // Recuperamos el usuario
@@ -68,10 +64,12 @@ const isEditMode = ref(false);
 // General Info
 const selectedRoute = ref("");
 const selectedTruck = ref("");
+
 const timeClockIn = ref("");
 const timeLeaveYard = ref("");
 const timeBackInYard = ref("");
 const timeClockOut = ref("");
+
 const startMiles = ref("");
 const endMiles = ref("");
 const fuel = ref("");
@@ -94,13 +92,24 @@ const errors = ref({
 // Spare Truck Info
 const spareTruckSpareTruckInfo = ref("");
 const selectedRouteSpareTruckInfo = ref("");
+
 const timeLeaveYardSpareTruckInfo = ref("");
 const timeBackInYardSpareTruckInfo = ref("");
+
 const startMilesSpareTruckInfo = ref("");
 const endMilesSpareTruckInfo = ref("");
 const fuelSpareTruckInfo = ref("");
 
 const formSubmittedSpareTruckInfo = ref(false);
+
+// Si quieres mostrar la hora actual en el input de Spare Truck Info
+// const timeLeaveYardSpareTruckInfo = ref({
+//   hours: new Date().getHours(),
+//   minutes: new Date().getMinutes()
+// });
+
+// Si quieres mostrar una hora determinada en el input de Spare Truck Info
+// const timeLeaveYardSpareTruckInfo = ref({hours: 15, minutes: 26});
 
 const errorsSpareTruckInfo = ref({
   spareTruckSpareTruckInfo_er: "",
@@ -149,23 +158,8 @@ const onSubmit = async (event) => {
     hasError = true;
   }
 
-  if (!timeClockIn.value || timeClockIn.value.includes("mm") || timeClockIn.value.includes("HH")) {
+  if (!timeClockIn.value) {
     errors.value.clockIn_er = "Required field";
-    hasError = true;
-  }
-
-  if (timeLeaveYard.value && (timeLeaveYard.value.includes("mm") || timeLeaveYard.value.includes("HH"))) {
-    errors.value.leaveYard_er = "Wrong format";
-    hasError = true;
-  }
-
-  if (timeBackInYard.value && (timeBackInYard.value.includes("mm") || timeBackInYard.value.includes("HH"))) {
-    errors.value.backInYard_er = "Wrong format";
-    hasError = true;
-  }
-
-  if (timeClockOut.value && (timeClockOut.value.includes("mm") || timeClockOut.value.includes("HH"))) {
-    errors.value.clockOut_er = "Wrong format";
     hasError = true;
   }
 
@@ -174,13 +168,14 @@ const onSubmit = async (event) => {
   }
 
   const coverSheetData = {
-    clockIn: timeClockIn.value,
-    leaveYard: timeLeaveYard.value || '',
-    backInYard: timeBackInYard.value || '',
-    clockOut: timeClockOut.value || '',
-    startMiles: startMiles.value.toString() || '',
-    endMiles: endMiles.value.toString() || '',
-    fuel: fuel.value.toString() || '',
+    clockIn: formatTime(timeClockIn.value),
+    leaveYard: formatTime(timeLeaveYard.value) || "",
+    backInYard: formatTime(timeBackInYard.value) || "",
+    clockOut: formatTime(timeClockOut.value) || "",
+
+    startMiles: startMiles.value.toString() || "",
+    endMiles: endMiles.value.toString() || "",
+    fuel: fuel.value.toString() || "",
     truck_id: selectedTruck.value,
     route_id: selectedRoute.value,
     driver_id: user.value.id,
@@ -221,7 +216,8 @@ const onSubmit = async (event) => {
         });
       }
     } else {
-      let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+      let coversheet_id =
+        JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
       const response = await CoverSheetAPI.edit(coversheet_id, coverSheetData);
 
       if (response.data.ok) {
@@ -266,29 +262,31 @@ const onSubmit = async (event) => {
   }
 };
 
-const getDenverTimeAsUTCISOString= () =>{
+const getDenverTimeAsUTCISOString = () => {
   const now = new Date();
-  
+
   // Obtiene la diferencia entre Denver y UTC en milisegundos
-  const options = { timeZone: 'America/Denver' };
-  const parts = Intl.DateTimeFormat('en-US', {
+  const options = { timeZone: "America/Denver" };
+  const parts = Intl.DateTimeFormat("en-US", {
     ...options,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
   }).formatToParts(now);
 
-  const extract = (type) => parts.find(p => p.type === type)?.value;
-  const formattedString = `${extract('year')}-${extract('month')}-${extract('day')}T${extract('hour')}:${extract('minute')}:${extract('second')}`;
-  
+  const extract = (type) => parts.find((p) => p.type === type)?.value;
+  const formattedString = `${extract("year")}-${extract("month")}-${extract(
+    "day"
+  )}T${extract("hour")}:${extract("minute")}:${extract("second")}`;
+
   // Convertimos ese string a Date y sacamos su ISO (que es UTC)
   const localDenverDate = new Date(formattedString);
   return localDenverDate.toISOString(); // <-- esto lo mandas al backend
-}
+};
 
 // Reset form after successful submission
 const resetForm = () => {
@@ -309,20 +307,15 @@ const resetForm = () => {
 const resetSpareTruckInfo = () => {
   spareTruckSpareTruckInfo.value = "";
 
-
   timeLeaveYardSpareTruckInfo.value = "";
   timeBackInYardSpareTruckInfo.value = "";
-
 
   startMilesSpareTruckInfo.value = "";
   endMilesSpareTruckInfo.value = "";
   fuelSpareTruckInfo.value = "";
- // selectedRouteSpareTruckInfo.value = JSON.parse(localStorage.getItem("COVERSHEET"))?.route_id || "";
+  // selectedRouteSpareTruckInfo.value = JSON.parse(localStorage.getItem("COVERSHEET"))?.route_id || "";
   isEditing.value = false;
   selectedSpareTruckId.value = null;
-
-
-
 };
 
 // Handle form submission Spare Truck Info (Add or Edit)
@@ -355,48 +348,33 @@ const HandleSpareTruckInfo = async (event) => {
     hasError = true;
   }
 
-
-  //       if (timeLeaveYardSpareTruckInfo.value &&(timeLeaveYardSpareTruckInfo.value.includes("mm") || timeLeaveYardSpareTruckInfo.value.includes("HH"))) {
-  //   errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "Wrong format";
-  //   hasError = true;
-  // }
-
-
-
-    
-
-
-  if (timeBackInYardSpareTruckInfo.value && (timeBackInYardSpareTruckInfo.value.includes("mm") || timeBackInYardSpareTruckInfo.value.includes("HH"))) {
-    errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "Wrong format";
-    hasError = true;
-  }
-
   if (hasError) {
     return;
   }
 
-  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+  let coversheet_id =
+    JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
   const spareTruckInfo = {
     spareTruckNumber: spareTruckSpareTruckInfo.value,
     route_id: selectedRouteSpareTruckInfo.value,
 
-   // leaveYard: timeLeaveYardSpareTruckInfo.value || '',
+    leaveYard: formatTime(timeLeaveYardSpareTruckInfo.value) || "",
+    backInYard: formatTime(timeBackInYardSpareTruckInfo.value) || "",
 
-    leaveYard: timeBackInYardSpareTruckInfo.value || '',
-
-
-    backInYard: timeBackInYardSpareTruckInfo.value || '',
-    startMiles: startMilesSpareTruckInfo.value.toString() || '',
-    endMiles: endMilesSpareTruckInfo.value.toString() || '',
-    fuel: fuelSpareTruckInfo.value.toString() || '',
+    startMiles: startMilesSpareTruckInfo.value.toString() || "",
+    endMiles: endMilesSpareTruckInfo.value.toString() || "",
+    fuel: fuelSpareTruckInfo.value.toString() || "",
     coversheet_id: coversheet_id,
   };
 
   try {
     if (isEditing.value) {
       // Edit existing Spare Truck Info
-      const response = await SpareTruckInfoAPI.edit(selectedSpareTruckId.value, spareTruckInfo);
+      const response = await SpareTruckInfoAPI.edit(
+        selectedSpareTruckId.value,
+        spareTruckInfo
+      );
 
       if (response.data.ok) {
         showSweetAlert({
@@ -449,7 +427,9 @@ const HandleSpareTruckInfo = async (event) => {
     }
   } catch (error) {
     showSweetAlert({
-      title: isEditing.value ? "Error updating Spare Truck Info!" : "Error saving Spare Truck Info!",
+      title: isEditing.value
+        ? "Error updating Spare Truck Info!"
+        : "Error saving Spare Truck Info!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
@@ -461,36 +441,32 @@ const HandleSpareTruckInfo = async (event) => {
 
 // Edit Spare Truck Info
 
+const formatTime = (controlTimeValue) => {
+  if (!controlTimeValue) {
+    return "";
+  }
 
-function toDateFromTimeString(timeStr) {
-  if (!timeStr || typeof timeStr !== 'string') return null;
-  const [hours, minutes] = timeStr.split(':');
-  const date = new Date();
-  date.setHours(+hours);
-  date.setMinutes(+minutes);
-  date.setSeconds(0);
-  date.setMilliseconds(0);
-  return date;
-}
+  const hours = String(controlTimeValue.hours).padStart(2, "0");
+  const minutes = String(controlTimeValue.minutes).padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
 
-
+// Function to set time from a database string (e.g., "14:36")
+const setTimeFromDB = (timeString) => {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  if (!isNaN(hours) && !isNaN(minutes)) {
+    return { hours, minutes };
+  }
+};
 
 const EditSpareTruckInfo = (item) => {
   // Populate the form with the selected Spare Truck Info
   spareTruckSpareTruckInfo.value = item.spareTruckNumber;
   selectedRouteSpareTruckInfo.value = item.route_id;
 
+  timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.leaveYard);
 
-//  timeLeaveYardSpareTruckInfo.value = item.leaveYard;
-
- // timeLeaveYardSpareTruckInfo.value = item.backInYard;
-
-
-
-
-  timeBackInYardSpareTruckInfo.value = item.backInYard;
-
-
+  timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.backInYard);
 
   startMilesSpareTruckInfo.value = item.startMiles;
   endMilesSpareTruckInfo.value = item.endMiles;
@@ -521,7 +497,8 @@ onMounted(() => {
   // }
 
   let udser_id = user.value.id;
-  let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let coversheet_driver_id =
+    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
   if (udser_id !== coversheet_driver_id) {
     localStorage.removeItem("COVERSHEET");
@@ -537,10 +514,12 @@ onMounted(() => {
     } else {
       isEditMode.value = true;
       const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
-      timeClockIn.value = coversheet.clockIn;
-      timeLeaveYard.value = coversheet.leaveYard;
-      timeBackInYard.value = coversheet.backInYard;
-      timeClockOut.value = coversheet.clockOut;
+
+      timeClockIn.value = setTimeFromDB(coversheet.clockIn);
+      timeLeaveYard.value = setTimeFromDB(coversheet.leaveYard);
+      timeBackInYard.value = setTimeFromDB(coversheet.backInYard);
+      timeClockOut.value = setTimeFromDB(coversheet.clockOut);
+
       startMiles.value = coversheet.startMiles;
       endMiles.value = coversheet.endMiles;
       fuel.value = coversheet.fuel;
@@ -604,7 +583,9 @@ const convertToDate = (timeString) => {
 
   const formattedHours = hours % 12 || 12;
   const period = hours >= 12 ? "PM" : "AM";
-  return `${formattedHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`;
+  return `${formattedHours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")} ${period}`;
 };
 </script>
 
@@ -640,7 +621,9 @@ const convertToDate = (timeString) => {
                     class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                   />
-                  <small v-if="errors.route_er" class="text-danger">{{errors.route_er}}</small>
+                  <small v-if="errors.route_er" class="text-danger">{{
+                    errors.route_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-4">
@@ -654,7 +637,9 @@ const convertToDate = (timeString) => {
                     class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                   />
-                  <small v-if="errors.truck_er" class="text-danger">{{ errors.truck_er }}</small>
+                  <small v-if="errors.truck_er" class="text-danger">{{
+                    errors.truck_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-4">
@@ -669,47 +654,87 @@ const convertToDate = (timeString) => {
 
               <div class="row">
                 <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-clock-in">Clock In</label>
+                  <label class="form-label">Clock In</label>
                   <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-clock-in"
+                    <VueDatePicker
                       v-model="timeClockIn"
-                    />
+                      time-picker
+                      placeholder="Select Time"
+                    >
+                      <template #input-icon>
+                        <img
+                          class="input-slot-image"
+                          src="../assets/icons/clock2.png"
+                        />
+                      </template>
+                    </VueDatePicker>
                   </div>
-                  <small v-if="errors.clockIn_er" class="text-danger">{{ errors.clockIn_er }}</small>
+                  <small v-if="errors.clockIn_er" class="text-danger">{{
+                    errors.clockIn_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-leave-yard">Leave Yard</label>
+                  <label class="form-label">Leave Yard</label>
                   <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-leave-yard"
+                    <VueDatePicker
                       v-model="timeLeaveYard"
-                    />
+                      time-picker
+                      placeholder="Select Time"
+                    >
+                     <template #input-icon>
+                        <img
+                          class="input-slot-image"
+                          src="../assets/icons/clock2.png"
+                        />
+                      </template>
+                    </VueDatePicker>
                   </div>
-                  <small v-if="errors.leaveYard_er" class="text-danger">{{ errors.leaveYard_er }}</small>
+                  <small v-if="errors.leaveYard_er" class="text-danger">{{
+                    errors.leaveYard_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-back-in-yard">Back In Yard</label>
+                  <label class="form-label">Back In Yard</label>
                   <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-back-in-yard"
+                    <VueDatePicker
                       v-model="timeBackInYard"
-                    />
+                      time-picker
+                      placeholder="Select Time"
+                    >
+                     <template #input-icon>
+                        <img
+                          class="input-slot-image"
+                          src="../assets/icons/clock2.png"
+                        />
+                      </template>
+                    </VueDatePicker>
                   </div>
-                  <small v-if="errors.backInYard_er" class="text-danger">{{ errors.backInYard_er }}</small>
+                  <small v-if="errors.backInYard_er" class="text-danger">{{
+                    errors.backInYard_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
-                  <label class="form-label" for="time-picker-clock-out">Clock Out</label>
+                  <label class="form-label">Clock Out</label>
                   <div class="mt-0">
-                    <VueTimepicker
-                      id="time-picker-clock-out"
+                    <VueDatePicker
                       v-model="timeClockOut"
-                    />
+                      time-picker
+                      placeholder="Select Time"
+                    >
+                     <template #input-icon>
+                        <img
+                          class="input-slot-image"
+                          src="../assets/icons/clock2.png"
+                        />
+                      </template>
+                    </VueDatePicker>
                   </div>
-                  <small v-if="errors.clockOut_er" class="text-danger">{{ errors.clockOut_er }}</small>
+                  <small v-if="errors.clockOut_er" class="text-danger">{{
+                    errors.clockOut_er
+                  }}</small>
                 </div>
               </div>
 
@@ -721,7 +746,9 @@ const convertToDate = (timeString) => {
                     v-model="startMiles"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errors.startMiles_er" class="text-danger">{{ errors.startMiles_er }}</small>
+                  <small v-if="errors.startMiles_er" class="text-danger">{{
+                    errors.startMiles_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
@@ -731,7 +758,9 @@ const convertToDate = (timeString) => {
                     v-model="endMiles"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errors.endMiles_er" class="text-danger">{{ errors.endMiles_er }}</small>
+                  <small v-if="errors.endMiles_er" class="text-danger">{{
+                    errors.endMiles_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
@@ -741,7 +770,9 @@ const convertToDate = (timeString) => {
                     v-model="fuel"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errors.fuel_er" class="text-danger">{{ errors.fuel_er }}</small>
+                  <small v-if="errors.fuel_er" class="text-danger">{{
+                    errors.fuel_er
+                  }}</small>
                 </div>
               </div>
 
@@ -756,7 +787,7 @@ const convertToDate = (timeString) => {
               </div>
 
               <button type="submit" class="btn btn-primary">
-                {{ isEditMode ? 'Update CoverSheet' : 'Save CoverSheet' }}
+                {{ isEditMode ? "Update CoverSheet" : "Save CoverSheet" }}
               </button>
             </form>
           </div>
@@ -768,10 +799,12 @@ const convertToDate = (timeString) => {
       <div class="card">
         <div class="card-body">
           <div class="basic-form">
-
             <form autocomplete="off">
               <div class="row">
-                <div class="accordion accordion-primary-solid" id="accordion-two">
+                <div
+                  class="accordion accordion-primary-solid"
+                  id="accordion-two"
+                >
                   <div class="accordion-item">
                     <h2 class="accordion-header">
                       <button
@@ -796,10 +829,16 @@ const convertToDate = (timeString) => {
                               type="text"
                               v-model="spareTruckSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
-
-
                             />
-                            <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.spareTruckSpareTruckInfo_er}}</small>
+                            <small
+                              v-if="
+                                errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
+                              "
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
+                              }}</small
+                            >
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -811,9 +850,17 @@ const convertToDate = (timeString) => {
                               :reduce="(route) => route.id"
                               label="routeNumber"
                               class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
+                              :class="{
+                                'is-invalid': formSubmitted && !selectedRoute,
+                              }"
                             />
-                            <small v-if="errorsSpareTruckInfo.routeSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.routeSpareTruckInfo_er}}</small>
+                            <small
+                              v-if="errorsSpareTruckInfo.routeSpareTruckInfo_er"
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.routeSpareTruckInfo_er
+                              }}</small
+                            >
                           </div>
 
                           <div class="mb-3 col-md-1">
@@ -823,7 +870,15 @@ const convertToDate = (timeString) => {
                               v-model="startMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
-                            <small v-if="errorsSpareTruckInfo.startMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.startMilesSpareTruckInfo_er}}</small>
+                            <small
+                              v-if="
+                                errorsSpareTruckInfo.startMilesSpareTruckInfo_er
+                              "
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.startMilesSpareTruckInfo_er
+                              }}</small
+                            >
                           </div>
 
                           <div class="mb-3 col-md-1">
@@ -833,7 +888,15 @@ const convertToDate = (timeString) => {
                               v-model="endMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
-                            <small v-if="errorsSpareTruckInfo.endMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.endMilesSpareTruckInfo_er}}</small>
+                            <small
+                              v-if="
+                                errorsSpareTruckInfo.endMilesSpareTruckInfo_er
+                              "
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.endMilesSpareTruckInfo_er
+                              }}</small
+                            >
                           </div>
 
                           <div class="mb-3 col-md-1">
@@ -843,29 +906,67 @@ const convertToDate = (timeString) => {
                               v-model="fuelSpareTruckInfo"
                               class="form-control form-control-sm border border-primary"
                             />
-                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.fuelSpareTruckInfo_er}}</small>
+                            <small
+                              v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er"
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.fuelSpareTruckInfo_er
+                              }}</small
+                            >
                           </div>
 
-                          <!-- <div class="mb-3 col-md-2">
-                            <label class="form-label" for="time-picker-leave-yard-sti">Leave Yard</label>
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Leave Yard</label>
                             <div class="mt-0">
-                              <VueTimepicker
-                                id="time-picker-leave-yard-sti"
+                              <VueDatePicker
                                 v-model="timeLeaveYardSpareTruckInfo"
-                              />
+                                time-picker
+                                placeholder="Select Time"
+                              >
+                               <template #input-icon>
+                        <img
+                          class="input-slot-image"
+                          src="../assets/icons/clock2.png"
+                        />
+                      </template>
+                    </VueDatePicker>
                             </div>
-                            <small v-if="errorsSpareTruckInfo.leaveYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.leaveYardSpareTruckInfo_er}}</small>
-                          </div> -->
+                            <small
+                              v-if="
+                                errorsSpareTruckInfo.leaveYardSpareTruckInfo_er
+                              "
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.leaveYardSpareTruckInfo_er
+                              }}</small
+                            >
+                          </div>
 
                           <div class="mb-3 col-md-2">
-                            <label class="form-label" for="time-picker-black-in-yard-sti">Back In Yard</label>
+                            <label class="form-label">Back In Yard</label>
                             <div class="mt-0">
-                              <VueTimepicker
-                                id="time-picker-black-in-yard-sti"
+                              <VueDatePicker
                                 v-model="timeBackInYardSpareTruckInfo"
-                              />
+                                time-picker
+                                placeholder="Select Time"
+                              >
+                               <template #input-icon>
+                        <img
+                          class="input-slot-image"
+                          src="../assets/icons/clock2.png"
+                        />
+                      </template>
+                    </VueDatePicker>
                             </div>
-                            <small v-if="errorsSpareTruckInfo.backInYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.backInYardSpareTruckInfo_er}}</small>
+                            <small
+                              v-if="
+                                errorsSpareTruckInfo.backInYardSpareTruckInfo_er
+                              "
+                              class="text-danger"
+                              >{{
+                                errorsSpareTruckInfo.backInYardSpareTruckInfo_er
+                              }}</small
+                            >
                           </div>
 
                           <div class="mb-4 col-md-2 align-self-end">
@@ -874,20 +975,24 @@ const convertToDate = (timeString) => {
                               type="button"
                               class="btn btn-rounded btn-info"
                             >
-                              <span class="btn-icon-start text-info"><i class="fa fa-plus color-info"></i></span>
-                              {{ isEditing ? 'Save' : 'Add' }}
+                              <span class="btn-icon-start text-info"
+                                ><i class="fa fa-plus color-info"></i
+                              ></span>
+                              {{ isEditing ? "Save" : "Add" }}
                             </button>
                           </div>
                         </div>
 
                         <div class="row">
-                          <hr style="color: black;">
+                          <hr style="color: black" />
                           <div class="table-responsive">
-                            <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                            <table
+                              class="table table-bordered header-border table-striped table-hover table-responsive-md"
+                            >
                               <thead class="thead-primary">
                                 <tr>
-                                  <th style="width:50px;"></th>
-                                  <th>Spare #.</th>
+                                  <!-- <th style="width:50px;"></th> -->
+                                  <th>Spare #</th>
                                   <th>Route #</th>
                                   <th>Start Miles</th>
                                   <th>End Miles</th>
@@ -898,9 +1003,14 @@ const convertToDate = (timeString) => {
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr v-for="(item, index) in spareTruckList" :key="index">
-                                  <td></td>
-                                  <td class="td">{{ item.spareTruckNumber }}</td>
+                                <tr
+                                  v-for="(item, index) in spareTruckList"
+                                  :key="index"
+                                >
+                                  <!-- <td></td> -->
+                                  <td class="td">
+                                    {{ item.spareTruckNumber }}
+                                  </td>
                                   <td class="td">{{ item.routeNumber }}</td>
                                   <td class="td">{{ item.startMiles }}</td>
                                   <td class="td">{{ item.endMiles }}</td>
@@ -909,7 +1019,12 @@ const convertToDate = (timeString) => {
                                   <td class="td">{{ item.backInYard }}</td>
                                   <td>
                                     <div>
-                                      <a href="#" @click="EditSpareTruckInfo(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+                                      <a
+                                        href="#"
+                                        @click="EditSpareTruckInfo(item)"
+                                        class="btn btn-primary shadow btn-xs sharp me-1"
+                                        ><i class="fa fa-pencil"></i
+                                      ></a>
                                     </div>
                                   </td>
                                 </tr>
@@ -983,6 +1098,12 @@ const convertToDate = (timeString) => {
 </template>
 
 <style scoped>
+.input-slot-image {
+  height: 20px;
+  width: auto;
+  margin-left: 5px;
+}
+
 .v-select {
   font-size: 1rem;
 }
