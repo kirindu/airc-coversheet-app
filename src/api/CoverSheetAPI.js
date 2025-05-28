@@ -28,6 +28,13 @@ export default {
 
   },
 
+    async getDowntime(idCoverSheet) {
+
+    const data = await api.get('/coversheets/' + idCoverSheet + '/downtime', {});
+    return data;
+
+  },
+
 
   // async add(values) {
 

@@ -6,6 +6,7 @@ import "vue-select/dist/vue-select.css";
 // Importamos el api
 import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 import SpareTruckInfoAPI from "@/api/SpareTruckInfoAPI";
+import DowntimeAPI from "@/api/DowntimeAPI";
 
 // Import composables
 import useSweetAlert2Notification from "@/composables/useSweetAlert2";
@@ -17,6 +18,8 @@ import Spinner from "@/components/Spinner.vue";
 // Importamos Stores
 import { useRoutesStore } from "@/stores/routes.js";
 const storeRoute = useRoutesStore();
+
+
 
 import { useTrucksStore } from "@/stores/trucks.js";
 const storeTruck = useTrucksStore();
@@ -118,13 +121,13 @@ const errorsSpareTruckInfo = ref({
 });
 
 // Downtime
-const truckNumberDowntime = ref("");
+const selectedTruckDowntime = ref("");
 const timeStartTimeDowntime = ref("");
 const timeEndTimeDowntime = ref("");
 const downtimeReasonDowntime = ref("");
 
 const errorsDowntime = ref({
-  truckNumberDowntime_er: "",
+  selectedTruckDowntime_er: "",
   timeStartTimeDowntime_er: "",
   timeEndTimeDowntime_er: "",
   downtimeReasonDowntime_er: "",
@@ -146,7 +149,7 @@ onMounted(() => {
     JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
   if (udser_id !== coversheet_driver_id) {
-    localStorage.removeItem("COVERSHEET");
+      localStorage.removeItem("COVERSHEET");
   } else {
     const date = new Date(JSON.parse(localStorage.getItem("COVERSHEET")).date);
     const today = new Date();
@@ -173,8 +176,11 @@ onMounted(() => {
       selectedTruck.value = coversheet.truck_id;
 
       selectedRouteSpareTruckInfo.value = coversheet.route_id;
+      selectedTruckDowntime.value = coversheet.truck_id;
 
       loadSpareTruckInfo();
+
+       loadDowntime();
     }
   }
 
@@ -342,15 +348,30 @@ const resetForm = () => {
 const resetSpareTruckInfo = () => {
   spareTruckSpareTruckInfo.value = "";
 
+  selectedRouteSpareTruckInfo.value = "";
+
   timeLeaveYardSpareTruckInfo.value = "";
   timeBackInYardSpareTruckInfo.value = "";
 
-  startMilesSpareTruckInfo.value = "";
+  startMilesSpareTruckInfo.value = ""
   endMilesSpareTruckInfo.value = "";
   fuelSpareTruckInfo.value = "";
-  // selectedRouteSpareTruckInfo.value = JSON.parse(localStorage.getItem("COVERSHEET"))?.route_id || "";
-  isEditingSpareTruckInfo.value = false;
   selectedSpareTruckId.value = null;
+
+  isEditingSpareTruckInfo.value = false;
+  
+};
+
+const resetDowntime = () => {
+
+  timeStartTimeDowntime.value = "";
+  timeEndTimeDowntime.value = "";
+  downtimeReasonDowntime.value = "";
+
+  selectedDowntimeId.value = null;
+
+  isEditingDowntime.value = false;
+  
 };
 
 // Handle form submission Spare Truck Info (Add or Edit)
@@ -406,10 +427,7 @@ const HandleSpareTruckInfo = async (event) => {
   try {
     if (isEditingSpareTruckInfo.value) {
       // Edit existing Spare Truck Info
-      const response = await SpareTruckInfoAPI.edit(
-        selectedSpareTruckId.value,
-        spareTruckInfo
-      );
+      const response = await SpareTruckInfoAPI.edit(selectedSpareTruckId.value,spareTruckInfo);
 
       if (response.data.ok) {
         showSweetAlert({
@@ -474,6 +492,114 @@ const HandleSpareTruckInfo = async (event) => {
   }
 };
 
+// Handle form submission Downtime
+const HandleDowntime = async (event) => {
+  event.preventDefault();
+
+  // Limpiar errores anteriores
+
+  errorsDowntime.value.selectedTruckDowntime_er = "";
+  errorsDowntime.value.timeStartTimeDowntime_er = "";
+  errorsDowntime.value.timeEndTimeDowntime_er = "";
+  errorsDowntime.value.downtimeReasonDowntime_er = "";
+
+
+  let hasError = false;
+
+  if (!selectedTruckDowntime.value) {
+    errorsDowntime.value.selectedTruckDowntime_er = "Required field";
+    hasError = true;
+  }
+
+  if (!timeStartTimeDowntime.value) {
+    errorsDowntime.value.timeStartTimeDowntime_er = "Required field";
+    hasError = true;
+  }
+
+  if (hasError) {
+    return;
+  }
+
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+
+  const downtime = {
+    truck_id: selectedTruckDowntime.value,
+    startTime: formatTime(timeStartTimeDowntime.value),
+    endTime: formatTime(timeEndTimeDowntime.value) || "",
+    downtimeReason: downtimeReasonDowntime.value || "",
+    coversheet_id: coversheet_id,
+  };
+
+  try {
+    if (isEditingDowntime.value) {
+      const response = await DowntimeAPI.edit(selectedDowntimeId.value,downtime);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Downtime updated successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          loadDowntime();
+          resetDowntime();
+        });
+      } else {
+        showSweetAlert({
+          title: "Error updating Downtime!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        });
+      }
+    } else {
+      // Add new Downtime
+      const response = await DowntimeAPI.add(downtime);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Downtime saved successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          loadDowntime();
+          resetDowntime();
+        });
+      } else {
+        showSweetAlert({
+          title: "Error saving Downtime!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        });
+      }
+    }
+  } catch (error) {
+    showSweetAlert({
+      title: isEditingDowntime.value? "Error updating Downtime!": "Error saving Downtime!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    });
+  }
+};
+
+
+
+
+
+
 const EditSpareTruckInfo = (item) => {
   // Populate the form with the selected Spare Truck Info
   spareTruckSpareTruckInfo.value = item.spareTruckNumber;
@@ -492,6 +618,18 @@ const EditSpareTruckInfo = (item) => {
   selectedSpareTruckId.value = item.id || item._id; // Ensure the ID is captured
 };
 
+const EditDowntime = (item) => {
+
+  selectedTruckDowntime.value = item.truck_id;
+  timeStartTimeDowntime.value = setTimeFromDB(item.startTime);
+  timeEndTimeDowntime.value = setTimeFromDB(item.endTime);
+  downtimeReasonDowntime.value = item.downtimeReason;
+
+  // Set editing mode
+  isEditingDowntime.value = true;
+  selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
+};
+
 const loadSpareTruckInfo = async () => {
   const rawCoverSheet = localStorage.getItem("COVERSHEET");
   if (!rawCoverSheet) return;
@@ -506,6 +644,26 @@ const loadSpareTruckInfo = async () => {
     spareTruckList.value = response.data.data || [];
   } catch (error) {
     console.error("Error al obtener SpareTruckInfo:", error);
+  }
+};
+
+const loadDowntime = async () => {
+  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  if (!rawCoverSheet) return;
+
+
+
+  const coverSheet = JSON.parse(rawCoverSheet);
+  const coverSheetId = coverSheet?.id || coverSheet?._id;
+
+  if (!coverSheetId) return;
+
+  try {
+    // Llamamos al API para obtener la lista de Downtime
+    const response = await CoverSheetAPI.getDowntime(coverSheetId);
+    downtimeList.value = response.data.data || [];
+  } catch (error) {
+    console.error("Error al obtener Downtime:", error);
   }
 };
 
@@ -603,7 +761,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <label class="form-label">Truck #</label>
                   <v-select :options="storeTruck.trucks" v-model="selectedTruck" placeholder="Choose your Truck"
                     :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
-                    :class="{ 'is-invalid': formSubmitted && !selectedRoute }" />
+                    :class="{ 'is-invalid': formSubmitted && !selectedTruck }" />
                   <small v-if="errors.truck_er" class="text-danger">{{
                     errors.truck_er
                   }}</small>
@@ -827,10 +985,17 @@ const getDenverTimeAsUTCISOString = () => {
                           </div>
 
                           <div class="mb-4 col-md-2 align-self-end">
-                            <button @click="HandleSpareTruckInfo" type="button" class="btn btn-rounded btn-info">
-                              <span class="btn-icon-start text-info"><i class="fa fa-plus color-info"></i></span>
+
+
+                            <button @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
                               {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
+                              <span class="btn-icon-end">
+                                <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
+                              </span>
                             </button>
+
+                             
+
                           </div>
                         </div>
 
@@ -891,70 +1056,67 @@ const getDenverTimeAsUTCISOString = () => {
 
 
                                <div class="row">
-                          <div class="mb-3 col-md-1">
-                            <label class="form-label">Truck # </label>
-                            <input type="text" v-model="truckNumberDowntime"class="form-control form-control-sm border border-primary" />
-                            <small v-if=" errorsDowntime.truckNumberDowntime_er" class="text-danger">{{errorsDowntime.truckNumberDowntime_er}}</small>
-                          </div>
+
+
+
+                                <div class="mb-3 col-md-3">
+                  <label class="form-label">Truck #</label>
+                  <v-select :options="storeTruck.trucks" v-model="selectedTruckDowntime" placeholder="Choose your Truck"
+                    :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedTruckDowntime }" />
+                  <small v-if="errorsDowntime.selectedTruckDowntime_er" class="text-danger">{{errorsDowntime.selectedTruckDowntime_er}}</small>
+                </div>
 
                           <div class="mb-3 col-md-2">
-                            <label class="form-label">Route #</label>
-                            <v-select :options="storeRoute.routes" v-model="selectedRouteSpareTruckInfo"
-                              placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber"
-                              class="form-control p-0" :class="{'is-invalid': formSubmitted && !selectedRoute,}" />
-                            <small v-if="errorsSpareTruckInfo.routeSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.routeSpareTruckInfo_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-1">
-                            <label class="form-label">Start Miles</label>
-                            <input type="number" v-model="startMilesSpareTruckInfo" class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsSpareTruckInfo.startMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.startMilesSpareTruckInfo_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-1">
-                            <label class="form-label">End Miles</label>
-                            <input type="number" v-model="endMilesSpareTruckInfo" class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsSpareTruckInfo.endMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.endMilesSpareTruckInfo_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-1">
-                            <label class="form-label">Fuel</label>
-                            <input type="number" v-model="fuelSpareTruckInfo" class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.fuelSpareTruckInfo_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-2">
-                            <label class="form-label">Leave Yard</label>
+                            <label class="form-label">Start Time</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="timeLeaveYardSpareTruckInfo" time-picker
+                              <VueDatePicker v-model="timeStartTimeDowntime" time-picker
                                 placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsSpareTruckInfo.leaveYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.leaveYardSpareTruckInfo_er}}</small>
+                            <small v-if="errorsDowntime.timeStartTimeDowntime_er" class="text-danger">{{errorsDowntime.timeStartTimeDowntime_er}}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
-                            <label class="form-label">Back In Yard</label>
+                            <label class="form-label">End Time</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="timeBackInYardSpareTruckInfo" time-picker
+                              <VueDatePicker v-model="timeEndTimeDowntime" time-picker
                                 placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsSpareTruckInfo.backInYardSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.backInYardSpareTruckInfo_er}}</small>
+                            <small v-if="errorsDowntime.timeEndTimeDowntime_er" class="text-danger">{{errorsDowntime.timeEndTimeDowntime_er}}</small>
+                          </div>
+
+                            <div class="mb-3 col-md-3">
+                              <label class="form-label">Downtime Reason</label>
+                              <input type="text" v-model="downtimeReasonDowntime" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsDowntime.downtimeReasonDowntime_er" class="text-danger">{{errorsDowntime.downtimeReasonDowntime_er}}</small>
                           </div>
 
                           <div class="mb-4 col-md-2 align-self-end">
-                            <button @click="HandleSpareTruckInfo" type="button" class="btn btn-rounded btn-info">
-                              <span class="btn-icon-start text-info"><i class="fa fa-plus color-info"></i></span>
-                              {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
+
+             
+
+                            <button @click="HandleDowntime" type="button" class="btn btn-info">
+                              {{ isEditingDowntime ? "Save" : "Add" }}
+                              <span class="btn-icon-end">
+                                <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
+                              </span>
                             </button>
+
+
                           </div>
+
+
+
+
+
                         </div>
 
                         <div class="row">
@@ -965,31 +1127,23 @@ const getDenverTimeAsUTCISOString = () => {
                               <thead class="thead-primary">
                                 <tr>
                                   <!-- <th style="width:50px;"></th> -->
-                                  <th>Spare #</th>
-                                  <th>Route #</th>
-                                  <th>Start Miles</th>
-                                  <th>End Miles</th>
-                                  <th>Fuel</th>
-                                  <th>Leave Yard</th>
-                                  <th>Back in Yard</th>
+                                  <th>Truck #</th>
+                                  <th>Start Time #</th>
+                                  <th>End Time</th>
+                                  <th>Dowtime Reason</th>
                                   <th>Action</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr v-for="(item, index) in spareTruckList" :key="index">
+                                <tr v-for="(item, index) in downtimeList" :key="index">
                                   <!-- <td></td> -->
-                                  <td class="td">
-                                    {{ item.spareTruckNumber }}
-                                  </td>
-                                  <td class="td">{{ item.routeNumber }}</td>
-                                  <td class="td">{{ item.startMiles }}</td>
-                                  <td class="td">{{ item.endMiles }}</td>
-                                  <td class="td">{{ item.fuel }}</td>
-                                  <td class="td">{{ item.leaveYard }}</td>
-                                  <td class="td">{{ item.backInYard }}</td>
+                                  <td class="td">{{ item.truckNumber }}</td>
+                                  <td class="td">{{ item.startTime }}</td>
+                                  <td class="td">{{ item.endTime }}</td>
+                                  <td class="td">{{ item.downtimeReason }}</td>
                                   <td>
                                     <div>
-                                      <a href="#" @click="EditSpareTruckInfo(item)"
+                                      <a href="#" @click="EditDowntime(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"><i
                                           class="fa fa-pencil"></i></a>
                                     </div>
