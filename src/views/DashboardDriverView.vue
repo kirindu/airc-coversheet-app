@@ -46,21 +46,6 @@ if (storedUser) {
   }
 }
 
-
-
-const spareTruckList = ref([]);
-const isEditingSpareTruckInfo = ref(false); // To track if we are editing a spare truck record
-const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
-
-
-const downtimeList = ref([]);
-const isEditingDowntime = ref(false); // To track if we are editing a downtime record
-const selectedDowntimeId = ref(null); // To store the ID of the downtime being edited
-
-
-// Modo de edición de la informaciongeneral para el coversheet
-const isEditModeCoverShet = ref(false);
-
 // General Info
 const selectedRoute = ref("");
 const selectedTruck = ref("");
@@ -89,7 +74,17 @@ const errors = ref({
   fuel_er: "",
 });
 
+// Modo de edición de la informaciongeneral para el coversheet
+const isEditModeCoverShet = ref(false);
+
+
+
 // Spare Truck Info
+
+const spareTruckList = ref([]);
+const isEditingSpareTruckInfo = ref(false); // To track if we are editing a spare truck record
+const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
+
 const spareTruckSpareTruckInfo = ref("");
 const selectedRouteSpareTruckInfo = ref("");
 
@@ -121,6 +116,11 @@ const errorsSpareTruckInfo = ref({
 });
 
 // Downtime
+
+const downtimeList = ref([]);
+const isEditingDowntime = ref(false); // To track if we are editing a downtime record
+const selectedDowntimeId = ref(null); // To store the ID of the downtime being edited
+
 const selectedTruckDowntime = ref("");
 const timeStartTimeDowntime = ref("");
 const timeEndTimeDowntime = ref("");
@@ -134,6 +134,40 @@ const errorsDowntime = ref({
 });
 
 
+// Load
+
+const loadList = ref([]);
+const isEditingLoad = ref(false); // To track if we are editing a load record
+const selectedLoadId = ref(null); // To store the ID of the load being edited
+
+const timeFirstStopTimeLoad = ref("");
+const selectedRouteLoad = ref("");
+const timeLastStopTimeLoad = ref("");
+const timeLandtFillTimeInLoad = ref("");
+const timeLandFillTimeOutLoad = ref("");
+const grossWeightLoad = ref("");
+const tareWeightLoad = ref("");
+const tonsLoad = ref("");
+const landFillLoad = ref("");
+const ticketNumberLoad = ref("");
+const noteLoad = ref("");
+const imageLoad = ref([]);
+
+
+const errorsLoad = ref({
+timeFirstStopTimeLoad_er:"",
+selectedRouteLoad_er:"",
+timeLastStopTimeLoad_er:"", 
+timeLandFillTimeInLoad_er:"",
+timeLandFillTimeOutLoad_er:"",
+grossWeightLoad_er:"",
+tareWeightLoad_er:"",
+tonsLoad_er:"",
+landFillLoad_er:"",
+ticketNumberLoad_er:"",
+noteLoad_er:"",
+imageLoad_er: "",
+});
 
 
 onMounted(() => {
@@ -1173,10 +1207,147 @@ const getDenverTimeAsUTCISOString = () => {
                     <div id="bordered_collapseThree" class="accordion-collapse collapse"
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
-                        Anim pariatur cliche reprehenderit, enim eiusmod high
-                        life accusamus terry richardson ad squid. 3 wolf moon
-                        officia aute, non cupidatat skateboard dolor brunch.
-                        Food truck quinoa nesciunt laborum eiusmod.
+
+                <div class="row">
+
+
+                          <div class="mb-3 col-md-3">
+                  <label class="form-label">Route #</label>
+                  <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route"
+                    :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
+                  <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
+                </div>
+
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">First Stop Time</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Last Stop Time</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeLastStopTimeLoad" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Landfill Time In </label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Landfill Time Out </label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
+                          </div>
+
+                            <div class="mb-3 col-md-2">
+                              <label class="form-label">Gross Weight</label>
+                              <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
+                          </div>
+
+                              <div class="mb-3 col-md-2">
+                              <label class="form-label">Tare Weight</label>
+                              <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
+                              </div>
+
+                              <div class="mb-3 col-md-2">
+                              <label class="form-label">Tons</label>
+                              <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
+                              </div>
+
+                          <div class="mb-4 col-md-2 align-self-end">
+
+             
+
+                            <button @click="HandleDowntime" type="button" class="btn btn-info">
+                              {{ isEditingDowntime ? "Save" : "Add" }}
+                              <span class="btn-icon-end">
+                                <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
+                              </span>
+                            </button>
+
+
+                          </div>
+
+                        </div>
+
+                        <div class="row">
+                          <hr style="color: black" />
+                          <div class="table-responsive">
+                            <table
+                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                              <thead class="thead-primary">
+                                <tr>
+                                  <!-- <th style="width:50px;"></th> -->
+                                  <th>Truck #</th>
+                                  <th>Start Time #</th>
+                                  <th>End Time</th>
+                                  <th>Dowtime Reason</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in downtimeList" :key="index">
+                                  <!-- <td></td> -->
+                                  <td class="td">{{ item.truckNumber }}</td>
+                                  <td class="td">{{ item.startTime }}</td>
+                                  <td class="td">{{ item.endTime }}</td>
+                                  <td class="td">{{ item.downtimeReason }}</td>
+                                  <td>
+                                    <div>
+                                      <a href="#" @click="EditDowntime(item)"
+                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
+                                          class="fa fa-pencil"></i></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+
+
+
+
+
+
+
                       </div>
                     </div>
                   </div>
