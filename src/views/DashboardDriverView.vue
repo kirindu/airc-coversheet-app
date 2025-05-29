@@ -221,6 +221,8 @@ onMounted(() => {
       loadSpareTruckInfo();
 
        loadDowntime();
+
+      loadLoad();
     }
   }
 
@@ -412,6 +414,25 @@ const resetDowntime = () => {
 
   isEditingDowntime.value = false;
   
+};
+
+const resetLoad = () => {
+
+  selectedRouteLoad.value = "";
+  timeFirstStopTimeLoad.value = "";
+  timeLastStopTimeLoad.value = "";
+  timeLandtFillTimeInLoad.value = "";
+  timeLandFillTimeOutLoad.value = "";
+  grossWeightLoad.value = "";
+  tareWeightLoad.value = "";
+  tonsLoad.value = "";
+  landFillLoad.value = "";
+  ticketNumberLoad.value = "";
+  noteLoad.value = "";
+  imageLoad.value = [];
+
+  isEditingLoad.value = false;
+
 };
 
 // Handle form submission Spare Truck Info (Add or Edit)
@@ -772,6 +793,18 @@ const EditDowntime = (item) => {
   selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
 };
 
+const EditLoad = (item) => {
+
+  selectedTruckDowntime.value = item.truck_id;
+  timeStartTimeDowntime.value = setTimeFromDB(item.startTime);
+  timeEndTimeDowntime.value = setTimeFromDB(item.endTime);
+  downtimeReasonDowntime.value = item.downtimeReason;
+
+  // Set editing mode
+  isEditingDowntime.value = true;
+  selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
+};
+
 const loadSpareTruckInfo = async () => {
   const rawCoverSheet = localStorage.getItem("COVERSHEET");
   if (!rawCoverSheet) return;
@@ -808,6 +841,28 @@ const loadDowntime = async () => {
     console.error("Error al obtener Downtime:", error);
   }
 };
+
+const loadLoad = async () => {
+  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  if (!rawCoverSheet) return;
+
+
+
+  const coverSheet = JSON.parse(rawCoverSheet);
+  const coverSheetId = coverSheet?.id || coverSheet?._id;
+
+  if (!coverSheetId) return;
+
+  try {
+    // Llamamos al API para obtener la lista de Downtime
+    const response = await CoverSheetAPI.getDowntime(coverSheetId);
+    downtimeList.value = response.data.data || [];
+  } catch (error) {
+    console.error("Error al obtener Downtime:", error);
+  }
+};
+
+
 
 // Function to handle file change
 const handleFileChange = (event) => {
@@ -1354,224 +1409,161 @@ const getDenverTimeAsUTCISOString = () => {
                     </div>
                   </div>
 
-                  <div class="accordion-item">
-                    <h2 class="accordion-header">
-                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#bordered_collapseThree">
-                        Load
-                      </button>
-                    </h2>
-                    <div id="bordered_collapseThree" class="accordion-collapse collapse"
-                      data-bs-parent="#accordion-two">
-                      <div class="accordion-body">
+           <div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
+      Load
+    </button>
+  </h2>
+  <div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
+    <div class="accordion-body">
 
+      <div class="row">
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Route #</label>
+          <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
+          <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">First Stop Time</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Last Stop Time</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLastStopTimeLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Landfill Time In</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Landfill Time Out</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
+        </div>
+      </div>
 
+      <div class="row">
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Gross Weight</label>
+          <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Tare Weight</label>
+          <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Tons</label>
+          <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Landfill</label>
+          <input type="text" v-model="landFillLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{errorsLoad.landFillLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-2">
+          <label class="form-label">Ticket #</label>
+          <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
+        </div>
+      </div>
 
+      <div class="row d-flex align-items-center">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Note</label>
+          <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-4">
+          <label class="form-label">Images</label>
+          <input type="file" ref="fileInput" class="form-control form-control-sm border border-primary" multiple="multiple" accept="image/*" @change="handleFileChange" style="height: 38px; padding: 0.375rem 0.75rem;" />
+          <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
+        </div>
+        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-2 d-flex ">
+          <button @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
+            {{ isEditingLoad ? "Save" : "Add" }}
+            <span class="btn-icon-end">
+              <i :class="isEditingLoad ? 'fa fa-save' : 'fa fa-plus'"></i>
+            </span>
+          </button>
+        </div>
+      </div>
 
-                <div class="row">
-
-                
-
-
-                          <div class="mb-3 col-md-3">
-                  <label class="form-label">Route #</label>
-                  <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route"
-                    :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
-                    :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
-                  <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
-                </div>
-
-
-                          <div class="mb-3 col-md-2">
-                            <label class="form-label">First Stop Time</label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker
-                                placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-2">
-                            <label class="form-label">Last Stop Time</label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeLastStopTimeLoad" time-picker
-                                placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-2">
-                            <label class="form-label">Landfill Time In </label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker
-                                placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-2">
-                            <label class="form-label">Landfill Time Out </label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker
-                                placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
-                          </div>
-
-                          </div>
-
-
-
-
-
-                          <div class="row">
-
-
-                            <div class="mb-3 col-md-2">
-                              <label class="form-label">Gross Weight</label>
-                              <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
-                              <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
-                          </div>
-
-                              <div class="mb-3 col-md-2">
-                              <label class="form-label">Tare Weight</label>
-                              <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
-                              <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
-                              </div>
-
-                              <div class="mb-3 col-md-2">
-                              <label class="form-label">Tons</label>
-                              <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
-                              <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
-                              </div>
-
-                              <div class="mb-3 col-md-2">
-                              <label class="form-label">Landfill</label>
-                              <input type="text" v-model="landFillLoad" class="form-control form-control-sm border border-primary" />
-                              <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{errorsLoad.landFillLoad_er}}</small>
-                              </div>
-
-                              <div class="mb-3 col-md-2">
-                              <label class="form-label">Ticket #</label>
-                              <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
-                              <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
-                              </div>
-
-
-                          </div>
-
-
-
-                          <div class="row">
-
-                              <div class="mb-3 col-md-6">
-                              <label class="form-label">Note</label>
-                              <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
-                              <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
-                              </div>
-
-                              <div class="mb-3 col-md-4">
-                              <!-- <label class="form-label">Images</label> -->
-                          
-                          <input type="file" ref="fileInput" class="form-control-sm border border-primary" multiple="multiple" accept="image/*" @change="handleFileChange"/>
-
-                              <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
-                              </div>
-
-                          <div class="mb-4 col-md-2 align-self-end">
-
-             
-
-                            <button @click="HandleLoad" type="button" class="btn btn-info">
-                              {{ isEditingLoad ? "Save" : "Add" }}
-                              <span class="btn-icon-end">
-                                <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
-                              </span>
-                            </button>
-
-
-                          </div>
-
-                        </div>
-
-                        <div class="row">
-                          <hr style="color: black" />
-                          <div class="table-responsive">
-                            <table
-                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
-                              <thead class="thead-primary">
-                                <tr>
-                                  <!-- <th style="width:50px;"></th> -->
-                                  <th>Route #</th>
-                                  <th>First Stop Time</th>
-                                  <th>Last Stop Time</th>
-                                  <th>Landfill Time In</th>
-                                  <th>Landfill Time Out</th>
-                                  <th>Gross Weight</th>
-                                  <th>Tare Weight</th>
-                                  <th>Tons</th>
-                                  <th>Landfill</th>
-                                  <th>Ticket #</th>
-                                  <!-- <th>Note</th> -->
-                                  <th>Action</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="(item, index) in loadList" :key="index">
-                                  <!-- <td></td> -->
-                                  <td class="td">{{ item.route }}</td>
-                                  <td class="td">{{ item.firstStopTime }}</td>
-                                  <td class="td">{{ item.lastStopTime }}</td>
-                                  <td class="td">{{ item.landFillTimeIn }}</td>
-                                  <td class="td">{{ item.landFillTimeOut }}</td>
-                                  <td class="td">{{ item.grossWeight }}</td>
-                                  <td class="td">{{ item.tareWeight }}</td>
-                                  <td class="td">{{ item.tons }}</td>
-                                  <td class="td">{{ item.landFill }}</td>
-                                  <td class="td">{{ item.ticketNumber }}</td>
-                                  <!-- <td class="td">{{ item.note }}</td> -->
-                
-                                  <td>
-                                    <div>
-                                      <a href="#" @click="EditDowntime(item)"
-                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
-                                          class="fa fa-pencil"></i></a>
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-
-
-
-
-
-
-
-
-                      </div>
-                    </div>
+      <div class="row">
+        <hr style="color: black" />
+        <div class="table-responsive">
+          <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
+            <thead class="thead-primary">
+              <tr>
+                <th>Route #</th>
+                <th>First Stop Time</th>
+                <th>Last Stop Time</th>
+                <th>Landfill Time In</th>
+                <th>Landfill Time Out</th>
+                <th>Gross Weight</th>
+                <th>Tare Weight</th>
+                <th>Tons</th>
+                <th>Landfill</th>
+                <th>Ticket #</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in loadList" :key="index">
+                <td class="td">{{ item.route }}</td>
+                <td class="td">{{ item.firstStopTime }}</td>
+                <td class="td">{{ item.lastStopTime }}</td>
+                <td class="td">{{ item.landFillTimeIn }}</td>
+                <td class="td">{{ item.landFillTimeOut }}</td>
+                <td class="td">{{ item.grossWeight }}</td>
+                <td class="td">{{ item.tareWeight }}</td>
+                <td class="td">{{ item.tons }}</td>
+                <td class="td">{{ item.landFill }}</td>
+                <td class="td">{{ item.ticketNumber }}</td>
+                <td>
+                  <div>
+                    <a href="#" @click="EditLoad(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
                   </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-                  
                 </div>
               </div>
 
@@ -1633,5 +1625,16 @@ const getDenverTimeAsUTCISOString = () => {
 
 .td {
   color: black;
+}
+
+/* Ajustes para alinear verticalmente */
+.form-control-sm {
+  min-height: 38px !important;
+  padding: 0.375rem 0.75rem !important;
+}
+
+.btn-info {
+  min-height: 38px !important;
+  padding: 0.375rem 0.75rem !important;
 }
 </style>
