@@ -136,9 +136,15 @@ const errorsDowntime = ref({
 
 // Load
 
+const formData = new FormData();
+const selectedImages = ref([]);
+const fileInput = ref(null);
+
 const loadList = ref([]);
 const isEditingLoad = ref(false); // To track if we are editing a load record
 const selectedLoadId = ref(null); // To store the ID of the load being edited
+
+
 
 const timeFirstStopTimeLoad = ref("");
 const selectedRouteLoad = ref("");
@@ -630,6 +636,108 @@ const HandleDowntime = async (event) => {
 };
 
 
+// Handle form submission for Load
+const HandleLoad = async (event) => {
+  event.preventDefault();
+
+  // Limpiar errores anteriores
+
+  errorsDowntime.value.selectedTruckDowntime_er = "";
+  errorsDowntime.value.timeStartTimeDowntime_er = "";
+  errorsDowntime.value.timeEndTimeDowntime_er = "";
+  errorsDowntime.value.downtimeReasonDowntime_er = "";
+
+
+  let hasError = false;
+
+  if (!selectedTruckDowntime.value) {
+    errorsDowntime.value.selectedTruckDowntime_er = "Required field";
+    hasError = true;
+  }
+
+  if (!timeStartTimeDowntime.value) {
+    errorsDowntime.value.timeStartTimeDowntime_er = "Required field";
+    hasError = true;
+  }
+
+  if (hasError) {
+    return;
+  }
+
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+
+  const downtime = {
+    truck_id: selectedTruckDowntime.value,
+    startTime: formatTime(timeStartTimeDowntime.value),
+    endTime: formatTime(timeEndTimeDowntime.value) || "",
+    downtimeReason: downtimeReasonDowntime.value || "",
+    coversheet_id: coversheet_id,
+  };
+
+  try {
+    if (isEditingDowntime.value) {
+      const response = await DowntimeAPI.edit(selectedDowntimeId.value,downtime);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Downtime updated successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          loadDowntime();
+          resetDowntime();
+        });
+      } else {
+        showSweetAlert({
+          title: "Error updating Downtime!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        });
+      }
+    } else {
+      // Add new Downtime
+      const response = await DowntimeAPI.add(downtime);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Downtime saved successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          loadDowntime();
+          resetDowntime();
+        });
+      } else {
+        showSweetAlert({
+          title: "Error saving Downtime!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        });
+      }
+    }
+  } catch (error) {
+    showSweetAlert({
+      title: isEditingDowntime.value? "Error updating Downtime!": "Error saving Downtime!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    });
+  }
+};
 
 
 
@@ -701,6 +809,50 @@ const loadDowntime = async () => {
   }
 };
 
+// Function to handle file change
+const handleFileChange = (event) => {
+  const files = event.target.files;
+
+  const images = [];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    if (file.size > 3145728) {
+      // Si la imagen es mayor de 3 MB , alertar  parar
+      showSweetAlert({
+        title: "Image with excess size!",
+        text: `You cannot upload the image ${file.name}, the maximum allowed is 3MbThe`,
+        icon: "warning",
+        allowOutsideClick: false,
+      }).then(() => {
+        fileInput.value.value = "";
+        formData.delete("image");
+        return;
+      });
+    }
+
+    images.push({
+      name: file.name,
+      size: file.size,
+    });
+
+    formData.append("image", file, file.name);
+  }
+  selectedImages.value = images;
+
+  if (selectedImages.value.length > 15) {
+    showSweetAlert({
+      title: "Upload not completed!",
+      text: "At most you can add up to 15 images.",
+      icon: "warning",
+      allowOutsideClick: false,
+    }).then(() => {
+      fileInput.value.value = "";
+      formData.delete("image");
+      return;
+    });
+  }
+};
 
 // Metodos Utilitarios
 
@@ -780,7 +932,10 @@ const getDenverTimeAsUTCISOString = () => {
         <div class="card-body">
           <div class="basic-form">
             <form @submit="onSubmit" autocomplete="off">
+
               <div class="row">
+
+
                 <div class="mb-3 col-md-4">
                   <label class="form-label">Route #</label>
                   <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose your Route"
@@ -809,6 +964,7 @@ const getDenverTimeAsUTCISOString = () => {
                     </label>
                   </div>
                 </div>
+
               </div>
 
               <div class="row">
@@ -1197,6 +1353,7 @@ const getDenverTimeAsUTCISOString = () => {
                       </div>
                     </div>
                   </div>
+
                   <div class="accordion-item">
                     <h2 class="accordion-header">
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -1208,7 +1365,12 @@ const getDenverTimeAsUTCISOString = () => {
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
 
+
+
+
                 <div class="row">
+
+                
 
 
                           <div class="mb-3 col-md-3">
@@ -1272,6 +1434,15 @@ const getDenverTimeAsUTCISOString = () => {
                             <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
                           </div>
 
+                          </div>
+
+
+
+
+
+                          <div class="row">
+
+
                             <div class="mb-3 col-md-2">
                               <label class="form-label">Gross Weight</label>
                               <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
@@ -1290,12 +1461,45 @@ const getDenverTimeAsUTCISOString = () => {
                               <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
                               </div>
 
+                              <div class="mb-3 col-md-2">
+                              <label class="form-label">Landfill</label>
+                              <input type="text" v-model="landFillLoad" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{errorsLoad.landFillLoad_er}}</small>
+                              </div>
+
+                              <div class="mb-3 col-md-2">
+                              <label class="form-label">Ticket #</label>
+                              <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
+                              </div>
+
+
+                          </div>
+
+
+
+                          <div class="row">
+
+                              <div class="mb-3 col-md-6">
+                              <label class="form-label">Note</label>
+                              <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
+                              </div>
+
+                              <div class="mb-3 col-md-4">
+                              <!-- <label class="form-label">Images</label> -->
+                          
+                          <input type="file" ref="fileInput" class="form-control-sm border border-primary" multiple="multiple" accept="image/*" @change="handleFileChange"/>
+
+                              <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
+                              </div>
+
                           <div class="mb-4 col-md-2 align-self-end">
 
              
 
-                            <button @click="HandleDowntime" type="button" class="btn btn-info">
-                              {{ isEditingDowntime ? "Save" : "Add" }}
+                            <button @click="HandleLoad" type="button" class="btn btn-info">
+                              {{ isEditingLoad ? "Save" : "Add" }}
                               <span class="btn-icon-end">
                                 <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
                               </span>
@@ -1314,20 +1518,35 @@ const getDenverTimeAsUTCISOString = () => {
                               <thead class="thead-primary">
                                 <tr>
                                   <!-- <th style="width:50px;"></th> -->
-                                  <th>Truck #</th>
-                                  <th>Start Time #</th>
-                                  <th>End Time</th>
-                                  <th>Dowtime Reason</th>
+                                  <th>Route #</th>
+                                  <th>First Stop Time</th>
+                                  <th>Last Stop Time</th>
+                                  <th>Landfill Time In</th>
+                                  <th>Landfill Time Out</th>
+                                  <th>Gross Weight</th>
+                                  <th>Tare Weight</th>
+                                  <th>Tons</th>
+                                  <th>Landfill</th>
+                                  <th>Ticket #</th>
+                                  <!-- <th>Note</th> -->
                                   <th>Action</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr v-for="(item, index) in downtimeList" :key="index">
+                                <tr v-for="(item, index) in loadList" :key="index">
                                   <!-- <td></td> -->
-                                  <td class="td">{{ item.truckNumber }}</td>
-                                  <td class="td">{{ item.startTime }}</td>
-                                  <td class="td">{{ item.endTime }}</td>
-                                  <td class="td">{{ item.downtimeReason }}</td>
+                                  <td class="td">{{ item.route }}</td>
+                                  <td class="td">{{ item.firstStopTime }}</td>
+                                  <td class="td">{{ item.lastStopTime }}</td>
+                                  <td class="td">{{ item.landFillTimeIn }}</td>
+                                  <td class="td">{{ item.landFillTimeOut }}</td>
+                                  <td class="td">{{ item.grossWeight }}</td>
+                                  <td class="td">{{ item.tareWeight }}</td>
+                                  <td class="td">{{ item.tons }}</td>
+                                  <td class="td">{{ item.landFill }}</td>
+                                  <td class="td">{{ item.ticketNumber }}</td>
+                                  <!-- <td class="td">{{ item.note }}</td> -->
+                
                                   <td>
                                     <div>
                                       <a href="#" @click="EditDowntime(item)"
@@ -1351,6 +1570,8 @@ const getDenverTimeAsUTCISOString = () => {
                       </div>
                     </div>
                   </div>
+
+                  
                 </div>
               </div>
 
