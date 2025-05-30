@@ -218,6 +218,7 @@ onMounted(() => {
 
       selectedRouteSpareTruckInfo.value = coversheet.route_id;
       selectedTruckDowntime.value = coversheet.truck_id;
+      selectedRouteLoad.value = coversheet.route_id;
 
       loadSpareTruckInfo();
 
@@ -299,7 +300,11 @@ const onSubmit = async (event) => {
       if (response.data.ok) {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+
         selectedRouteSpareTruckInfo.value = coversheet.route_id;
+        selectedTruckDowntime.value = coversheet.truck_id;
+        selectedRouteLoad.value = coversheet.route_id;
+
         isEditModeCoverShet.value = true;
 
         showSweetAlert({
@@ -332,7 +337,10 @@ const onSubmit = async (event) => {
       if (response.data.ok) {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+
         selectedRouteSpareTruckInfo.value = coversheet.route_id;
+        selectedTruckDowntime.value = coversheet.truck_id;
+        selectedRouteLoad.value = coversheet.route_id;
 
         showSweetAlert({
           title: "General information edited successfully!",
@@ -419,7 +427,7 @@ const resetDowntime = () => {
 
 const resetLoad = () => {
 
-  selectedRouteLoad.value = "";
+  // selectedRouteLoad.value = "";
   timeFirstStopTimeLoad.value = "";
   timeLastStopTimeLoad.value = "";
   timeLandtFillTimeInLoad.value = "";
@@ -430,7 +438,7 @@ const resetLoad = () => {
   landFillLoad.value = "";
   ticketNumberLoad.value = "";
   noteLoad.value = "";
-  imageLoad.value = [];
+  fileInput.value.value = null;
 
   isEditingLoad.value = false;
 
@@ -698,15 +706,31 @@ const HandleLoad = async (event) => {
 
   formData.append("route", selectedRouteLoad.value);
   formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
-  formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value) || "");
-  formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value) || "");
-  formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value) || "");
-  formData.append("grossWeight", grossWeightLoad.value);
-  formData.append("tareWeight", tareWeightLoad.value);
-  formData.append("tons", tonsLoad.value);
-  formData.append("landFill", landFillLoad.value);
-  formData.append("ticketNumber", ticketNumberLoad.value);
-  formData.append("note", noteLoad.value);
+
+  if (timeLastStopTimeLoad.value) formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value));
+  if (timeLandtFillTimeInLoad.value) formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value));
+  if (timeLandFillTimeOutLoad.value) formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value));
+
+  if (grossWeightLoad.value) formData.append("grossWeight", (grossWeightLoad.value));
+  if (tareWeightLoad.value) formData.append("tareWeight", (tareWeightLoad.value));
+  if (tonsLoad.value) formData.append("tons", (tonsLoad.value));
+  if (landFillLoad.value) formData.append("landFill", (landFillLoad.value));
+  if (ticketNumberLoad.value) formData.append("ticketNumber", (ticketNumberLoad.value));
+  if (noteLoad.value) formData.append("note", (noteLoad.value));
+  
+  
+
+  // formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value) || null);
+  // formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value) || null);
+  // formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value) || null);
+
+  // formData.append("grossWeight", (grossWeightLoad.value)|| null);
+  // formData.append("tareWeight", (tareWeightLoad.value)|| null);
+  // formData.append("tons", (tonsLoad.value)|| null);
+  // formData.append("landFill", (landFillLoad.value)|| null);
+  // formData.append("ticketNumber", (ticketNumberLoad.value)|| null);
+  // formData.append("note", (noteLoad.value)|| null);
+
   formData.append("coversheet_id", coversheet_id);
 
 
