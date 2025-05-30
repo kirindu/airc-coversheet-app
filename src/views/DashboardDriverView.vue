@@ -222,7 +222,7 @@ onMounted(() => {
 
       loadSpareTruckInfo();
 
-       loadDowntime();
+      loadDowntime();
 
       loadLoad();
     }
@@ -427,7 +427,7 @@ const resetDowntime = () => {
 
 const resetLoad = () => {
 
-  // selectedRouteLoad.value = "";
+//selectedRouteLoad.value = "";
   timeFirstStopTimeLoad.value = "";
   timeLastStopTimeLoad.value = "";
   timeLandtFillTimeInLoad.value = "";
@@ -438,9 +438,13 @@ const resetLoad = () => {
   landFillLoad.value = "";
   ticketNumberLoad.value = "";
   noteLoad.value = "";
-  fileInput.value.value = null;
-
+  selectedImages.value = []; // Limpiar la lista de imágenes seleccionadas
+  formData.delete("image"); // Limpiar las imágenes del FormData
+  if (fileInput.value) {
+    fileInput.value.value = ""; // Limpiar el input de archivos
+  }
   isEditingLoad.value = false;
+  selectedLoadId.value = null;
 
 };
 
@@ -671,11 +675,10 @@ const HandleLoad = async (event) => {
   event.preventDefault();
 
   // Limpiar errores anteriores
-
   errorsLoad.value.selectedRouteLoad_er = "";
   errorsLoad.value.timeFirstStopTimeLoad_er = "";
   errorsLoad.value.timeLastStopTimeLoad_er = "";
-  errorsLoad.value.timeLandtFillTimeInLoad_er = "";
+  errorsLoad.value.timeLandFillTimeInLoad_er = "";
   errorsLoad.value.timeLandFillTimeOutLoad_er = "";
   errorsLoad.value.grossWeightLoad_er = "";
   errorsLoad.value.tareWeightLoad_er = "";
@@ -684,7 +687,6 @@ const HandleLoad = async (event) => {
   errorsLoad.value.ticketNumberLoad_er = "";
   errorsLoad.value.noteLoad_er = "";
   errorsLoad.value.imageLoad_er = "";
-
 
   let hasError = false;
 
@@ -704,40 +706,35 @@ const HandleLoad = async (event) => {
 
   let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
+  // Crear un nuevo FormData para evitar datos acumulados
+  const formData = new FormData();
+
+  // Agregar los campos al FormData
   formData.append("route", selectedRouteLoad.value);
   formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
 
   if (timeLastStopTimeLoad.value) formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value));
   if (timeLandtFillTimeInLoad.value) formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value));
   if (timeLandFillTimeOutLoad.value) formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value));
-
-  if (grossWeightLoad.value) formData.append("grossWeight", (grossWeightLoad.value));
-  if (tareWeightLoad.value) formData.append("tareWeight", (tareWeightLoad.value));
-  if (tonsLoad.value) formData.append("tons", (tonsLoad.value));
-  if (landFillLoad.value) formData.append("landFill", (landFillLoad.value));
-  if (ticketNumberLoad.value) formData.append("ticketNumber", (ticketNumberLoad.value));
-  if (noteLoad.value) formData.append("note", (noteLoad.value));
-  
-  
-
-  // formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value) || null);
-  // formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value) || null);
-  // formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value) || null);
-
-  // formData.append("grossWeight", (grossWeightLoad.value)|| null);
-  // formData.append("tareWeight", (tareWeightLoad.value)|| null);
-  // formData.append("tons", (tonsLoad.value)|| null);
-  // formData.append("landFill", (landFillLoad.value)|| null);
-  // formData.append("ticketNumber", (ticketNumberLoad.value)|| null);
-  // formData.append("note", (noteLoad.value)|| null);
-
+  if (grossWeightLoad.value) formData.append("grossWeight", grossWeightLoad.value.toString());
+  if (tareWeightLoad.value) formData.append("tareWeight", tareWeightLoad.value.toString());
+  if (tonsLoad.value) formData.append("tons", tonsLoad.value.toString());
+  if (landFillLoad.value) formData.append("landFill", landFillLoad.value);
+  if (ticketNumberLoad.value) formData.append("ticketNumber", ticketNumberLoad.value);
+  if (noteLoad.value) formData.append("note", noteLoad.value);
   formData.append("coversheet_id", coversheet_id);
 
-
+  // Agregar las imágenes al FormData (si las hay)
+  if (selectedImages.value.length > 0) {
+    const files = fileInput.value.files;
+    for (let i = 0; i < files.length; i++) {
+      formData.append("images", files[i], files[i].name); // Cambiar "image[]" por "images"
+    }
+  }
 
   try {
     if (isEditingLoad.value) {
-      const response = await LoadAPI.edit(selectedLoadId.value,formData);
+      const response = await LoadAPI.edit(selectedLoadId.value, formData);
 
       if (response.data.ok) {
         showSweetAlert({
@@ -788,21 +785,18 @@ const HandleLoad = async (event) => {
         });
       }
     }
-  } 
-
-  catch (error) {
+  } catch (error) {
     showSweetAlert({
-      title: isEditingDowntime.value? "Error updating Load!": "Error saving Load!",
+      title: isEditingLoad.value ? "Error updating Load!" : "Error saving Load!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
       confirmButtonText: "Ok",
       allowOutsideClick: false,
     });
-
+    console.error("Error al enviar Load:", error);
   }
 };
-
 
 
 
@@ -840,16 +834,29 @@ const EditLoad = (item) => {
 
   selectedRouteLoad.value = item.route;
   timeFirstStopTimeLoad.value = setTimeFromDB(item.firstStopTime);
-  timeLastStopTimeLoad.value = setTimeFromDB(item.lastStopTime);
-  timeLandtFillTimeInLoad.value = setTimeFromDB(item.landFillTimeIn);
-  timeLandFillTimeOutLoad.value = setTimeFromDB(item.landFillTimeOut);
-  grossWeightLoad.value = item.grossWeight;
-  tareWeightLoad.value = item.tareWeight;
-  tonsLoad.value = item.tons;
-  landFillLoad.value = item.landFill;
-  ticketNumberLoad.value = item.ticketNumber;
-  noteLoad.value = item.note;
-  // imageLoad.value = item.image || []; // Ensure image is an array
+
+  timeLastStopTimeLoad.value = item.lastStopTime ? setTimeFromDB(item.lastStopTime) : "";
+  timeLandtFillTimeInLoad.value = item.landFillTimeIn ? setTimeFromDB(item.landFillTimeIn) : "";
+  timeLandFillTimeOutLoad.value = item.landFillTimeOut ? setTimeFromDB(item.landFillTimeOut) : "";
+  grossWeightLoad.value = item.grossWeight ? item.grossWeight.toString() : "";
+  tareWeightLoad.value = item.tareWeight ? item.tareWeight.toString() : "";
+  tonsLoad.value = item.tons ? item.tons.toString() : "";
+  landFillLoad.value = item.landFill ? item.landFill : "";
+  ticketNumberLoad.value = item.ticketNumber ? item.ticketNumber : "";
+  noteLoad.value = item.note ? item.note : "";
+  
+
+
+
+  // timeLastStopTimeLoad.value = setTimeFromDB(item.lastStopTime);
+  // timeLandtFillTimeInLoad.value = setTimeFromDB(item.landFillTimeIn);
+  // timeLandFillTimeOutLoad.value = setTimeFromDB(item.landFillTimeOut);
+  // grossWeightLoad.value = item.grossWeight;
+  // tareWeightLoad.value = item.tareWeight;
+  // tonsLoad.value = item.tons;
+  // landFillLoad.value = item.landFill;
+  // ticketNumberLoad.value = item.ticketNumber;
+  // noteLoad.value = item.note;
 
 
 
@@ -927,29 +934,26 @@ const handleFileChange = (event) => {
     const file = files[i];
 
     if (file.size > 3145728) {
-      // Si la imagen es mayor de 3 MB , alertar  parar
       showSweetAlert({
         title: "Image with excess size!",
-        text: `You cannot upload the image ${file.name}, the maximum allowed is 3MbThe`,
+        text: `You cannot upload the image ${file.name}, the maximum allowed is 3Mb`,
         icon: "warning",
         allowOutsideClick: false,
       }).then(() => {
         fileInput.value.value = "";
-        formData.delete("image");
+        selectedImages.value = [];
         return;
       });
+      return; // Salir de la función si hay un error
     }
 
     images.push({
       name: file.name,
       size: file.size,
     });
-
-    formData.append("image", file, file.name);
   }
-  selectedImages.value = images;
 
-  if (selectedImages.value.length > 15) {
+  if (images.length > 15) {
     showSweetAlert({
       title: "Upload not completed!",
       text: "At most you can add up to 15 images.",
@@ -957,12 +961,14 @@ const handleFileChange = (event) => {
       allowOutsideClick: false,
     }).then(() => {
       fileInput.value.value = "";
-      formData.delete("image");
+      selectedImages.value = [];
       return;
     });
+    return; // Salir de la función si hay un error
   }
-};
 
+  selectedImages.value = images;
+};
 // Metodos Utilitarios
 
 const currentDate = ref(
