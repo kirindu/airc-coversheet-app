@@ -35,6 +35,13 @@ export default {
 
   },
 
+      async getLoad(idCoverSheet) {
+
+    const data = await api.get('/coversheets/' + idCoverSheet + '/load', {});
+    return data;
+
+  },
+
 
   // async add(values) {
 

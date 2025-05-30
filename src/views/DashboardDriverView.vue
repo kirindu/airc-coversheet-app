@@ -7,6 +7,7 @@ import "vue-select/dist/vue-select.css";
 import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 import SpareTruckInfoAPI from "@/api/SpareTruckInfoAPI";
 import DowntimeAPI from "@/api/DowntimeAPI";
+import LoadAPI from "@/api/LoadAPI";
 
 // Import composables
 import useSweetAlert2Notification from "@/composables/useSweetAlert2";
@@ -161,8 +162,8 @@ const imageLoad = ref([]);
 
 
 const errorsLoad = ref({
-timeFirstStopTimeLoad_er:"",
 selectedRouteLoad_er:"",
+timeFirstStopTimeLoad_er:"",
 timeLastStopTimeLoad_er:"", 
 timeLandFillTimeInLoad_er:"",
 timeLandFillTimeOutLoad_er:"",
@@ -663,21 +664,29 @@ const HandleLoad = async (event) => {
 
   // Limpiar errores anteriores
 
-  errorsDowntime.value.selectedTruckDowntime_er = "";
-  errorsDowntime.value.timeStartTimeDowntime_er = "";
-  errorsDowntime.value.timeEndTimeDowntime_er = "";
-  errorsDowntime.value.downtimeReasonDowntime_er = "";
+  errorsLoad.value.selectedRouteLoad_er = "";
+  errorsLoad.value.timeFirstStopTimeLoad_er = "";
+  errorsLoad.value.timeLastStopTimeLoad_er = "";
+  errorsLoad.value.timeLandtFillTimeInLoad_er = "";
+  errorsLoad.value.timeLandFillTimeOutLoad_er = "";
+  errorsLoad.value.grossWeightLoad_er = "";
+  errorsLoad.value.tareWeightLoad_er = "";
+  errorsLoad.value.tonsLoad_er = "";
+  errorsLoad.value.landFillLoad_er = "";
+  errorsLoad.value.ticketNumberLoad_er = "";
+  errorsLoad.value.noteLoad_er = "";
+  errorsLoad.value.imageLoad_er = "";
 
 
   let hasError = false;
 
-  if (!selectedTruckDowntime.value) {
-    errorsDowntime.value.selectedTruckDowntime_er = "Required field";
+  if (!selectedRouteLoad.value) {
+    errorsLoad.value.selectedRouteLoad_er = "Required field";
     hasError = true;
   }
 
-  if (!timeStartTimeDowntime.value) {
-    errorsDowntime.value.timeStartTimeDowntime_er = "Required field";
+  if (!timeFirstStopTimeLoad.value) {
+    errorsLoad.value.timeFirstStopTimeLoad_er = "Required field";
     hasError = true;
   }
 
@@ -687,33 +696,40 @@ const HandleLoad = async (event) => {
 
   let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
-  const downtime = {
-    truck_id: selectedTruckDowntime.value,
-    startTime: formatTime(timeStartTimeDowntime.value),
-    endTime: formatTime(timeEndTimeDowntime.value) || "",
-    downtimeReason: downtimeReasonDowntime.value || "",
-    coversheet_id: coversheet_id,
-  };
+  formData.append("route", selectedRouteLoad.value);
+  formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
+  formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value) || "");
+  formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value) || "");
+  formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value) || "");
+  formData.append("grossWeight", grossWeightLoad.value);
+  formData.append("tareWeight", tareWeightLoad.value);
+  formData.append("tons", tonsLoad.value);
+  formData.append("landFill", landFillLoad.value);
+  formData.append("ticketNumber", ticketNumberLoad.value);
+  formData.append("note", noteLoad.value);
+  formData.append("coversheet_id", coversheet_id);
+
+
 
   try {
-    if (isEditingDowntime.value) {
-      const response = await DowntimeAPI.edit(selectedDowntimeId.value,downtime);
+    if (isEditingLoad.value) {
+      const response = await LoadAPI.edit(selectedLoadId.value,formData);
 
       if (response.data.ok) {
         showSweetAlert({
-          title: "Downtime updated successfully!",
+          title: "Load updated successfully!",
           icon: "success",
           showDenyButton: false,
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
-          loadDowntime();
-          resetDowntime();
+          loadLoad();
+          resetLoad();
         });
       } else {
         showSweetAlert({
-          title: "Error updating Downtime!",
+          title: "Error updating Load!",
           icon: "warning",
           showDenyButton: false,
           showCancelButton: false,
@@ -722,24 +738,24 @@ const HandleLoad = async (event) => {
         });
       }
     } else {
-      // Add new Downtime
-      const response = await DowntimeAPI.add(downtime);
+      // Add new Load
+      const response = await LoadAPI.add(formData);
 
       if (response.data.ok) {
         showSweetAlert({
-          title: "Downtime saved successfully!",
+          title: "Load saved successfully!",
           icon: "success",
           showDenyButton: false,
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
-          loadDowntime();
-          resetDowntime();
+          loadLoad();
+          resetLoad();
         });
       } else {
         showSweetAlert({
-          title: "Error saving Downtime!",
+          title: "Error saving Load!",
           icon: "warning",
           showDenyButton: false,
           showCancelButton: false,
@@ -748,15 +764,18 @@ const HandleLoad = async (event) => {
         });
       }
     }
-  } catch (error) {
+  } 
+
+  catch (error) {
     showSweetAlert({
-      title: isEditingDowntime.value? "Error updating Downtime!": "Error saving Downtime!",
+      title: isEditingDowntime.value? "Error updating Load!": "Error saving Load!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
       confirmButtonText: "Ok",
       allowOutsideClick: false,
     });
+
   }
 };
 
@@ -795,14 +814,25 @@ const EditDowntime = (item) => {
 
 const EditLoad = (item) => {
 
-  selectedTruckDowntime.value = item.truck_id;
-  timeStartTimeDowntime.value = setTimeFromDB(item.startTime);
-  timeEndTimeDowntime.value = setTimeFromDB(item.endTime);
-  downtimeReasonDowntime.value = item.downtimeReason;
+  selectedRouteLoad.value = item.route;
+  timeFirstStopTimeLoad.value = setTimeFromDB(item.firstStopTime);
+  timeLastStopTimeLoad.value = setTimeFromDB(item.lastStopTime);
+  timeLandtFillTimeInLoad.value = setTimeFromDB(item.landFillTimeIn);
+  timeLandFillTimeOutLoad.value = setTimeFromDB(item.landFillTimeOut);
+  grossWeightLoad.value = item.grossWeight;
+  tareWeightLoad.value = item.tareWeight;
+  tonsLoad.value = item.tons;
+  landFillLoad.value = item.landFill;
+  ticketNumberLoad.value = item.ticketNumber;
+  noteLoad.value = item.note;
+  // imageLoad.value = item.image || []; // Ensure image is an array
+
+
+
 
   // Set editing mode
-  isEditingDowntime.value = true;
-  selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
+  isEditingLoad.value = true;
+  selectedLoadId.value = item.id || item._id; // Ensure the ID is captured
 };
 
 const loadSpareTruckInfo = async () => {
@@ -855,10 +885,10 @@ const loadLoad = async () => {
 
   try {
     // Llamamos al API para obtener la lista de Downtime
-    const response = await CoverSheetAPI.getDowntime(coverSheetId);
-    downtimeList.value = response.data.data || [];
+    const response = await CoverSheetAPI.getLoad(coverSheetId);
+   loadList.value = response.data.data || [];
   } catch (error) {
-    console.error("Error al obtener Downtime:", error);
+    console.error("Error al obtener Load:", error);
   }
 };
 
