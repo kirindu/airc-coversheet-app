@@ -3,6 +3,9 @@ import { ref, onMounted } from "vue";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
+// Importamos utilidades
+import { DateTime } from "luxon";
+
 // Importamos el api
 import CoverSheetAPI from "@/api/CoverSheetAPI.js";
 import SpareTruckInfoAPI from "@/api/SpareTruckInfoAPI";
@@ -62,6 +65,7 @@ const fuel = ref("");
 const notes = ref("");
 
 const formSubmitted = ref(false);
+const isVisibleAcordion = ref(false);
 
 const errors = ref({
   route_er: "",
@@ -185,19 +189,25 @@ onMounted(() => {
     sessionStorage.removeItem("page_reloaded2");
   }
 
-  let udser_id = user.value.id;
-  let coversheet_driver_id =
-    JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+  let user_id = user.value.id;
+  let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
-  if (udser_id !== coversheet_driver_id) {
-      localStorage.removeItem("COVERSHEET");
+  if (user_id !== coversheet_driver_id) {
+    localStorage.removeItem("COVERSHEET");
   } else {
-    const date = new Date(JSON.parse(localStorage.getItem("COVERSHEET")).date);
-    const today = new Date();
+    // Parse the date from localStorage (assumed to be in UTC)
+    const dbDate = DateTime.fromISO(JSON.parse(localStorage.getItem("COVERSHEET")).date, { zone: 'utc' });
+    const today = DateTime.now(); // Current time
+
+    // Convert both dates to Denver timezone for comparison
+    const dbDateDenver = dbDate.setZone('America/Denver');
+    const todayDenver = today.setZone('America/Denver');
+
+    // Compare year, month, and day
     if (
-      date.getDate() !== today.getDate() ||
-      date.getMonth() !== today.getMonth() ||
-      date.getFullYear() !== today.getFullYear()
+      dbDateDenver.year !== todayDenver.year ||
+      dbDateDenver.month !== todayDenver.month ||
+      dbDateDenver.day !== todayDenver.day
     ) {
       localStorage.removeItem("COVERSHEET");
     } else {
@@ -220,10 +230,9 @@ onMounted(() => {
       selectedTruckDowntime.value = coversheet.truck_id;
       selectedRouteLoad.value = coversheet.route_id;
 
+      handleVisibleAcordion();
       loadSpareTruckInfo();
-
       loadDowntime();
-
       loadLoad();
     }
   }
@@ -315,6 +324,7 @@ const onSubmit = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isVisibleAcordion.value = true;
           return;
         });
       } else {
@@ -923,7 +933,12 @@ const loadLoad = async () => {
   }
 };
 
+const handleVisibleAcordion = async () => {
+  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  if (!rawCoverSheet) return;
 
+  isVisibleAcordion.value = true
+};
 
 // Function to handle file change
 const handleFileChange = (event) => {
@@ -999,30 +1014,35 @@ const setTimeFromDB = (timeString) => {
   }
 };
 
+// const getDenverTimeAsUTCISOString = () => {
+//   const now = new Date();
+
+//   // Obtiene la diferencia entre Denver y UTC en milisegundos
+//   const options = { timeZone: "America/Denver" };
+//   const parts = Intl.DateTimeFormat("en-US", {
+//     ...options,
+//     year: "numeric",
+//     month: "2-digit",
+//     day: "2-digit",
+//     hour: "2-digit",
+//     minute: "2-digit",
+//     second: "2-digit",
+//     hour12: false,
+//   }).formatToParts(now);
+
+//   const extract = (type) => parts.find((p) => p.type === type)?.value;
+//   const formattedString = `${extract("year")}-${extract("month")}-${extract(
+//     "day"
+//   )}T${extract("hour")}:${extract("minute")}:${extract("second")}`;
+
+//   // Convertimos ese string a Date y sacamos su ISO (que es UTC)
+//   const localDenverDate = new Date(formattedString);
+//   return localDenverDate.toISOString(); // <-- esto lo mandas al backend
+// };
+
 const getDenverTimeAsUTCISOString = () => {
-  const now = new Date();
-
-  // Obtiene la diferencia entre Denver y UTC en milisegundos
-  const options = { timeZone: "America/Denver" };
-  const parts = Intl.DateTimeFormat("en-US", {
-    ...options,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).formatToParts(now);
-
-  const extract = (type) => parts.find((p) => p.type === type)?.value;
-  const formattedString = `${extract("year")}-${extract("month")}-${extract(
-    "day"
-  )}T${extract("hour")}:${extract("minute")}:${extract("second")}`;
-
-  // Convertimos ese string a Date y sacamos su ISO (que es UTC)
-  const localDenverDate = new Date(formattedString);
-  return localDenverDate.toISOString(); // <-- esto lo mandas al backend
+  const now = DateTime.now().setZone('America/Denver'); // Get current time in Denver
+  return now.toUTC().toISO(); // Convert to UTC and return ISO string
 };
 
 </script>
@@ -1175,7 +1195,7 @@ const getDenverTimeAsUTCISOString = () => {
               </div>
 
               <button type="submit" class="btn btn-primary">
-                {{ isEditModeCoverShet ? "Update CoverSheet" : "Save CoverSheet" }}
+                {{ isEditModeCoverShet ? "Update CoverSheet" : "Start CoverSheet" }}
               </button>
             </form>
           </div>
@@ -1183,7 +1203,7 @@ const getDenverTimeAsUTCISOString = () => {
       </div>
     </div>
 
-    <div class="col-lg-12">
+    <div v-if="isVisibleAcordion" class="col-lg-12">
       <div class="card">
         <div class="card-body">
           <div class="basic-form">
@@ -1628,7 +1648,7 @@ const getDenverTimeAsUTCISOString = () => {
               </div>
 
               <button type="submit" class="btn btn-primary">
-                Save CoverSheet
+                Start CoverSheet
               </button>
             </form>
           </div>
