@@ -1348,7 +1348,7 @@ const getDenverTimeAsUTCISOString = () => {
                                   <td class="td">{{ item.backInYard }}</td>
                                   <td>
                                     <div>
-                                      <a href="#" @click="EditSpareTruckInfo(item)"
+                                      <a @click="EditSpareTruckInfo(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"><i
                                           class="fa fa-pencil"></i></a>
                                     </div>
@@ -1460,7 +1460,7 @@ const getDenverTimeAsUTCISOString = () => {
                                   <td class="td">{{ item.downtimeReason }}</td>
                                   <td>
                                     <div>
-                                      <a href="#" @click="EditDowntime(item)"
+                                      <a @click="EditDowntime(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"><i
                                           class="fa fa-pencil"></i></a>
                                     </div>
@@ -1636,7 +1636,7 @@ const getDenverTimeAsUTCISOString = () => {
                 <td class="td">{{ item.ticketNumber }}</td>
                 <td>
                   <div>
-                    <a href="#" @click="EditLoad(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+                    <a @click="EditLoad(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
                   </div>
                 </td>
               </tr>
