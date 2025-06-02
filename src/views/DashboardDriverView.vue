@@ -23,6 +23,9 @@ import Spinner from "@/components/Spinner.vue";
 import { useRoutesStore } from "@/stores/routes.js";
 const storeRoute = useRoutesStore();
 
+import { useLandFillsStore } from "@/stores/landfills";
+const storeLandFill = useLandFillsStore();
+
 
 
 import { useTrucksStore } from "@/stores/trucks.js";
@@ -159,7 +162,7 @@ const timeLandFillTimeOutLoad = ref("");
 const grossWeightLoad = ref("");
 const tareWeightLoad = ref("");
 const tonsLoad = ref("");
-const landFillLoad = ref("");
+const selectedLandFillLoad = ref("");
 const ticketNumberLoad = ref("");
 const noteLoad = ref("");
 const imageLoad = ref([]);
@@ -174,7 +177,7 @@ timeLandFillTimeOutLoad_er:"",
 grossWeightLoad_er:"",
 tareWeightLoad_er:"",
 tonsLoad_er:"",
-landFillLoad_er:"",
+selectedLandFillLoad_er:"",
 ticketNumberLoad_er:"",
 noteLoad_er:"",
 imageLoad_er: "",
@@ -445,7 +448,7 @@ const resetLoad = () => {
   grossWeightLoad.value = "";
   tareWeightLoad.value = "";
   tonsLoad.value = "";
-  landFillLoad.value = "";
+  selectedLandFillLoad.value = "";
   ticketNumberLoad.value = "";
   noteLoad.value = "";
   selectedImages.value = []; // Limpiar la lista de imágenes seleccionadas
@@ -693,7 +696,7 @@ const HandleLoad = async (event) => {
   errorsLoad.value.grossWeightLoad_er = "";
   errorsLoad.value.tareWeightLoad_er = "";
   errorsLoad.value.tonsLoad_er = "";
-  errorsLoad.value.landFillLoad_er = "";
+  errorsLoad.value.selectedLandFillLoad_er = "";
   errorsLoad.value.ticketNumberLoad_er = "";
   errorsLoad.value.noteLoad_er = "";
   errorsLoad.value.imageLoad_er = "";
@@ -731,7 +734,7 @@ const HandleLoad = async (event) => {
   if (grossWeightLoad.value) formData.append("grossWeight", grossWeightLoad.value.toString());
   if (tareWeightLoad.value) formData.append("tareWeight", tareWeightLoad.value.toString());
   if (tonsLoad.value) formData.append("tons", tonsLoad.value.toString());
-  if (landFillLoad.value) formData.append("landFill", landFillLoad.value);
+  if (selectedLandFillLoad.value) formData.append("landFill_id", selectedLandFillLoad.value);
   if (ticketNumberLoad.value) formData.append("ticketNumber", ticketNumberLoad.value);
   if (noteLoad.value) formData.append("note", noteLoad.value);
   formData.append("coversheet_id", coversheet_id);
@@ -855,25 +858,10 @@ const EditLoad = (item) => {
   grossWeightLoad.value = item.grossWeight ? item.grossWeight.toString() : "";
   tareWeightLoad.value = item.tareWeight ? item.tareWeight.toString() : "";
   tonsLoad.value = item.tons ? item.tons.toString() : "";
-  landFillLoad.value = item.landFill ? item.landFill : "";
+  selectedLandFillLoad.value = item.landFill_id ? item.landFill_id : "";
   ticketNumberLoad.value = item.ticketNumber ? item.ticketNumber : "";
   noteLoad.value = item.note ? item.note : "";
   
-
-
-
-  // timeLastStopTimeLoad.value = setTimeFromDB(item.lastStopTime);
-  // timeLandtFillTimeInLoad.value = setTimeFromDB(item.landFillTimeIn);
-  // timeLandFillTimeOutLoad.value = setTimeFromDB(item.landFillTimeOut);
-  // grossWeightLoad.value = item.grossWeight;
-  // tareWeightLoad.value = item.tareWeight;
-  // tonsLoad.value = item.tons;
-  // landFillLoad.value = item.landFill;
-  // ticketNumberLoad.value = item.ticketNumber;
-  // noteLoad.value = item.note;
-
-
-
 
   // Set editing mode
   isEditingLoad.value = true;
@@ -1570,11 +1558,23 @@ const getDenverTimeAsUTCISOString = () => {
           <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
-          <label class="form-label">Landfill</label>
-          <input type="text" v-model="landFillLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{errorsLoad.landFillLoad_er}}</small>
-        </div>
+
+
+                        <div class="mb-3 col-md-2">
+                  <label class="form-label">Landfill</label>
+                  <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
+                    :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
+                  <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{
+                    errorsLoad.landFillLoad_er
+                  }}</small>
+                </div>
+
+
+
+
+
+
         <div class="mb-3 col-md-2">
           <label class="form-label">Ticket #</label>
           <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
@@ -1632,7 +1632,7 @@ const getDenverTimeAsUTCISOString = () => {
                 <td class="td">{{ item.grossWeight }}</td>
                 <td class="td">{{ item.tareWeight }}</td>
                 <td class="td">{{ item.tons }}</td>
-                <td class="td">{{ item.landFill }}</td>
+                <td class="td">{{ item.landfillName }}</td>
                 <td class="td">{{ item.ticketNumber }}</td>
                 <td>
                   <div>

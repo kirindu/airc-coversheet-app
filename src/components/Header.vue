@@ -1,33 +1,33 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 
 const user = ref(null)
-
+const router = useRouter() // Instanciamos el router
 
 onMounted(() => {
-
   const storedUser = localStorage.getItem('USER')
 
-if (storedUser) {
-  try {
-    const parsed = JSON.parse(storedUser)
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser)
 
-
-    if(parsed.data.user) {
-      user.value = parsed.data.user // ADMIN
-    } else {
-      user.value = parsed.data // DRIVER
+      if (parsed.data.user) {
+        user.value = parsed.data.user // ADMIN
+      } else {
+        user.value = parsed.data // DRIVER
+      }
+    } catch (e) {
+      console.error('Error al parsear USER desde localStorage:', e)
     }
-
-    
-  } catch (e) {
-    console.error('Error al parsear USER desde localStorage:', e)
   }
+})
+
+// Método para manejar el logout
+const logout = () => {
+  localStorage.removeItem('USER') // Eliminamos la variable USER del localStorage
+  router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
 }
-
-});
-
-
 </script>
 
 <template>
@@ -37,7 +37,6 @@ if (storedUser) {
         <div class="collapse navbar-collapse justify-content-between">
           <div class="header-left">
             <div class="dashboard_bar">Dashboard</div>
-
           </div>
           <ul class="navbar-nav header-right">
             <li class="nav-item dropdown header-profile ps30">
@@ -70,9 +69,9 @@ if (storedUser) {
               <div class="dropdown-menu dropdown-menu-end">
                 <div class="card shadow-none border-0 mb-0">
                   <div class="card-footer px-0 py-2" style="background-color:bisque;">
-                    <a href="page-login.html" class="dropdown-item ai-icon">
+                    <a href="#" @click.prevent="logout" class="dropdown-item ai-icon">
                       <i class="flaticon-logout-1 fs-18 text-danger"></i>
-                      <span class="ms-2 text-danger">Logout </span>
+                      <span class="ms-2 text-danger">Logout</span>
                     </a>
                   </div>
                 </div>
