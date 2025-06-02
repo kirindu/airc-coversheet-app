@@ -720,10 +720,12 @@ const HandleLoad = async (event) => {
   const formData = new FormData();
 
   // Agregar los campos al FormData
-  formData.append("route", selectedRouteLoad.value);
+  formData.append("route_id", selectedRouteLoad.value);
   formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
 
   if (timeLastStopTimeLoad.value) formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value));
+
+
   if (timeLandtFillTimeInLoad.value) formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value));
   if (timeLandFillTimeOutLoad.value) formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value));
   if (grossWeightLoad.value) formData.append("grossWeight", grossWeightLoad.value.toString());
@@ -787,6 +789,7 @@ const HandleLoad = async (event) => {
       } else {
         showSweetAlert({
           title: "Error saving Load!",
+          text: response.data.msg,
           icon: "warning",
           showDenyButton: false,
           showCancelButton: false,
@@ -798,6 +801,7 @@ const HandleLoad = async (event) => {
   } catch (error) {
     showSweetAlert({
       title: isEditingLoad.value ? "Error updating Load!" : "Error saving Load!",
+      text: error.response.data.msg,
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
@@ -842,7 +846,7 @@ const EditDowntime = (item) => {
 
 const EditLoad = (item) => {
 
-  selectedRouteLoad.value = item.route;
+  selectedRouteLoad.value = item.route_id;
   timeFirstStopTimeLoad.value = setTimeFromDB(item.firstStopTime);
 
   timeLastStopTimeLoad.value = item.lastStopTime ? setTimeFromDB(item.lastStopTime) : "";
@@ -1620,7 +1624,7 @@ const getDenverTimeAsUTCISOString = () => {
             </thead>
             <tbody>
               <tr v-for="(item, index) in loadList" :key="index">
-                <td class="td">{{ item.route }}</td>
+                <td class="td">{{ item.routeNumber }}</td>
                 <td class="td">{{ item.firstStopTime }}</td>
                 <td class="td">{{ item.lastStopTime }}</td>
                 <td class="td">{{ item.landFillTimeIn }}</td>
