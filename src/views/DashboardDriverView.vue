@@ -1095,7 +1095,7 @@ const getDenverTimeAsUTCISOString = () => {
               </div>
 
               <div class="row">
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Clock In</label>
                   <div class="mt-0">
                     <VueDatePicker v-model="timeClockIn" time-picker placeholder="Select Time">
@@ -1109,7 +1109,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Leave Yard</label>
                   <div class="mt-0">
                     <VueDatePicker v-model="timeLeaveYard" time-picker placeholder="Select Time">
@@ -1123,7 +1123,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Back In Yard</label>
                   <div class="mt-0">
                     <VueDatePicker v-model="timeBackInYard" time-picker placeholder="Select Time">
@@ -1137,7 +1137,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Clock Out</label>
                   <div class="mt-0">
                     <VueDatePicker v-model="timeClockOut" time-picker placeholder="Select Time">
@@ -1153,7 +1153,7 @@ const getDenverTimeAsUTCISOString = () => {
               </div>
 
               <div class="row">
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Start Miles</label>
                   <input type="number" v-model="startMiles"
                     class="form-control form-control-sm border border-primary" />
@@ -1162,7 +1162,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">End Miles</label>
                   <input type="number" v-model="endMiles" class="form-control form-control-sm border border-primary" />
                   <small v-if="errors.endMiles_er" class="text-danger">{{
@@ -1170,7 +1170,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-2">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Fuel</label>
                   <input type="number" v-model="fuel" class="form-control form-control-sm border border-primary" />
                   <small v-if="errors.fuel_er" class="text-danger">{{
@@ -1212,8 +1212,10 @@ const getDenverTimeAsUTCISOString = () => {
                     <div id="bordered_collapseOne" class="accordion-collapse collapse show"
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
+
                         <div class="row">
-                          <div class="mb-3 col-md-1">
+
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Spare # </label>
                             <input type="text" v-model="spareTruckSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
@@ -1224,7 +1226,7 @@ const getDenverTimeAsUTCISOString = () => {
                               }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-2">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Route #</label>
                             <v-select :options="storeRoute.routes" v-model="selectedRouteSpareTruckInfo"
                               placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber"
@@ -1236,7 +1238,7 @@ const getDenverTimeAsUTCISOString = () => {
                             }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-1">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Start Miles</label>
                             <input type="number" v-model="startMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
@@ -1247,7 +1249,7 @@ const getDenverTimeAsUTCISOString = () => {
                               }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-1">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">End Miles</label>
                             <input type="number" v-model="endMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
@@ -1258,7 +1260,14 @@ const getDenverTimeAsUTCISOString = () => {
                               }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-1">
+               
+                        </div>
+
+                                <div class="row">
+
+             
+
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Fuel</label>
                             <input type="number" v-model="fuelSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
@@ -1267,7 +1276,7 @@ const getDenverTimeAsUTCISOString = () => {
                             }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-2">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Leave Yard</label>
                             <div class="mt-0">
                               <VueDatePicker v-model="timeLeaveYardSpareTruckInfo" time-picker
@@ -1284,7 +1293,7 @@ const getDenverTimeAsUTCISOString = () => {
                               }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-2">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Back In Yard</label>
                             <div class="mt-0">
                               <VueDatePicker v-model="timeBackInYardSpareTruckInfo" time-picker
@@ -1304,7 +1313,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-4 col-md-2 align-self-end">
 
 
-                            <button @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
+                            <button style="margin-bottom: -5px !important;" @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
                               {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
                               <span class="btn-icon-end">
                                 <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
@@ -1384,7 +1393,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <small v-if="errorsDowntime.selectedTruckDowntime_er" class="text-danger">{{errorsDowntime.selectedTruckDowntime_er}}</small>
                 </div>
 
-                          <div class="mb-3 col-md-2">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">Start Time</label>
                             <div class="mt-0">
                               <VueDatePicker v-model="timeStartTimeDowntime" time-picker
@@ -1397,7 +1406,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <small v-if="errorsDowntime.timeStartTimeDowntime_er" class="text-danger">{{errorsDowntime.timeStartTimeDowntime_er}}</small>
                           </div>
 
-                          <div class="mb-3 col-md-2">
+                          <div class="mb-3 col-md-3">
                             <label class="form-label">End Time</label>
                             <div class="mt-0">
                               <VueDatePicker v-model="timeEndTimeDowntime" time-picker
@@ -1410,7 +1419,21 @@ const getDenverTimeAsUTCISOString = () => {
                             <small v-if="errorsDowntime.timeEndTimeDowntime_er" class="text-danger">{{errorsDowntime.timeEndTimeDowntime_er}}</small>
                           </div>
 
-                            <div class="mb-3 col-md-3">
+                  
+
+                        </div>
+
+
+
+                               <div class="row">
+
+
+
+       
+
+           
+
+                            <div class="mb-3 col-md-9">
                               <label class="form-label">Downtime Reason</label>
                               <input type="text" v-model="downtimeReasonDowntime" class="form-control form-control-sm border border-primary" />
                               <small v-if="errorsDowntime.downtimeReasonDowntime_er" class="text-danger">{{errorsDowntime.downtimeReasonDowntime_er}}</small>
@@ -1420,7 +1443,7 @@ const getDenverTimeAsUTCISOString = () => {
 
              
 
-                            <button @click="HandleDowntime" type="button" class="btn btn-info">
+                            <button style="margin-bottom: -7px !important;" @click="HandleDowntime" type="button" class="btn btn-info">
                               {{ isEditingDowntime ? "Save" : "Add" }}
                               <span class="btn-icon-end">
                                 <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
@@ -1435,6 +1458,9 @@ const getDenverTimeAsUTCISOString = () => {
 
 
                         </div>
+
+
+
 
                         <div class="row">
                           <hr style="color: black" />
@@ -1490,13 +1516,24 @@ const getDenverTimeAsUTCISOString = () => {
   <div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
     <div class="accordion-body">
 
+
+
       <div class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Route #</label>
           <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
           <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
+
+        
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Ticket #</label>
+          <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
+        </div>
+
+
+        <div class="mb-3 col-md-3">
           <label class="form-label">First Stop Time</label>
           <div class="mt-0">
             <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker placeholder="Select Time">
@@ -1507,7 +1544,8 @@ const getDenverTimeAsUTCISOString = () => {
           </div>
           <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
+
+        <div class="mb-3 col-md-3">
           <label class="form-label">Last Stop Time</label>
           <div class="mt-0">
             <VueDatePicker v-model="timeLastStopTimeLoad" time-picker placeholder="Select Time">
@@ -1518,7 +1556,26 @@ const getDenverTimeAsUTCISOString = () => {
           </div>
           <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
+
+
+
+      </div>
+
+  <div class="row">
+
+                        <div class="mb-3 col-md-6">
+                  <label class="form-label">Landfill</label>
+                  <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
+                    :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
+                  <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{
+                    errorsLoad.landFillLoad_er
+                  }}</small>
+                </div>
+
+
+
+        <div class="mb-3 col-md-3">
           <label class="form-label">Landfill Time In</label>
           <div class="mt-0">
             <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker placeholder="Select Time">
@@ -1529,7 +1586,7 @@ const getDenverTimeAsUTCISOString = () => {
           </div>
           <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
+        <div class="mb-3 col-md-3">
           <label class="form-label">Landfill Time Out</label>
           <div class="mt-0">
             <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker placeholder="Select Time">
@@ -1542,45 +1599,56 @@ const getDenverTimeAsUTCISOString = () => {
         </div>
       </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <div class="row">
-        <div class="mb-3 col-md-2">
+        <div class="mb-3 col-md-3">
           <label class="form-label">Gross Weight</label>
           <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
+        <div class="mb-3 col-md-3">
           <label class="form-label">Tare Weight</label>
           <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
         </div>
-        <div class="mb-3 col-md-2">
+        <div class="mb-3 col-md-3">
           <label class="form-label">Tons</label>
           <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
         </div>
 
 
-                        <div class="mb-3 col-md-2">
-                  <label class="form-label">Landfill</label>
-                  <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
-                    :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
-                    :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
-                  <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{
-                    errorsLoad.landFillLoad_er
-                  }}</small>
-                </div>
+  
 
 
 
 
 
 
-        <div class="mb-3 col-md-2">
-          <label class="form-label">Ticket #</label>
-          <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
-        </div>
+
+
       </div>
+
+
+
+
+
+
+
 
       <div class="row d-flex align-items-center">
         <div class="mb-3 col-md-6">
@@ -1651,9 +1719,6 @@ const getDenverTimeAsUTCISOString = () => {
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-primary">
-                Start CoverSheet
-              </button>
             </form>
           </div>
         </div>
