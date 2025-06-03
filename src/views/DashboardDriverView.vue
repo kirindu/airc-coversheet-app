@@ -32,6 +32,7 @@ import { useTrucksStore } from "@/stores/trucks.js";
 const storeTruck = useTrucksStore();
 
 import { useDriversStore } from "@/stores/drivers.js";
+import { is } from "@vee-validate/rules";
 const storeDriver = useDriversStore();
 
 const user = ref(null);
@@ -103,6 +104,7 @@ const startMilesSpareTruckInfo = ref("");
 const endMilesSpareTruckInfo = ref("");
 const fuelSpareTruckInfo = ref("");
 
+const isLoadingSpareTruckInfo = ref(false); // To show loading spinner when fetching spare truck info
 
 // Si quieres mostrar la hora actual en el input de Spare Truck Info
 // const timeLeaveYardSpareTruckInfo = ref({
@@ -133,6 +135,8 @@ const selectedTruckDowntime = ref("");
 const timeStartTimeDowntime = ref("");
 const timeEndTimeDowntime = ref("");
 const downtimeReasonDowntime = ref("");
+
+const isLoadingDowntime = ref(false); // To show loading spinner when fetching downtime info
 
 const errorsDowntime = ref({
   selectedTruckDowntime_er: "",
@@ -166,6 +170,8 @@ const selectedLandFillLoad = ref("");
 const ticketNumberLoad = ref("");
 const noteLoad = ref("");
 const imageLoad = ref([]);
+
+const isLoadingLoad = ref(false); // To show loading spinner when fetching load info
 
 
 const errorsLoad = ref({
@@ -514,6 +520,7 @@ const HandleSpareTruckInfo = async (event) => {
   try {
     if (isEditingSpareTruckInfo.value) {
       // Edit existing Spare Truck Info
+      isLoadingSpareTruckInfo.value = true; // Show loading spinner
       const response = await SpareTruckInfoAPI.edit(selectedSpareTruckId.value,spareTruckInfo);
 
       if (response.data.ok) {
@@ -525,6 +532,7 @@ const HandleSpareTruckInfo = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isLoadingSpareTruckInfo.value = false; // Hide loading spinner
           loadSpareTruckInfo();
           resetSpareTruckInfo();
         });
@@ -536,11 +544,14 @@ const HandleSpareTruckInfo = async (event) => {
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
+        }).then(() => {
+          isLoadingSpareTruckInfo.value = false; // Hide loading spinner
         });
       }
     } else {
       // Add new Spare Truck Info
-      const response = await SpareTruckInfoAPI.add(spareTruckInfo);
+      isLoadingSpareTruckInfo.value = true; // Show loading spinner
+      const response = await SpareTruckInfoAPI.add(spareTruckInfo);      
 
       if (response.data.ok) {
         showSweetAlert({
@@ -551,6 +562,7 @@ const HandleSpareTruckInfo = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isLoadingSpareTruckInfo.value = false; // Hide loading spinner
           loadSpareTruckInfo();
           resetSpareTruckInfo();
         });
@@ -562,6 +574,8 @@ const HandleSpareTruckInfo = async (event) => {
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
+        }).then(() => {
+          isLoadingSpareTruckInfo.value = false; // Hide loading spinner
         });
       }
     }
@@ -575,6 +589,8 @@ const HandleSpareTruckInfo = async (event) => {
       showCancelButton: false,
       confirmButtonText: "Ok",
       allowOutsideClick: false,
+    }).then(() => {
+      isLoadingSpareTruckInfo.value = false; // Hide loading spinner
     });
   }
 };
@@ -619,6 +635,7 @@ const HandleDowntime = async (event) => {
 
   try {
     if (isEditingDowntime.value) {
+      isLoadingDowntime.value = true; // Show loading spinner
       const response = await DowntimeAPI.edit(selectedDowntimeId.value,downtime);
 
       if (response.data.ok) {
@@ -630,6 +647,7 @@ const HandleDowntime = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isLoadingDowntime.value = false; // Hide loading spinner
           loadDowntime();
           resetDowntime();
         });
@@ -641,10 +659,13 @@ const HandleDowntime = async (event) => {
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
+        }).then(() => {
+          isLoadingDowntime.value = false; // Hide loading spinner
         });
       }
     } else {
       // Add new Downtime
+      isLoadingDowntime.value = true; // Show loading spinner
       const response = await DowntimeAPI.add(downtime);
 
       if (response.data.ok) {
@@ -656,6 +677,7 @@ const HandleDowntime = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isLoadingDowntime.value = false; // Hide loading spinner
           loadDowntime();
           resetDowntime();
         });
@@ -667,6 +689,8 @@ const HandleDowntime = async (event) => {
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
+        }).then(() => {
+          isLoadingDowntime.value = false; // Hide loading spinner
         });
       }
     }
@@ -678,6 +702,8 @@ const HandleDowntime = async (event) => {
       showCancelButton: false,
       confirmButtonText: "Ok",
       allowOutsideClick: false,
+    }).then(() => {
+      isLoadingDowntime.value = false; // Hide loading spinner
     });
   }
 };
@@ -749,6 +775,7 @@ const HandleLoad = async (event) => {
 
   try {
     if (isEditingLoad.value) {
+      isLoadingLoad.value = true; // Show loading spinner
       const response = await LoadAPI.edit(selectedLoadId.value, formData);
 
       if (response.data.ok) {
@@ -760,6 +787,7 @@ const HandleLoad = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isLoadingLoad.value = false; // Hide loading spinner
           loadLoad();
           resetLoad();
         });
@@ -771,10 +799,13 @@ const HandleLoad = async (event) => {
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
+        }).then(() => {
+          isLoadingLoad.value = false; // Hide loading spinner
         });
       }
     } else {
       // Add new Load
+      isLoadingLoad.value = true; // Show loading spinner
       const response = await LoadAPI.add(formData);
 
       if (response.data.ok) {
@@ -786,6 +817,7 @@ const HandleLoad = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          isLoadingLoad.value = false; // Hide loading spinner
           loadLoad();
           resetLoad();
         });
@@ -798,6 +830,8 @@ const HandleLoad = async (event) => {
           showCancelButton: false,
           confirmButtonText: "Ok",
           allowOutsideClick: false,
+        }).then(() => {
+          isLoadingLoad.value = false; // Hide loading spinner
         });
       }
     }
@@ -810,6 +844,8 @@ const HandleLoad = async (event) => {
       showCancelButton: false,
       confirmButtonText: "Ok",
       allowOutsideClick: false,
+    }).then(() => {
+      isLoadingLoad.value = false; // Hide loading spinner
     });
     console.error("Error al enviar Load:", error);
   }
@@ -1200,8 +1236,17 @@ const getDenverTimeAsUTCISOString = () => {
         <div class="card-body">
           <div class="basic-form">
             <form autocomplete="off">
+
+
+                
+
+
               <div class="row">
                 <div class="accordion accordion-primary-solid" id="accordion-two">
+
+                <Spinner v-if="isLoadingSpareTruckInfo" />
+
+
                   <div class="accordion-item">
                     <h2 class="accordion-header">
                       <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -1209,6 +1254,10 @@ const getDenverTimeAsUTCISOString = () => {
                         Spare Truck Info
                       </button>
                     </h2>
+
+                     <Spinner v-if="storeRoute.loading || storeTruck.loading" />
+
+                     
                     <div id="bordered_collapseOne" class="accordion-collapse collapse show"
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
@@ -1313,7 +1362,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-4 col-md-2 align-self-end">
 
 
-                            <button style="margin-bottom: -5px !important;" @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
+                            <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;" @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
                               {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
                               <span class="btn-icon-end">
                                 <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
@@ -1370,6 +1419,8 @@ const getDenverTimeAsUTCISOString = () => {
                       </div>
                     </div>
                   </div>
+
+                   <Spinner v-if="isLoadingDowntime" />
                   <div class="accordion-item">
                     <h2 class="accordion-header">
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -1443,7 +1494,7 @@ const getDenverTimeAsUTCISOString = () => {
 
              
 
-                            <button style="margin-bottom: -7px !important;" @click="HandleDowntime" type="button" class="btn btn-info">
+                            <button :disabled="isLoadingDowntime" style="margin-bottom: -7px !important;" @click="HandleDowntime" type="button" class="btn btn-info">
                               {{ isEditingDowntime ? "Save" : "Add" }}
                               <span class="btn-icon-end">
                                 <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
@@ -1506,6 +1557,8 @@ const getDenverTimeAsUTCISOString = () => {
                       </div>
                     </div>
                   </div>
+
+                   <Spinner v-if="isLoadingLoad" />
 
            <div class="accordion-item">
   <h2 class="accordion-header">
@@ -1662,7 +1715,7 @@ const getDenverTimeAsUTCISOString = () => {
           <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
         </div>
         <div style="margin-bottom: -10px !important;" class="mb-0 col-md-2 d-flex ">
-          <button @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
+          <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
             {{ isEditingLoad ? "Save" : "Add" }}
             <span class="btn-icon-end">
               <i :class="isEditingLoad ? 'fa fa-save' : 'fa fa-plus'"></i>
