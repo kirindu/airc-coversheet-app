@@ -1359,7 +1359,7 @@ const getDenverTimeAsUTCISOString = () => {
                               }}</small>
                           </div>
 
-                          <div class="mb-4 col-md-2 align-self-end">
+                          <div class="mb-4 col-md-3 align-self-end">
 
 
                             <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;" @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
@@ -1490,7 +1490,7 @@ const getDenverTimeAsUTCISOString = () => {
                               <small v-if="errorsDowntime.downtimeReasonDowntime_er" class="text-danger">{{errorsDowntime.downtimeReasonDowntime_er}}</small>
                           </div>
 
-                          <div class="mb-4 col-md-2 align-self-end">
+                          <div class="mb-4 col-md-3 align-self-end">
 
              
 
@@ -1704,7 +1704,7 @@ const getDenverTimeAsUTCISOString = () => {
 
 
       <div class="row d-flex align-items-center">
-        <div class="mb-3 col-md-6">
+        <div class="mb-3 col-md-5">
           <label class="form-label">Note</label>
           <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
@@ -1714,7 +1714,7 @@ const getDenverTimeAsUTCISOString = () => {
           <input type="file" ref="fileInput" class="form-control form-control-sm border border-primary" multiple="multiple" accept="image/*" @change="handleFileChange" style="height: 38px; padding: 0.375rem 0.75rem;" />
           <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
         </div>
-        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-2 d-flex ">
+        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex ">
           <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
             {{ isEditingLoad ? "Save" : "Add" }}
             <span class="btn-icon-end">
