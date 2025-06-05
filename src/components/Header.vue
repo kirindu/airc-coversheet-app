@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 
 const user = ref(null)
 const router = useRouter() // Instanciamos el router
+
+
 
 onMounted(() => {
   const storedUser = localStorage.getItem('USER')
@@ -22,6 +25,29 @@ onMounted(() => {
     }
   }
 })
+
+const avatarSrc = computed(() => {
+
+    const storedUser = localStorage.getItem('USER')
+
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser)
+
+      if (parsed.data.user) {
+        user.value = parsed.data.user // ADMIN
+        return '/src/assets/images/avatar/avatar_admin.png'
+      } else {
+        user.value = parsed.data // DRIVER
+        return '/src/assets/images/avatar/avatar.jpg'
+      }
+    } catch (e) {
+      console.error('Error al parsear USER desde localStorage:', e)
+    }
+  }
+
+})
+
 
 // Método para manejar el logout
 const logout = () => {
@@ -46,7 +72,7 @@ const logout = () => {
                 role="button"
                 data-bs-toggle="dropdown"
               >
-                <img src="/src/assets/images/avatar/avatar.jpg" width="20" alt="" />
+                <img :src="avatarSrc" width="20" alt="" />
                 <div class="header-info ms-2 me-3">
                   <span class="fs-13 font-w500 mb-0">{{ user?.name || 'Usuario desconocido' }}</span>
                   <small class="fs-12">{{ user?.rol || 'Rol no definido' }}</small>

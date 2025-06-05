@@ -1678,8 +1678,9 @@ const getDenverTimeAsUTCISOString = () => {
 
 
         <div class="mb-3 col-md-9">
-          <label class="form-label">Images</label>
-          <input
+          <!-- <label class="form-label">Images</label> -->
+
+          <input v-show="false"
             type="file"
             ref="fileInput"
             class="form-control form-control-sm border border-primary"
@@ -1689,6 +1690,12 @@ const getDenverTimeAsUTCISOString = () => {
             @change="handleFileChange"
             style="height: 38px; padding: 0.375rem 0.75rem;"
           />
+
+                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-danger btn-rounded btn-sm">Add Photos<span
+                                        class="btn-icon-end"><i class="fa fa-camera"></i></span>
+                                </button>
+
+
           <div v-if="selectedImages.length > 0" class="row mt-2">
             <div v-for="(image, index) in selectedImages" :key="index" class="col-md-3">
               <img :src="image.url" alt="Preview" style="max-width: 100px; margin-bottom: 10px;" />
