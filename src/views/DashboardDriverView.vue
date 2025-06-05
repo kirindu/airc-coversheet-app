@@ -154,6 +154,7 @@ const errorsDowntime = ref({
 // Load
 
 const formData = new FormData();
+const selectedFiles = ref([]); // Store File objects for FormData
 const selectedImages = ref([]);
 const fileInput = ref(null);
 
@@ -450,8 +451,7 @@ const resetDowntime = () => {
 };
 
 const resetLoad = () => {
-
-//selectedRouteLoad.value = "";
+  selectedRouteLoad.value = "";
   timeFirstStopTimeLoad.value = "";
   timeLastStopTimeLoad.value = "";
   timeLandtFillTimeInLoad.value = "";
@@ -462,14 +462,13 @@ const resetLoad = () => {
   selectedLandFillLoad.value = "";
   ticketNumberLoad.value = "";
   noteLoad.value = "";
-  selectedImages.value = []; // Limpiar la lista de imágenes seleccionadas
-  formData.delete("image"); // Limpiar las imágenes del FormData
+  selectedImages.value = [];
+  selectedFiles.value = []; // Clear files as well
   if (fileInput.value) {
-    fileInput.value.value = ""; // Limpiar el input de archivos
+    fileInput.value.value = "";
   }
   isEditingLoad.value = false;
   selectedLoadId.value = null;
-
 };
 
 // Handle form submission Spare Truck Info (Add or Edit)
@@ -718,7 +717,7 @@ const HandleDowntime = async (event) => {
 const HandleLoad = async (event) => {
   event.preventDefault();
 
-  // Limpiar errores anteriores
+  // Clear previous errors
   errorsLoad.value.selectedRouteLoad_er = "";
   errorsLoad.value.timeFirstStopTimeLoad_er = "";
   errorsLoad.value.timeLastStopTimeLoad_er = "";
@@ -750,16 +749,13 @@ const HandleLoad = async (event) => {
 
   let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
-  // Crear un nuevo FormData para evitar datos acumulados
+  // Create a new FormData object
   const formData = new FormData();
 
-  // Agregar los campos al FormData
+  // Add form fields to FormData
   formData.append("route_id", selectedRouteLoad.value);
   formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
-
   if (timeLastStopTimeLoad.value) formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value));
-
-
   if (timeLandtFillTimeInLoad.value) formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value));
   if (timeLandFillTimeOutLoad.value) formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value));
   if (grossWeightLoad.value) formData.append("grossWeight", grossWeightLoad.value.toString());
@@ -770,17 +766,14 @@ const HandleLoad = async (event) => {
   if (noteLoad.value) formData.append("note", noteLoad.value);
   formData.append("coversheet_id", coversheet_id);
 
-  // Agregar las imágenes al FormData (si las hay)
-  if (selectedImages.value.length > 0) {
-    const files = fileInput.value.files;
-    for (let i = 0; i < files.length; i++) {
-      formData.append("images", files[i], files[i].name); // Cambiar "image[]" por "images"
-    }
-  }
+  // Append all selected files to FormData
+  selectedFiles.value.forEach((file, index) => {
+    formData.append("images", file, file.name); // Use "images" as the key
+  });
 
   try {
     if (isEditingLoad.value) {
-      isLoadingLoad.value = true; // Show loading spinner
+      isLoadingLoad.value = true;
       const response = await LoadAPI.edit(selectedLoadId.value, formData);
 
       if (response.data.ok) {
@@ -792,7 +785,7 @@ const HandleLoad = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
-          isLoadingLoad.value = false; // Hide loading spinner
+          isLoadingLoad.value = false;
           loadLoad();
           resetLoad();
         });
@@ -805,12 +798,11 @@ const HandleLoad = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
-          isLoadingLoad.value = false; // Hide loading spinner
+          isLoadingLoad.value = false;
         });
       }
     } else {
-      // Add new Load
-      isLoadingLoad.value = true; // Show loading spinner
+      isLoadingLoad.value = true;
       const response = await LoadAPI.add(formData);
 
       if (response.data.ok) {
@@ -822,7 +814,7 @@ const HandleLoad = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
-          isLoadingLoad.value = false; // Hide loading spinner
+          isLoadingLoad.value = false;
           loadLoad();
           resetLoad();
         });
@@ -836,26 +828,25 @@ const HandleLoad = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
-          isLoadingLoad.value = false; // Hide loading spinner
+          isLoadingLoad.value = false;
         });
       }
     }
   } catch (error) {
     showSweetAlert({
       title: isEditingLoad.value ? "Error updating Load!" : "Error saving Load!",
-      text: error.response.data.msg,
+      text: error.response?.data?.msg || "An error occurred",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
       confirmButtonText: "Ok",
       allowOutsideClick: false,
     }).then(() => {
-      isLoadingLoad.value = false; // Hide loading spinner
+      isLoadingLoad.value = false;
     });
     console.error("Error al enviar Load:", error);
   }
 };
-
 
 
 const EditSpareTruckInfo = (item) => {
@@ -975,12 +966,20 @@ const handleVisibleAcordion = async () => {
 
 // Function to handle file change
 const handleFileChange = (event) => {
-  const files = event.target.files;
+  if (!event.target.files.length || event.target.files[0]?.type.indexOf("image/") !== 0) {
+    showSweetAlert({
+      title: "Camera Error",
+      text: "Unable to access the camera. Please ensure permissions are granted or select an image from the gallery.",
+      icon: "warning",
+      allowOutsideClick: false,
+    });
+    return;
+  }
 
-  const images = [];
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  const files = Array.from(event.target.files); // Convert FileList to Array
+  const newImages = [];
 
+  for (let file of files) {
     if (file.size > 3145728) {
       showSweetAlert({
         title: "Image with excess size!",
@@ -990,18 +989,18 @@ const handleFileChange = (event) => {
       }).then(() => {
         fileInput.value.value = "";
         selectedImages.value = [];
-        return;
+        selectedFiles.value = []; // Clear files as well
       });
-      return; // Salir de la función si hay un error
+      return;
     }
-
-    images.push({
+    newImages.push({
       name: file.name,
       size: file.size,
+      url: URL.createObjectURL(file), // Create URL for preview
     });
   }
 
-  if (images.length > 15) {
+  if (newImages.length + selectedImages.value.length > 15) {
     showSweetAlert({
       title: "Upload not completed!",
       text: "At most you can add up to 15 images.",
@@ -1009,14 +1008,23 @@ const handleFileChange = (event) => {
       allowOutsideClick: false,
     }).then(() => {
       fileInput.value.value = "";
-      selectedImages.value = [];
-      return;
     });
-    return; // Salir de la función si hay un error
+    return;
   }
 
-  selectedImages.value = images;
+  // Append new files and images
+  selectedFiles.value = [...selectedFiles.value, ...files];
+  selectedImages.value = [...selectedImages.value, ...newImages];
+
+  // Clear the file input to allow new selections
+  fileInput.value.value = "";
 };
+
+const removeImage = (index) => {
+  selectedImages.value.splice(index, 1);
+  selectedFiles.value.splice(index, 1);
+};
+
 // Metodos Utilitarios
 
 const currentDate = ref(
@@ -1575,7 +1583,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                    <Spinner v-if="isLoadingLoad" />
 
-           <div class="accordion-item">
+<div class="accordion-item">
   <h2 class="accordion-header">
     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
       Load
@@ -1583,24 +1591,17 @@ const getDenverTimeAsUTCISOString = () => {
   </h2>
   <div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
     <div class="accordion-body">
-
-
-
       <div class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Route #</label>
           <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
           <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
         </div>
-
-        
         <div class="mb-3 col-md-3">
           <label class="form-label">Ticket #</label>
           <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
         </div>
-
-
         <div class="mb-3 col-md-3">
           <label class="form-label">First Stop Time</label>
           <div class="mt-0">
@@ -1612,7 +1613,6 @@ const getDenverTimeAsUTCISOString = () => {
           </div>
           <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
         </div>
-
         <div class="mb-3 col-md-3">
           <label class="form-label">Last Stop Time</label>
           <div class="mt-0">
@@ -1624,25 +1624,15 @@ const getDenverTimeAsUTCISOString = () => {
           </div>
           <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
         </div>
-
-
-
       </div>
-
-  <div class="row">
-
-                        <div class="mb-3 col-md-6">
-                  <label class="form-label">Landfill</label>
-                  <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
-                    :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
-                    :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
-                  <small v-if="errorsLoad.landFillLoad_er" class="text-danger">{{
-                    errorsLoad.landFillLoad_er
-                  }}</small>
-                </div>
-
-
-
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Landfill</label>
+          <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
+            :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
+            :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
+          <small v-if="errorsLoad.selectedLandFillLoad_er" class="text-danger">{{errorsLoad.selectedLandFillLoad_er}}</small>
+        </div>
         <div class="mb-3 col-md-3">
           <label class="form-label">Landfill Time In</label>
           <div class="mt-0">
@@ -1666,22 +1656,6 @@ const getDenverTimeAsUTCISOString = () => {
           <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
         </div>
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <div class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Gross Weight</label>
@@ -1698,38 +1672,45 @@ const getDenverTimeAsUTCISOString = () => {
           <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
         </div>
-
-
-  
-
-
-
-
-
-
-
-
       </div>
 
 
 
-
-
-
-
-
       <div class="row d-flex align-items-center">
-        <div class="mb-3 col-md-5">
-          <label class="form-label">Note</label>
-          <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-4">
+
+
+        <div class="mb-3 col-md-9">
           <label class="form-label">Images</label>
-          <input type="file" ref="fileInput" class="form-control form-control-sm border border-primary" multiple="multiple" accept="image/*" @change="handleFileChange" style="height: 38px; padding: 0.375rem 0.75rem;" />
+          <input
+            type="file"
+            ref="fileInput"
+            class="form-control form-control-sm border border-primary"
+            multiple
+            accept="image/*"
+            capture="environment"
+            @change="handleFileChange"
+            style="height: 38px; padding: 0.375rem 0.75rem;"
+          />
+          <div v-if="selectedImages.length > 0" class="row mt-2">
+            <div v-for="(image, index) in selectedImages" :key="index" class="col-md-3">
+              <img :src="image.url" alt="Preview" style="max-width: 100px; margin-bottom: 10px;" />
+              <p>{{ image.name }} ({{ (image.size / 1024).toFixed(2) }} KB)</p>
+              <button @click.prevent="removeImage(index)" class="btn btn-danger btn-xs">Remove</button>
+            </div>
+          </div>
+          <!-- <button
+            v-if="selectedImages.length > 0"
+            @click.prevent="fileInput.click()"
+            class="btn btn-secondary"
+            style="height: 38px; margin-left: 10px;"
+          >
+            Capture Another
+          </button> -->
           <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
         </div>
-        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex ">
+
+
+        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex">
           <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
             {{ isEditingLoad ? "Save" : "Add" }}
             <span class="btn-icon-end">
@@ -1738,6 +1719,17 @@ const getDenverTimeAsUTCISOString = () => {
           </button>
         </div>
       </div>
+
+       <div class="row">
+
+        <div class="mb-3 col-md-12">
+          <label class="form-label">Note</label>
+          <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
+        </div>
+
+       
+       </div>
 
       <div class="row">
         <hr style="color: black" />
@@ -1783,7 +1775,6 @@ const getDenverTimeAsUTCISOString = () => {
     </div>
   </div>
 </div>
-
                 </div>
               </div>
 

@@ -1,5 +1,6 @@
 {
   "name": "CoverSheet App",
+  "permissions": ["camera"],
   "short_name": "CoverSheet",
   "start_url": ".",
   "display": "standalone",
