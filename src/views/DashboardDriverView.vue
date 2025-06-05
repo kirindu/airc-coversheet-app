@@ -1,10 +1,15 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+
+import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
+const router = useRouter() // Instanciamos el router
 
 // Importamos utilidades
 import { DateTime } from "luxon";
+
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
 
 // Importamos el api
 import CoverSheetAPI from "@/api/CoverSheetAPI.js";
@@ -1042,6 +1047,12 @@ const setTimeFromDB = (timeString) => {
   }
 };
 
+// Método para manejar el logout
+const logout = () => {
+  localStorage.removeItem('USER') // Eliminamos la variable USER del localStorage
+  router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
+}
+
 // const getDenverTimeAsUTCISOString = () => {
 //   const now = new Date();
 
@@ -1224,6 +1235,10 @@ const getDenverTimeAsUTCISOString = () => {
 
               <button type="submit" class="btn btn-primary">
                 {{ isEditModeCoverShet ? "Update CoverSheet" : "Start CoverSheet" }}
+              </button>
+
+              <button style="margin-left: 20px;" class="btn btn-secondary" @click.prevent="logout">
+                Finalize CoverSheet
               </button>
             </form>
           </div>
