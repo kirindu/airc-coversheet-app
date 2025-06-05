@@ -1674,8 +1674,6 @@ const getDenverTimeAsUTCISOString = () => {
         </div>
       </div>
 
-
-
       <div class="row d-flex align-items-center">
 
 
