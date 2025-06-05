@@ -1691,7 +1691,7 @@ const getDenverTimeAsUTCISOString = () => {
             style="height: 38px; padding: 0.375rem 0.75rem;"
           />
 
-                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-danger btn-rounded btn-sm">Add Photos<span
+                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-primary btn-rounded btn-sm">Add Photos<span
                                         class="btn-icon-end"><i class="fa fa-camera"></i></span>
                                 </button>
 
