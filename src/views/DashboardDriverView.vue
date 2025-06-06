@@ -38,7 +38,6 @@ const storeTruck = useTrucksStore();
 
 import { useDriversStore } from "@/stores/drivers.js";
 import { is } from "@vee-validate/rules";
-const storeDriver = useDriversStore();
 
 const user = ref(null);
 
@@ -1113,6 +1112,7 @@ const getDenverTimeAsUTCISOString = () => {
       <div class="card">
         <div class="card-body">
           <div class="basic-form">
+
             <form @submit="onSubmit" autocomplete="off">
 
               <div class="row">
@@ -1439,6 +1439,7 @@ const getDenverTimeAsUTCISOString = () => {
                             </table>
                           </div>
                         </div>
+                        
                       </div>
                     </div>
                   </div>
