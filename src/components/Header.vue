@@ -36,10 +36,10 @@ const avatarSrc = computed(() => {
 
       if (parsed.data.user) {
         user.value = parsed.data.user // ADMIN
-        return '/src/assets/images/avatar/avatar_admin.png'
+        return '/assets/images/avatar/avatar_admin.png'
       } else {
         user.value = parsed.data // DRIVER
-        return '/src/assets/images/avatar/avatar.jpg'
+        return '/assets/images/avatar/avatar_driver.jpg'
       }
     } catch (e) {
       console.error('Error al parsear USER desde localStorage:', e)
