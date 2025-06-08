@@ -15,13 +15,13 @@ import Footer from '@/components/Footer.vue'
 <div id="main-wrapper">
     <NavHeader />
     <Header />
-    <SideBar />
+    <!-- <SideBar /> -->
 
 </div>
 
 
 
-    <div class="content-body">
+    <!-- <div class="content-body"> -->
 
 <RouterView />
 
@@ -29,7 +29,7 @@ import Footer from '@/components/Footer.vue'
 
 
 
-</div>
+<!-- </div> -->
   
 </template>
 

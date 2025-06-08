@@ -5,6 +5,12 @@ export default {
  async all() {
     return api.get("/coversheets/");
   },
+
+
+ async allByDate(date) {
+    return api.get('/coversheets/by-date/' + date, {});
+  },
+  
   
   async add(values) {
 

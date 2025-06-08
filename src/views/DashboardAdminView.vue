@@ -68,24 +68,11 @@ const date = ref(new Date());
 const coverSheetList = ref([]);
 
 
-const startMiles = ref("");
-const endMiles = ref("");
-const fuel = ref("");
-const notes = ref("");
-
 const formSubmitted = ref(false);
-const isVisibleAcordion = ref(false);
 
 const errors = ref({
-  route_er: "",
-  truck_er: "",
-  clockIn_er: "",
-  leaveYard_er: "",
-  backInYard_er: "",
-  clockOut_er: "",
-  startMiles_er: "",
-  endMiles_er: "",
-  fuel_er: "",
+  date_er: "",
+
 });
 
 // Modo de edición de la informaciongeneral para el coversheet
@@ -95,10 +82,43 @@ const isEditModeCoverShet = ref(false);
 const SearchCoverSheet = async (event) => {
   event.preventDefault();
 
+    // Limpiar errores anteriores
+  errors.value.date_er = "";
+  let hasError = false;
+
+    if (!date.value) {
+    errors.value.date_er = "Required field";
+    hasError = true;
+  }
+  
+    if (hasError) {
+    return;
+  }
+
 
     try {
-    const response = await CoverSheetAPI.all();
-    coverSheetList.value = response.data.data || [];
+      
+    const response = await CoverSheetAPI.allByDate(formatToYYYYMMDD(date.value));
+
+    const allCoversheets = response.data.data || [];
+
+
+    const filters = {
+  route_id: selectedRoute.value || null,
+  truck_id: selectedTruck.value || null,
+  driver_id: selectedDriver.value || null
+};
+
+
+
+    // coverSheetList.value = response.data.data || [];
+
+    coverSheetList.value = filterCoversheets(allCoversheets, filters);
+
+
+
+
+
   } catch (error) {
     console.error("Error al obtener CoverSheet:", error);
   }
@@ -122,6 +142,28 @@ const currentDate = ref(
   })
 );
 
+const formatToYYYYMMDD = (inputDate) => {
+  const date = new Date(inputDate);
+  if (isNaN(date.getTime())) {
+    console.warn("Fecha inválida:", inputDate);
+    return null;
+  }
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+const filterCoversheets = (coversheets, filters) =>{
+  return coversheets.filter(c => {
+    const matchRoute = !filters.route_id || c.route_id === filters.route_id;
+    const matchTruck = !filters.truck_id || c.truck_id === filters.truck_id;
+    const matchDriver = !filters.driver_id || c.driver_id === filters.driver_id;
+    return matchRoute && matchTruck && matchDriver;
+  });
+}
 
 
 onMounted(() => {
@@ -150,6 +192,60 @@ onMounted(() => {
 
     <Spinner v-if="storeRoute.loading || storeTruck.loading" />
 
+<!--
+    <div class="col-lg-12">
+
+              
+
+              <nav class="navbar navbar-expand-lg navbar-light" style="background-color:peru;">
+              
+  <div class="container-fluid">
+
+  <div class="row">
+    
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Link
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Link</a>
+        </li>
+      </ul>
+     
+    </div>
+  </div>
+  </div>
+</nav>
+
+       
+
+
+
+
+
+
+
+			
+
+    </div>
+
+<br>
+-->
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
@@ -168,8 +264,8 @@ onMounted(() => {
                       </template>
                     </VueDatePicker>
                   </div>
-                  <small v-if="errors.clockIn_er" class="text-danger">{{
-                    errors.clockIn_er
+                  <small v-if="errors.date_er" class="text-danger">{{
+                    errors.date_er
                   }}</small>
                 </div>
 
@@ -242,9 +338,10 @@ onMounted(() => {
                               class="table table-bordered header-border table-striped table-hover table-responsive-md">
                               <thead class="thead-primary">
                                 <tr>
-                                  <th>Driver</th>
+                                  <th>Route #</th>         
                                   <th>Truck #</th>
-                                  <th>Route #</th>
+                                  <th>Driver</th>
+                                  
                                   <th>Notes</th>
 								   <th>Action</th>
                                   
@@ -253,9 +350,10 @@ onMounted(() => {
                               <tbody>
                                 <tr v-for="(item, index) in coverSheetList" :key="index">
 
-                                  <td class="td">{{ item.driverName }}</td>
-                                  <td class="td">{{ item.truckNumber }}</td>
                                   <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.truckNumber }}</td>
+                                  <td class="td">{{ item.driverName }}</td>
+                          
                                   <td class="td">{{ item.notes }}</td>
                         
                                   <td>
