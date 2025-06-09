@@ -124,20 +124,12 @@ const SearchCoverSheet = async (event) => {
   }
 
 }
+// Abrir modal para ver el CoverSheet
 
 const openCoverSheetModal = async (item) => {
 
   await openModal(
-    defineAsyncComponent(() => import('@/components/CoverSheetModal.vue')),
-	{
-	  // props to pass to the modal component
-	  title: "CoverSheet Details",
-	  size: "lg", // 'sm', 'md', 'lg', 'xl'
-	  backdrop: true, // true, false, 'static'
-	  keyboard: true, // true, false
-	  centered: true, // true, false
-	  scrollable: true, // true, false
-	},
+    defineAsyncComponent(() => import("@/components/CoverSheetModal.vue")),
     {
       item: item,
     }
@@ -150,6 +142,7 @@ const openCoverSheetModal = async (item) => {
     .catch(() => {
       console.log("catch");
     });
+
 };
 
 

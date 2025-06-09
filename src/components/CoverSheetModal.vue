@@ -281,6 +281,12 @@ const onSubmit = async (event) => {
   }
 };
 
+// Una vez que se complete el mounted pintamos los campos con su informacion
+onMounted(() => {
+
+  startMiles.value = reactiveProps.item.value.startMiles;
+
+});
 
 
 </script>
