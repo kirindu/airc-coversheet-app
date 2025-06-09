@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { defineAsyncComponent } from "vue";
 
 import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 const router = useRouter() // Instanciamos el router
 
 // Importamos utilidades
 import { DateTime } from "luxon";
-
+import { openModal } from "@kolirt/vue-modal";
+import { ModalTarget } from '@kolirt/vue-modal'
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
@@ -23,6 +25,7 @@ const { showSweetAlert, alertResult } = useSweetAlert2Notification();
 
 // Importamos componentes
 import Spinner from "@/components/Spinner.vue";
+import CoverSheetModal from "@/components/CoverSheetModal.vue";
 
 // Importamos Stores
 import { useRoutesStore } from "@/stores/routes.js";
@@ -116,15 +119,38 @@ const SearchCoverSheet = async (event) => {
     coverSheetList.value = filterCoversheets(allCoversheets, filters);
 
 
-
-
-
   } catch (error) {
     console.error("Error al obtener CoverSheet:", error);
   }
 
 }
 
+const openCoverSheetModal = async (item) => {
+
+  await openModal(
+    defineAsyncComponent(() => import('@/components/CoverSheetModal.vue')),
+	{
+	  // props to pass to the modal component
+	  title: "CoverSheet Details",
+	  size: "lg", // 'sm', 'md', 'lg', 'xl'
+	  backdrop: true, // true, false, 'static'
+	  keyboard: true, // true, false
+	  centered: true, // true, false
+	  scrollable: true, // true, false
+	},
+    {
+      item: item,
+    }
+  )
+    // runs when modal is closed via confirmModal
+    .then((data) => {
+      console.log("success", data);
+    })
+    // runs when modal is closed via closeModal or esc
+    .catch(() => {
+      console.log("catch");
+    });
+};
 
 
 const EditCoverSheet = (item) => {
@@ -359,12 +385,12 @@ onMounted(() => {
                                   <td>
 								  
                                     <div>
-									        <a @click="EditCoverSheet(item)"
+									        <a @click="openCoverSheetModal(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"><i
                                           class="fa fa-eye"></i></a>
-                                      <a @click="EditCoverSheet(item)"
+                                      <!-- <a @click="EditCoverSheet(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"><i
-                                          class="fa fa-pencil"></i></a>
+                                          class="fa fa-pencil"></i></a> -->
                                     </div>
                                   </td>
                                 </tr>
@@ -385,5 +411,6 @@ onMounted(() => {
     </div>
 				
 			</div>
- 
+ <ModalTarget />
 </template>
+
