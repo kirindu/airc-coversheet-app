@@ -1,6 +1,6 @@
 <script setup>
 //Importaciones de sistemas y librerias
-import { ref, toRefs, computed, watch, onMounted } from "vue";
+import { ref, toRefs, computed, watch, onMounted, defineEmits } from "vue";
 import { closeModal, confirmModal } from "@kolirt/vue-modal";
 import { useRouter } from "vue-router";
 const router = useRouter();
@@ -13,6 +13,9 @@ import { DateTime } from "luxon";
 
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+
+// Escuchamos eventos
+// const emit = defineEmits(['update-success'])
 
 
 // Importamos el api
@@ -47,6 +50,10 @@ const user = ref(null);
 const props = defineProps({
   item: {
     type: Object,
+  },
+  onUpdateSuccess: {
+    type: Function,
+    default: () => {},
   },
 });
 
@@ -226,14 +233,14 @@ const onSubmit = async (event) => {
     fuel: fuel.value.toString() || "",
     truck_id: selectedTruck.value,
     route_id: selectedRoute.value,
-    driver_id: user.value.id,
+    driver_id: reactiveProps.item.value.driver_id,
     notes: notes.value,
-    date: getDenverTimeAsUTCISOString(),
+   // date: getDenverTimeAsUTCISOString(),
   };
 
   try {
 
-      let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+      let coversheet_id = reactiveProps.item.value.id;
       const response = await CoverSheetAPI.edit(coversheet_id, coverSheetData);
 
       if (response.data.ok) {
@@ -252,6 +259,7 @@ const onSubmit = async (event) => {
           confirmButtonText: "Ok",
           allowOutsideClick: false,
         }).then(() => {
+          props.onUpdateSuccess();
           return;
         });
       } else {
@@ -284,9 +292,55 @@ const onSubmit = async (event) => {
 // Una vez que se complete el mounted pintamos los campos con su informacion
 onMounted(() => {
 
+  selectedRoute.value = reactiveProps.item.value.route_id;
+  selectedTruck.value = reactiveProps.item.value.truck_id;
+  date.value = DateTime.fromISO(reactiveProps.item.value.date).toJSDate();
+
+
+
+  timeClockIn.value = setTimeFromDB(reactiveProps.item.value.clockIn);
+
+
+  timeLeaveYard.value = setTimeFromDB(reactiveProps.item.value.leaveYard);
+  timeBackInYard.value = setTimeFromDB(reactiveProps.item.value.backInYard);
+  timeClockOut.value = setTimeFromDB(reactiveProps.item.value.clockOut);
+
   startMiles.value = reactiveProps.item.value.startMiles;
+  endMiles.value = reactiveProps.item.value.endMiles;
+  fuel.value = reactiveProps.item.value.fuel;
+  notes.value = reactiveProps.item.value.notes;
 
 });
+
+// Utility functions
+
+// Function to set time from a database string (e.g., "14:36")
+const setTimeFromDB = (timeString) => {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  if (!isNaN(hours) && !isNaN(minutes)) {
+    return { hours, minutes };
+  }
+};
+
+const formatTime = (controlTimeValue) => {
+  if (!controlTimeValue) {
+    return "";
+  }
+
+  const hours = String(controlTimeValue.hours).padStart(2, "0");
+  const minutes = String(controlTimeValue.minutes).padStart(2, "0");
+  return `${hours}:${minutes}`;
+};
+
+const getDenverTimeAsUTCISOString = () => {
+  const now = DateTime.now().setZone('America/Denver'); // Get current time in Denver
+  return now.toUTC().toISO(); // Convert to UTC and return ISO string
+};
+
+const logout = () => {
+  localStorage.removeItem('USER') // Eliminamos la variable USER del localStorage
+  router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
+}
 
 
 </script>
@@ -330,7 +384,7 @@ onMounted(() => {
 
                   <label class="form-label">Date</label>
                   <div class="mt-0">
-                    <VueDatePicker v-model="date" :enable-time-picker="false"  placeholder="Select Time">
+                    <VueDatePicker v-model="date" :enable-time-picker="false"  placeholder="Select Time" disabled>
                       <template #input-icon>
                         <img class="input-slot-image" src="../assets/icons/calendar.png" />
                       </template>

@@ -83,7 +83,11 @@ const isEditModeCoverShet = ref(false);
 
 
 const SearchCoverSheet = async (event) => {
-  event.preventDefault();
+  console.log("SearchCoverSheet triggered"); //
+
+  if(event){
+      event.preventDefault();
+  }
 
     // Limpiar errores anteriores
   errors.value.date_er = "";
@@ -132,6 +136,7 @@ const openCoverSheetModal = async (item) => {
     defineAsyncComponent(() => import("@/components/CoverSheetModal.vue")),
     {
       item: item,
+      onUpdateSuccess: SearchCoverSheet, // Pass the function
     }
   )
     // runs when modal is closed via confirmModal
@@ -360,7 +365,11 @@ onMounted(() => {
                                   <th>Route #</th>         
                                   <th>Truck #</th>
                                   <th>Driver</th>
-                                  
+                                  <th>Clock In</th>
+                                  <th>Leave Yard</th>
+                                  <th>Start Miles</th>
+                                  <th>Back In Yard</th>
+                                  <th>Clock Out</th>
                                   <th>Notes</th>
 								   <th>Action</th>
                                   
@@ -372,9 +381,13 @@ onMounted(() => {
                                   <td class="td">{{ item.routeNumber }}</td>
                                   <td class="td">{{ item.truckNumber }}</td>
                                   <td class="td">{{ item.driverName }}</td>
-                          
-                                  <td class="td">{{ item.notes }}</td>
-                        
+                                  <td class="td">{{ item.clockIn }}</td>
+                                  <td class="td">{{ item.leaveYard }}</td>
+                                  <td class="td">{{ item.startMiles }}</td>
+                                  <td class="td">{{ item.backInYard }}</td>                                  
+                                  <td class="td">{{ item.clockOut }}</td>
+                                   <td class="td">{{ item.notes }}</td>
+ 
                                   <td>
 								  
                                     <div>
@@ -404,6 +417,6 @@ onMounted(() => {
     </div>
 				
 			</div>
- <ModalTarget />
+ <ModalTarget/>
 </template>
 
