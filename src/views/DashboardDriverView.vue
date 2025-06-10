@@ -1265,6 +1265,7 @@ const getDenverTimeAsUTCISOString = () => {
 
 
               <div class="row">
+              
                 <div class="accordion accordion-primary-solid" id="accordion-two">
 
                 <Spinner v-if="isLoadingSpareTruckInfo" />

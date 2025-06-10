@@ -83,7 +83,6 @@ const isEditModeCoverShet = ref(false);
 
 
 const SearchCoverSheet = async (event) => {
-  console.log("SearchCoverSheet triggered"); //
 
   if(event){
       event.preventDefault();

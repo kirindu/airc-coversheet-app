@@ -312,6 +312,25 @@ onMounted(() => {
 
 });
 
+const EditSpareTruckInfo = (item) => {
+  // Populate the form with the selected Spare Truck Info
+  spareTruckSpareTruckInfo.value = item.spareTruckNumber;
+  selectedRouteSpareTruckInfo.value = item.route_id;
+
+  timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.leaveYard);
+
+  timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.backInYard);
+
+  startMilesSpareTruckInfo.value = item.startMiles;
+  endMilesSpareTruckInfo.value = item.endMiles;
+  fuelSpareTruckInfo.value = item.fuel;
+
+  // Set editing mode
+  isEditingSpareTruckInfo.value = true;
+  selectedSpareTruckId.value = item.id || item._id; // Ensure the ID is captured
+};
+
+
 // Utility functions
 
 // Function to set time from a database string (e.g., "14:36")
@@ -348,7 +367,7 @@ const logout = () => {
 
 <template>
 
-
+ <div class="container-fluid">  
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
@@ -503,6 +522,541 @@ const logout = () => {
     </div>
 
 
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="basic-form">
+            <form autocomplete="off">
+
+
+                
+
+
+              <div class="row">
+              
+                <div class="accordion accordion-primary-solid" id="accordion-two">
+
+                <Spinner v-if="isLoadingSpareTruckInfo" />
+
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#bordered_collapseOne">
+                        Spare Truck Info
+                      </button>
+                    </h2>
+
+                     <Spinner v-if="storeRoute.loading || storeTruck.loading" />
+
+                     
+                    <div id="bordered_collapseOne" class="accordion-collapse collapse show"
+                      data-bs-parent="#accordion-two">
+                      <div class="accordion-body">
+
+                        <div class="row">
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Spare # </label>
+                            <input type="text" v-model="spareTruckSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary" />
+                            <small v-if="
+                              errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
+                            " class="text-danger">{{
+                                errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
+                              }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Route #</label>
+                            <v-select :options="storeRoute.routes" v-model="selectedRouteSpareTruckInfo"
+                              placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber"
+                              class="form-control p-0" :class="{
+                                'is-invalid': formSubmitted && !selectedRoute,
+                              }" />
+                            <small v-if="errorsSpareTruckInfo.routeSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.routeSpareTruckInfo_er
+                            }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Start Miles</label>
+                            <input type="number" v-model="startMilesSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary" />
+                            <small v-if="
+                              errorsSpareTruckInfo.startMilesSpareTruckInfo_er
+                            " class="text-danger">{{
+                                errorsSpareTruckInfo.startMilesSpareTruckInfo_er
+                              }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">End Miles</label>
+                            <input type="number" v-model="endMilesSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary" />
+                            <small v-if="
+                              errorsSpareTruckInfo.endMilesSpareTruckInfo_er
+                            " class="text-danger">{{
+                                errorsSpareTruckInfo.endMilesSpareTruckInfo_er
+                              }}</small>
+                          </div>
+
+               
+                        </div>
+
+                                <div class="row">
+
+             
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Fuel</label>
+                            <input type="number" v-model="fuelSpareTruckInfo"
+                              class="form-control form-control-sm border border-primary" />
+                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.fuelSpareTruckInfo_er
+                            }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Leave Yard</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeLeaveYardSpareTruckInfo" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="
+                              errorsSpareTruckInfo.leaveYardSpareTruckInfo_er
+                            " class="text-danger">{{
+                                errorsSpareTruckInfo.leaveYardSpareTruckInfo_er
+                              }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Back In Yard</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeBackInYardSpareTruckInfo" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="
+                              errorsSpareTruckInfo.backInYardSpareTruckInfo_er
+                            " class="text-danger">{{
+                                errorsSpareTruckInfo.backInYardSpareTruckInfo_er
+                              }}</small>
+                          </div>
+
+                          <div class="mb-4 col-md-3 align-self-end">
+
+
+                            <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;" @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
+                              {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
+                              <span class="btn-icon-end">
+                                <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
+                              </span>
+                            </button>
+
+                             
+
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <hr style="color: black" />
+                          <div class="table-responsive">
+                            <table
+                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                              <thead class="thead-primary">
+                                <tr>
+                                  <!-- <th style="width:50px;"></th> -->
+                                  <th>Spare #</th>
+                                  <th>Route #</th>
+                                  <th>Start Miles</th>
+                                  <th>End Miles</th>
+                                  <th>Fuel</th>
+                                  <th>Leave Yard</th>
+                                  <th>Back in Yard</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in spareTruckList" :key="index">
+                                  <!-- <td></td> -->
+                                  <td class="td">
+                                    {{ item.spareTruckNumber }}
+                                  </td>
+                                  <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.startMiles }}</td>
+                                  <td class="td">{{ item.endMiles }}</td>
+                                  <td class="td">{{ item.fuel }}</td>
+                                  <td class="td">{{ item.leaveYard }}</td>
+                                  <td class="td">{{ item.backInYard }}</td>
+                                  <td>
+                                    <div>
+                                      <a @click="EditSpareTruckInfo(item)"
+                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
+                                          class="fa fa-pencil"></i></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+
+                   <!-- <Spinner v-if="isLoadingDowntime" />
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#bordered_collapseTwo">
+                        Downtime
+                      </button>
+                    </h2>
+                    <div id="bordered_collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
+                      <div class="accordion-body">
+
+
+                               <div class="row">
+
+
+
+                                <div class="mb-3 col-md-3">
+                  <label class="form-label">Truck #</label>
+                  <v-select :options="storeTruck.trucks" v-model="selectedTruckDowntime" placeholder="Choose your Truck"
+                    :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedTruckDowntime }" />
+                  <small v-if="errorsDowntime.selectedTruckDowntime_er" class="text-danger">{{errorsDowntime.selectedTruckDowntime_er}}</small>
+                </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Start Time</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeStartTimeDowntime" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsDowntime.timeStartTimeDowntime_er" class="text-danger">{{errorsDowntime.timeStartTimeDowntime_er}}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">End Time</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeEndTimeDowntime" time-picker
+                                placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsDowntime.timeEndTimeDowntime_er" class="text-danger">{{errorsDowntime.timeEndTimeDowntime_er}}</small>
+                          </div>
+
+                  
+
+                        </div>
+
+
+
+                               <div class="row">
+
+
+
+       
+
+           
+
+                            <div class="mb-3 col-md-9">
+                              <label class="form-label">Downtime Reason</label>
+                              <input type="text" v-model="downtimeReasonDowntime" class="form-control form-control-sm border border-primary" />
+                              <small v-if="errorsDowntime.downtimeReasonDowntime_er" class="text-danger">{{errorsDowntime.downtimeReasonDowntime_er}}</small>
+                          </div>
+
+                          <div class="mb-4 col-md-3 align-self-end">
+
+             
+
+                            <button :disabled="isLoadingDowntime" style="margin-bottom: -7px !important;" @click="HandleDowntime" type="button" class="btn btn-info">
+                              {{ isEditingDowntime ? "Save" : "Add" }}
+                              <span class="btn-icon-end">
+                                <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
+                              </span>
+                            </button>
+
+
+                          </div>
+
+
+
+
+
+                        </div>
+
+
+
+
+                        <div class="row">
+                          <hr style="color: black" />
+                          <div class="table-responsive">
+                            <table
+                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                              <thead class="thead-primary">
+                                <tr>
+                                  
+                                  <th>Truck #</th>
+                                  <th>Start Time #</th>
+                                  <th>End Time</th>
+                                  <th>Dowtime Reason</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in downtimeList" :key="index">
+                                
+                                  <td class="td">{{ item.truckNumber }}</td>
+                                  <td class="td">{{ item.startTime }}</td>
+                                  <td class="td">{{ item.endTime }}</td>
+                                  <td class="td">{{ item.downtimeReason }}</td>
+                                  <td>
+                                    <div>
+                                      <a @click="EditDowntime(item)"
+                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
+                                          class="fa fa-pencil"></i></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+
+
+
+
+
+          
+                      </div>
+                    </div>
+                  </div>
+
+                   <Spinner v-if="isLoadingLoad" />
+
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
+      Load
+    </button>
+  </h2>
+  <div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
+    <div class="accordion-body">
+      <div class="row">
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Route #</label>
+          <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
+          <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Ticket #</label>
+          <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">First Stop Time</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Last Stop Time</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLastStopTimeLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
+        </div>
+      </div>
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Landfill</label>
+          <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
+            :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
+            :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
+          <small v-if="errorsLoad.selectedLandFillLoad_er" class="text-danger">{{errorsLoad.selectedLandFillLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Landfill Time In</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Landfill Time Out</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
+        </div>
+      </div>
+      <div class="row">
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Gross Weight</label>
+          <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Tare Weight</label>
+          <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Tons</label>
+          <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
+        </div>
+      </div>
+
+      <div class="row d-flex align-items-center">
+
+
+        <div class="mb-3 col-md-9">
+         
+
+          <input v-show="false"
+            type="file"
+            ref="fileInput"
+            class="form-control form-control-sm border border-primary"
+            multiple
+            accept="image/*"
+            capture="environment"
+            @change="handleFileChange"
+            style="height: 38px; padding: 0.375rem 0.75rem;"
+          />
+
+                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-primary btn-rounded btn-sm">Add Photos<span
+                                        class="btn-icon-end"><i class="fa fa-camera"></i></span>
+                                </button>
+
+
+          <div v-if="selectedImages.length > 0" class="row mt-2">
+            <div v-for="(image, index) in selectedImages" :key="index" class="col-md-3">
+              <img :src="image.url" alt="Preview" style="max-width: 100px; margin-bottom: 10px;" />
+              <p>{{ image.name }} ({{ (image.size / 1024).toFixed(2) }} KB)</p>
+              <button @click.prevent="removeImage(index)" class="btn btn-danger btn-xs">Remove</button>
+            </div>
+          </div>
+         
+          <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
+        </div>
+
+
+        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex">
+          <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
+            {{ isEditingLoad ? "Save" : "Add" }}
+            <span class="btn-icon-end">
+              <i :class="isEditingLoad ? 'fa fa-save' : 'fa fa-plus'"></i>
+            </span>
+          </button>
+        </div>
+      </div>
+
+       <div class="row">
+
+        <div class="mb-3 col-md-12">
+          <label class="form-label">Note</label>
+          <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
+        </div>
+
+       
+       </div>
+
+      <div class="row">
+        <hr style="color: black" />
+        <div class="table-responsive">
+          <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
+            <thead class="thead-primary">
+              <tr>
+                <th>Route #</th>
+                <th>First Stop Time</th>
+                <th>Last Stop Time</th>
+                <th>Landfill Time In</th>
+                <th>Landfill Time Out</th>
+                <th>Gross Weight</th>
+                <th>Tare Weight</th>
+                <th>Tons</th>
+                <th>Landfill</th>
+                <th>Ticket #</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in loadList" :key="index">
+                <td class="td">{{ item.routeNumber }}</td>
+                <td class="td">{{ item.firstStopTime }}</td>
+                <td class="td">{{ item.lastStopTime }}</td>
+                <td class="td">{{ item.landFillTimeIn }}</td>
+                <td class="td">{{ item.landFillTimeOut }}</td>
+                <td class="td">{{ item.grossWeight }}</td>
+                <td class="td">{{ item.tareWeight }}</td>
+                <td class="td">{{ item.tons }}</td>
+                <td class="td">{{ item.landfillName }}</td>
+                <td class="td">{{ item.ticketNumber }}</td>
+                <td>
+                  <div>
+                    <a @click="EditLoad(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-pencil"></i></a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+</div>
 </template>
 
 <style scoped>
