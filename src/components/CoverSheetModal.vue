@@ -290,16 +290,15 @@ const onSubmit = async (event) => {
 };
 
 // Una vez que se complete el mounted pintamos los campos con su informacion
-onMounted(() => {
+onMounted(async () => {
+
+  // Cargamos el CoverSheet
 
   selectedRoute.value = reactiveProps.item.value.route_id;
   selectedTruck.value = reactiveProps.item.value.truck_id;
   date.value = DateTime.fromISO(reactiveProps.item.value.date).toJSDate();
 
-
-
   timeClockIn.value = setTimeFromDB(reactiveProps.item.value.clockIn);
-
 
   timeLeaveYard.value = setTimeFromDB(reactiveProps.item.value.leaveYard);
   timeBackInYard.value = setTimeFromDB(reactiveProps.item.value.backInYard);
@@ -309,6 +308,13 @@ onMounted(() => {
   endMiles.value = reactiveProps.item.value.endMiles;
   fuel.value = reactiveProps.item.value.fuel;
   notes.value = reactiveProps.item.value.notes;
+
+  // Cargando Spare Truck Info si existe
+  if (reactiveProps.item.value.spareTruckInfo_id) {
+     spareTruckList.value = await CoverSheetAPI.getSpareTruckInfo(reactiveProps.item.value.id);
+  } else {
+    spareTruckList.value = [];
+  }
 
 });
 
@@ -529,7 +535,6 @@ const logout = () => {
             <form autocomplete="off">
 
 
-                
 
 
               <div class="row">
@@ -553,6 +558,52 @@ const logout = () => {
                     <div id="bordered_collapseOne" class="accordion-collapse collapse show"
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
+
+
+
+                    <div class="row">
+                          <hr style="color: black" />
+                          <div class="table-responsive">
+                            <table
+                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                              <thead class="thead-primary">
+                                <tr>
+                                  <!-- <th style="width:50px;"></th> -->
+                                  <th>Spare #</th>
+                                  <th>Route #</th>
+                                  <th>Start Miles</th>
+                                  <th>End Miles</th>
+                                  <th>Fuel</th>
+                                  <th>Leave Yard</th>
+                                  <th>Back in Yard</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in spareTruckList.data.data" :key="index">
+                                  <!-- <td></td> -->
+                                  <td class="td">
+                                    {{ item.spareTruckNumber }}
+                                  </td>
+                                  <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.startMiles }}</td>
+                                  <td class="td">{{ item.endMiles }}</td>
+                                  <td class="td">{{ item.fuel }}</td>
+                                  <td class="td">{{ item.leaveYard }}</td>
+                                  <td class="td">{{ item.backInYard }}</td>
+                                  <td>
+                                    <div>
+                                      <a @click="EditSpareTruckInfo(item)"
+                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
+                                          class="fa fa-pencil"></i></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
 
                         <div class="row">
 
@@ -604,9 +655,10 @@ const logout = () => {
                
                         </div>
 
-                                <div class="row">
 
-             
+
+
+                                <div class="row">
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Fuel</label>
@@ -655,9 +707,9 @@ const logout = () => {
 
 
                             <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;" @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
-                              {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
+                              Update
                               <span class="btn-icon-end">
-                                <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
+                                <i class="fa fa-save"></i>
                               </span>
                             </button>
 
@@ -666,48 +718,7 @@ const logout = () => {
                           </div>
                         </div>
 
-                        <div class="row">
-                          <hr style="color: black" />
-                          <div class="table-responsive">
-                            <table
-                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
-                              <thead class="thead-primary">
-                                <tr>
-                                  <!-- <th style="width:50px;"></th> -->
-                                  <th>Spare #</th>
-                                  <th>Route #</th>
-                                  <th>Start Miles</th>
-                                  <th>End Miles</th>
-                                  <th>Fuel</th>
-                                  <th>Leave Yard</th>
-                                  <th>Back in Yard</th>
-                                  <th>Action</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="(item, index) in spareTruckList" :key="index">
-                                  <!-- <td></td> -->
-                                  <td class="td">
-                                    {{ item.spareTruckNumber }}
-                                  </td>
-                                  <td class="td">{{ item.routeNumber }}</td>
-                                  <td class="td">{{ item.startMiles }}</td>
-                                  <td class="td">{{ item.endMiles }}</td>
-                                  <td class="td">{{ item.fuel }}</td>
-                                  <td class="td">{{ item.leaveYard }}</td>
-                                  <td class="td">{{ item.backInYard }}</td>
-                                  <td>
-                                    <div>
-                                      <a @click="EditSpareTruckInfo(item)"
-                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
-                                          class="fa fa-pencil"></i></a>
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
+           
                         
                       </div>
                     </div>
