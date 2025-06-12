@@ -78,7 +78,6 @@ const fuel = ref("");
 const notes = ref("");
 
 const formSubmitted = ref(false);
-const isVisibleAcordion = ref(false);
 
 const errors = ref({
   route_er: "",
@@ -97,6 +96,9 @@ const errors = ref({
 const spareTruckList = ref([]);
 const isEditingSpareTruckInfo = ref(false); // To track if we are editing a spare truck record
 const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
+
+const isVisibleSpareTruckInfo = ref(false);
+
 
 const spareTruckSpareTruckInfo = ref("");
 const selectedRouteSpareTruckInfo = ref("");
@@ -310,13 +312,46 @@ onMounted(async () => {
   notes.value = reactiveProps.item.value.notes;
 
   // Cargando Spare Truck Info si existe
-  if (reactiveProps.item.value.spareTruckInfo_id) {
-     spareTruckList.value = await CoverSheetAPI.getSpareTruckInfo(reactiveProps.item.value.id);
-  } else {
-    spareTruckList.value = [];
+ 
+  await CargamosSpareTruckInfo(); // Invoke the function
+});
+
+// Handle form submission Spare Truck Info (Add or Edit)
+const CargamosSpareTruckInfo = async (event = null) => { // Default event to null
+  if (event) {
+    event.preventDefault(); // Only call preventDefault if event exists
   }
 
-});
+  try {
+    if (reactiveProps.item.value.spareTruckInfo_id?.length) {
+      isLoadingSpareTruckInfo.value = true;
+      isVisibleSpareTruckInfo.value = true; // Show the Spare Truck Info section  
+      const response = await CoverSheetAPI.getSpareTruckInfo(reactiveProps.item.value.id);
+
+      spareTruckList.value = response.data.data; // Update the spare truck list with the fetched data
+
+      if (response.data.ok) {
+        isLoadingSpareTruckInfo.value = false; // Hide loading spinner
+      } else {
+        isLoadingSpareTruckInfo.value = false; // Hide loading spinner
+      }
+    } else {
+      isLoadingSpareTruckInfo.value = false;
+      isVisibleSpareTruckInfo.value = false;
+    }
+  } catch (error) {
+    showSweetAlert({
+      title: "Error getting Spare Truck Info!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      isLoadingSpareTruckInfo.value = false; // Hide loading spinner
+    });
+  }
+};
 
 const EditSpareTruckInfo = (item) => {
   // Populate the form with the selected Spare Truck Info
@@ -335,6 +370,101 @@ const EditSpareTruckInfo = (item) => {
   isEditingSpareTruckInfo.value = true;
   selectedSpareTruckId.value = item.id || item._id; // Ensure the ID is captured
 };
+
+const HandleSpareTruckInfo = async (event) => {
+  event.preventDefault();
+
+  // Limpiar errores anteriores
+  errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.routeSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.startMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.endMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.fuelSpareTruckInfo_er = "";
+
+  let hasError = false;
+
+  if (!spareTruckSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if (!selectedRouteSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.routeSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if (!startMilesSpareTruckInfo.value) {
+    errorsSpareTruckInfo.value.startMilesSpareTruckInfo_er = "Required field";
+    hasError = true;
+  }
+
+  if (hasError) {
+    return;
+  }
+
+  const spareTruckInfo = {
+    spareTruckNumber: spareTruckSpareTruckInfo.value,
+    route_id: selectedRouteSpareTruckInfo.value,
+
+    leaveYard: formatTime(timeLeaveYardSpareTruckInfo.value) || "",
+    backInYard: formatTime(timeBackInYardSpareTruckInfo.value) || "",
+
+    startMiles: startMilesSpareTruckInfo.value.toString() || "",
+    endMiles: endMilesSpareTruckInfo.value.toString() || "",
+    fuel: fuelSpareTruckInfo.value.toString() || "",
+    // coversheet_id: coversheet_id,
+  };
+
+  try {
+
+      // Edit existing Spare Truck Info
+      isLoadingSpareTruckInfo.value = true; // Show loading spinner
+      const response = await SpareTruckInfoAPI.edit(selectedSpareTruckId.value,spareTruckInfo);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Spare Truck Info updated successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          isLoadingSpareTruckInfo.value = false; // Hide loading spinner
+          loadSpareTruckInfo();
+          resetSpareTruckInfo();
+        });
+      } else {
+        showSweetAlert({
+          title: "Error updating Spare Truck Info!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          isLoadingSpareTruckInfo.value = false; // Hide loading spinner
+        });
+      }
+
+  } catch (error) {
+    showSweetAlert({
+      title: isEditingSpareTruckInfo.value
+        ? "Error updating Spare Truck Info!"
+        : "Error saving Spare Truck Info!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      isLoadingSpareTruckInfo.value = false; // Hide loading spinner
+    });
+  }
+};
+
 
 
 // Utility functions
@@ -544,7 +674,7 @@ const logout = () => {
                 <Spinner v-if="isLoadingSpareTruckInfo" />
 
 
-                  <div class="accordion-item">
+                  <div v-if="isVisibleSpareTruckInfo" class="accordion-item">
                     <h2 class="accordion-header">
                       <button class="accordion-button" type="button" data-bs-toggle="collapse"
                         data-bs-target="#bordered_collapseOne">
@@ -580,7 +710,7 @@ const logout = () => {
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr v-for="(item, index) in spareTruckList.data.data" :key="index">
+                                <tr v-for="(item, index) in spareTruckList" :key="index">
                                   <!-- <td></td> -->
                                   <td class="td">
                                     {{ item.spareTruckNumber }}
@@ -603,6 +733,8 @@ const logout = () => {
                             </table>
                           </div>
                         </div>
+
+                        <hr style="color: blue;" />
 
 
                         <div class="row">
