@@ -94,7 +94,6 @@ const errors = ref({
 // Spare Truck Info
 
 const spareTruckList = ref([]);
-const isEditingSpareTruckInfo = ref(false); // To track if we are editing a spare truck record
 const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
 
 const isVisibleSpareTruckInfo = ref(false);
@@ -125,8 +124,9 @@ const errorsSpareTruckInfo = ref({
 // Downtime
 
 const downtimeList = ref([]);
-const isEditingDowntime = ref(false); // To track if we are editing a downtime record
 const selectedDowntimeId = ref(null); // To store the ID of the downtime being edited
+
+const isVisibleDowntime = ref(false);
 
 const selectedTruckDowntime = ref("");
 const timeStartTimeDowntime = ref("");
@@ -151,7 +151,6 @@ const selectedImages = ref([]);
 const fileInput = ref(null);
 
 const loadList = ref([]);
-const isEditingLoad = ref(false); // To track if we are editing a load record
 const selectedLoadId = ref(null); // To store the ID of the load being edited
 
 
@@ -314,9 +313,13 @@ onMounted(async () => {
   // Cargando Spare Truck Info si existe
  
   await CargamosSpareTruckInfo(); // Invoke the function
+  // Cargando Downtime si existe
+  await CargamosDowntime(); // Invoke the function  
+  // Cargando Load si existe
+  await CargamosLoad(); // Invoke the function
 });
 
-// Handle form submission Spare Truck Info (Add or Edit)
+
 const CargamosSpareTruckInfo = async (event = null) => { // Default event to null
   if (event) {
     event.preventDefault(); // Only call preventDefault if event exists
@@ -353,6 +356,55 @@ const CargamosSpareTruckInfo = async (event = null) => { // Default event to nul
   }
 };
 
+const CargamosDowntime = async (event = null) => { // Default event to null
+  if (event) {
+    event.preventDefault(); // Only call preventDefault if event exists
+  }
+
+  try {
+    if (reactiveProps.item.value.downtime_id?.length) {
+      isLoadingDowntime.value = true;
+      isVisibleDowntime.value = true; // Show the Downtime section
+      const response = await CoverSheetAPI.getDowntime(reactiveProps.item.value.id);
+      downtimeList.value = response.data.data; // Update the downtime list with the fetched data
+
+
+
+      if (response.data.ok) {
+        isLoadingDowntime.value = false; // Hide loading spinner
+      } else {
+        isLoadingDowntime.value = false; // Hide loading spinner
+      }
+    } else {
+      isLoadingDowntime.value = false;
+      isVisibleDowntime.value = false;
+    }
+  } catch (error) {
+    showSweetAlert({
+      title: "Error getting Downtime!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      isLoadingDowntime.value = false; // Hide loading spinner
+    });
+  }
+};
+
+
+const CargamosLoad = async () => {
+
+  try {
+    // Llamamos al API para obtener la lista de Downtime
+   const response = await CoverSheetAPI.getLoad(reactiveProps.item.value.id);
+   loadList.value = response.data.data || [];
+  } catch (error) {
+    console.error("Error al obtener Load:", error);
+  }
+};
+
 const EditSpareTruckInfo = (item) => {
   // Populate the form with the selected Spare Truck Info
   spareTruckSpareTruckInfo.value = item.spareTruckNumber;
@@ -366,9 +418,39 @@ const EditSpareTruckInfo = (item) => {
   endMilesSpareTruckInfo.value = item.endMiles;
   fuelSpareTruckInfo.value = item.fuel;
 
-  // Set editing mode
-  isEditingSpareTruckInfo.value = true;
+
   selectedSpareTruckId.value = item.id || item._id; // Ensure the ID is captured
+};
+
+const EditDowntime = (item) => {
+
+  selectedTruckDowntime.value = item.truck_id;
+  timeStartTimeDowntime.value = setTimeFromDB(item.startTime);
+  timeEndTimeDowntime.value = setTimeFromDB(item.endTime);
+  downtimeReasonDowntime.value = item.downtimeReason;
+
+
+  selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
+};
+
+const EditLoad = (item) => {
+
+  selectedRouteLoad.value = item.route_id;
+  timeFirstStopTimeLoad.value = setTimeFromDB(item.firstStopTime);
+
+  timeLastStopTimeLoad.value = item.lastStopTime ? setTimeFromDB(item.lastStopTime) : "";
+  timeLandtFillTimeInLoad.value = item.landFillTimeIn ? setTimeFromDB(item.landFillTimeIn) : "";
+  timeLandFillTimeOutLoad.value = item.landFillTimeOut ? setTimeFromDB(item.landFillTimeOut) : "";
+  grossWeightLoad.value = item.grossWeight ? item.grossWeight.toString() : "";
+  tareWeightLoad.value = item.tareWeight ? item.tareWeight.toString() : "";
+  tonsLoad.value = item.tons ? item.tons.toString() : "";
+  selectedLandFillLoad.value = item.landFill_id ? item.landFill_id : "";
+  ticketNumberLoad.value = item.ticketNumber ? item.ticketNumber : "";
+  noteLoad.value = item.note ? item.note : "";
+  
+
+
+  selectedLoadId.value = item.id || item._id; // Ensure the ID is captured
 };
 
 const HandleSpareTruckInfo = async (event) => {
@@ -414,7 +496,6 @@ const HandleSpareTruckInfo = async (event) => {
     startMiles: startMilesSpareTruckInfo.value.toString() || "",
     endMiles: endMilesSpareTruckInfo.value.toString() || "",
     fuel: fuelSpareTruckInfo.value.toString() || "",
-    // coversheet_id: coversheet_id,
   };
 
   try {
@@ -433,8 +514,7 @@ const HandleSpareTruckInfo = async (event) => {
           allowOutsideClick: false,
         }).then(() => {
           isLoadingSpareTruckInfo.value = false; // Hide loading spinner
-          loadSpareTruckInfo();
-          resetSpareTruckInfo();
+          CargamosSpareTruckInfo();
         });
       } else {
         showSweetAlert({
@@ -451,9 +531,7 @@ const HandleSpareTruckInfo = async (event) => {
 
   } catch (error) {
     showSweetAlert({
-      title: isEditingSpareTruckInfo.value
-        ? "Error updating Spare Truck Info!"
-        : "Error saving Spare Truck Info!",
+      title: "Error updating Spare Truck Info!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
@@ -465,7 +543,186 @@ const HandleSpareTruckInfo = async (event) => {
   }
 };
 
+const HandleDowntime = async (event) => {
+  event.preventDefault();
 
+  // Limpiar errores anteriores
+
+  errorsDowntime.value.selectedTruckDowntime_er = "";
+  errorsDowntime.value.timeStartTimeDowntime_er = "";
+  errorsDowntime.value.timeEndTimeDowntime_er = "";
+  errorsDowntime.value.downtimeReasonDowntime_er = "";
+
+
+  let hasError = false;
+
+  if (!selectedTruckDowntime.value) {
+    errorsDowntime.value.selectedTruckDowntime_er = "Required field";
+    hasError = true;
+  }
+
+  if (!timeStartTimeDowntime.value) {
+    errorsDowntime.value.timeStartTimeDowntime_er = "Required field";
+    hasError = true;
+  }
+
+  if (hasError) {
+    return;
+  }
+
+
+  const downtime = {
+    truck_id: selectedTruckDowntime.value,
+    startTime: formatTime(timeStartTimeDowntime.value),
+    endTime: formatTime(timeEndTimeDowntime.value) || "",
+    downtimeReason: downtimeReasonDowntime.value || "",
+  };
+
+  try {
+
+      isLoadingDowntime.value = true; // Show loading spinner
+      const response = await DowntimeAPI.edit(selectedDowntimeId.value,downtime);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Downtime updated successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          isLoadingDowntime.value = false; // Hide loading spinner
+          CargamosDowntime();
+  
+        });
+      } else {
+        showSweetAlert({
+          title: "Error updating Downtime!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          isLoadingDowntime.value = false; // Hide loading spinner
+        });
+      }
+    
+  } catch (error) {
+    showSweetAlert({
+      title:  "Error updating Downtime!",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      isLoadingDowntime.value = false; // Hide loading spinner
+    });
+  }
+};
+
+// Handle form submission for Load
+const HandleLoad = async (event) => {
+  event.preventDefault();
+
+  // Clear previous errors
+  errorsLoad.value.selectedRouteLoad_er = "";
+  errorsLoad.value.timeFirstStopTimeLoad_er = "";
+  errorsLoad.value.timeLastStopTimeLoad_er = "";
+  errorsLoad.value.timeLandFillTimeInLoad_er = "";
+  errorsLoad.value.timeLandFillTimeOutLoad_er = "";
+  errorsLoad.value.grossWeightLoad_er = "";
+  errorsLoad.value.tareWeightLoad_er = "";
+  errorsLoad.value.tonsLoad_er = "";
+  errorsLoad.value.selectedLandFillLoad_er = "";
+  errorsLoad.value.ticketNumberLoad_er = "";
+  errorsLoad.value.noteLoad_er = "";
+  errorsLoad.value.imageLoad_er = "";
+
+  let hasError = false;
+
+  if (!selectedRouteLoad.value) {
+    errorsLoad.value.selectedRouteLoad_er = "Required field";
+    hasError = true;
+  }
+
+  if (!timeFirstStopTimeLoad.value) {
+    errorsLoad.value.timeFirstStopTimeLoad_er = "Required field";
+    hasError = true;
+  }
+
+  if (hasError) {
+    return;
+  }
+
+  // Create a new FormData object
+  const formData = new FormData();
+
+  // Add form fields to FormData
+  formData.append("route_id", selectedRouteLoad.value);
+  formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
+  if (timeLastStopTimeLoad.value) formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value));
+  if (timeLandtFillTimeInLoad.value) formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value));
+  if (timeLandFillTimeOutLoad.value) formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value));
+  if (grossWeightLoad.value) formData.append("grossWeight", grossWeightLoad.value.toString());
+  if (tareWeightLoad.value) formData.append("tareWeight", tareWeightLoad.value.toString());
+  if (tonsLoad.value) formData.append("tons", tonsLoad.value.toString());
+  if (selectedLandFillLoad.value) formData.append("landFill_id", selectedLandFillLoad.value);
+  if (ticketNumberLoad.value) formData.append("ticketNumber", ticketNumberLoad.value);
+  if (noteLoad.value) formData.append("note", noteLoad.value);
+ // formData.append("coversheet_id", coversheet_id);
+
+  // Append all selected files to FormData
+  selectedFiles.value.forEach((file, index) => {
+    formData.append("images", file, file.name); // Use "images" as the key
+  });
+
+  try {
+      isLoadingLoad.value = true;
+      const response = await LoadAPI.edit(selectedLoadId.value, formData);
+
+      if (response.data.ok) {
+        showSweetAlert({
+          title: "Load updated successfully!",
+          icon: "success",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          isLoadingLoad.value = false;
+          CargamosLoad(); // Refresh the Load list
+
+        });
+      } else {
+        showSweetAlert({
+          title: "Error updating Load!",
+          icon: "warning",
+          showDenyButton: false,
+          showCancelButton: false,
+          confirmButtonText: "Ok",
+          allowOutsideClick: false,
+        }).then(() => {
+          isLoadingLoad.value = false;
+        });
+      }
+  } catch (error) {
+    showSweetAlert({
+      title: isEditingLoad.value ? "Error updating Load!" : "Error saving Load!",
+      text: error.response?.data?.msg || "An error occurred",
+      icon: "warning",
+      showDenyButton: false,
+      showCancelButton: false,
+      confirmButtonText: "Ok",
+      allowOutsideClick: false,
+    }).then(() => {
+      isLoadingLoad.value = false;
+    });
+    console.error("Error al enviar Load:", error);
+  }
+};
 
 // Utility functions
 
@@ -737,7 +994,7 @@ const logout = () => {
                         <hr style="color: blue;" />
 
 
-                        <div class="row">
+                        <div style="background-color:#7e769e;" class="row">
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Spare # </label>
@@ -790,7 +1047,7 @@ const logout = () => {
 
 
 
-                                <div class="row">
+                                <div style="background-color: #7e769e;" class="row">
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Fuel</label>
@@ -856,8 +1113,11 @@ const logout = () => {
                     </div>
                   </div>
 
-                   <!-- <Spinner v-if="isLoadingDowntime" />
-                  <div class="accordion-item">
+
+
+
+                    <Spinner v-if="isLoadingDowntime" />
+                  <div v-if="isVisibleDowntime" class="accordion-item">
                     <h2 class="accordion-header">
                       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#bordered_collapseTwo">
@@ -866,6 +1126,45 @@ const logout = () => {
                     </h2>
                     <div id="bordered_collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
                       <div class="accordion-body">
+
+
+
+
+                  <div class="row">
+                          <hr style="color: black" />
+                          <div class="table-responsive">
+                            <table
+                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                              <thead class="thead-primary">
+                                <tr>
+                                  
+                                  <th>Truck #</th>
+                                  <th>Start Time #</th>
+                                  <th>End Time</th>
+                                  <th>Dowtime Reason</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="(item, index) in downtimeList" :key="index">
+                                
+                                  <td class="td">{{ item.truckNumber }}</td>
+                                  <td class="td">{{ item.startTime }}</td>
+                                  <td class="td">{{ item.endTime }}</td>
+                                  <td class="td">{{ item.downtimeReason }}</td>
+                                  <td>
+                                    <div>
+                                      <a @click="EditDowntime(item)"
+                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
+                                          class="fa fa-pencil"></i></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
 
 
                                <div class="row">
@@ -931,9 +1230,9 @@ const logout = () => {
              
 
                             <button :disabled="isLoadingDowntime" style="margin-bottom: -7px !important;" @click="HandleDowntime" type="button" class="btn btn-info">
-                              {{ isEditingDowntime ? "Save" : "Add" }}
+                              Update
                               <span class="btn-icon-end">
-                                <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
+                                <i class='fa fa-save'></i>
                               </span>
                             </button>
 
@@ -949,40 +1248,7 @@ const logout = () => {
 
 
 
-                        <div class="row">
-                          <hr style="color: black" />
-                          <div class="table-responsive">
-                            <table
-                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
-                              <thead class="thead-primary">
-                                <tr>
-                                  
-                                  <th>Truck #</th>
-                                  <th>Start Time #</th>
-                                  <th>End Time</th>
-                                  <th>Dowtime Reason</th>
-                                  <th>Action</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="(item, index) in downtimeList" :key="index">
-                                
-                                  <td class="td">{{ item.truckNumber }}</td>
-                                  <td class="td">{{ item.startTime }}</td>
-                                  <td class="td">{{ item.endTime }}</td>
-                                  <td class="td">{{ item.downtimeReason }}</td>
-                                  <td>
-                                    <div>
-                                      <a @click="EditDowntime(item)"
-                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
-                                          class="fa fa-pencil"></i></a>
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
+      
 
 
 
@@ -994,9 +1260,12 @@ const logout = () => {
                     </div>
                   </div>
 
+
+
+
                    <Spinner v-if="isLoadingLoad" />
 
-<div class="accordion-item">
+ <div class="accordion-item">
   <h2 class="accordion-header">
     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
       Load
@@ -1004,145 +1273,8 @@ const logout = () => {
   </h2>
   <div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
     <div class="accordion-body">
-      <div class="row">
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Route #</label>
-          <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
-          <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Ticket #</label>
-          <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">First Stop Time</label>
-          <div class="mt-0">
-            <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker placeholder="Select Time">
-              <template #input-icon>
-                <img class="input-slot-image" src="../assets/icons/clock2.png" />
-              </template>
-            </VueDatePicker>
-          </div>
-          <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Last Stop Time</label>
-          <div class="mt-0">
-            <VueDatePicker v-model="timeLastStopTimeLoad" time-picker placeholder="Select Time">
-              <template #input-icon>
-                <img class="input-slot-image" src="../assets/icons/clock2.png" />
-              </template>
-            </VueDatePicker>
-          </div>
-          <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
-        </div>
-      </div>
-      <div class="row">
-        <div class="mb-3 col-md-6">
-          <label class="form-label">Landfill</label>
-          <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
-            :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
-            :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
-          <small v-if="errorsLoad.selectedLandFillLoad_er" class="text-danger">{{errorsLoad.selectedLandFillLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Landfill Time In</label>
-          <div class="mt-0">
-            <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker placeholder="Select Time">
-              <template #input-icon>
-                <img class="input-slot-image" src="../assets/icons/clock2.png" />
-              </template>
-            </VueDatePicker>
-          </div>
-          <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Landfill Time Out</label>
-          <div class="mt-0">
-            <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker placeholder="Select Time">
-              <template #input-icon>
-                <img class="input-slot-image" src="../assets/icons/clock2.png" />
-              </template>
-            </VueDatePicker>
-          </div>
-          <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
-        </div>
-      </div>
-      <div class="row">
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Gross Weight</label>
-          <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Tare Weight</label>
-          <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
-        </div>
-        <div class="mb-3 col-md-3">
-          <label class="form-label">Tons</label>
-          <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
-        </div>
-      </div>
 
-      <div class="row d-flex align-items-center">
-
-
-        <div class="mb-3 col-md-9">
-         
-
-          <input v-show="false"
-            type="file"
-            ref="fileInput"
-            class="form-control form-control-sm border border-primary"
-            multiple
-            accept="image/*"
-            capture="environment"
-            @change="handleFileChange"
-            style="height: 38px; padding: 0.375rem 0.75rem;"
-          />
-
-                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-primary btn-rounded btn-sm">Add Photos<span
-                                        class="btn-icon-end"><i class="fa fa-camera"></i></span>
-                                </button>
-
-
-          <div v-if="selectedImages.length > 0" class="row mt-2">
-            <div v-for="(image, index) in selectedImages" :key="index" class="col-md-3">
-              <img :src="image.url" alt="Preview" style="max-width: 100px; margin-bottom: 10px;" />
-              <p>{{ image.name }} ({{ (image.size / 1024).toFixed(2) }} KB)</p>
-              <button @click.prevent="removeImage(index)" class="btn btn-danger btn-xs">Remove</button>
-            </div>
-          </div>
-         
-          <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
-        </div>
-
-
-        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex">
-          <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
-            {{ isEditingLoad ? "Save" : "Add" }}
-            <span class="btn-icon-end">
-              <i :class="isEditingLoad ? 'fa fa-save' : 'fa fa-plus'"></i>
-            </span>
-          </button>
-        </div>
-      </div>
-
-       <div class="row">
-
-        <div class="mb-3 col-md-12">
-          <label class="form-label">Note</label>
-          <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
-          <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
-        </div>
-
-       
-       </div>
-
-      <div class="row">
+        <div class="row">
         <hr style="color: black" />
         <div class="table-responsive">
           <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
@@ -1183,9 +1315,156 @@ const logout = () => {
           </table>
         </div>
       </div>
+
+
+      <div class="row">
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Route #</label>
+          <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
+          <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Ticket #</label>
+          <input type="text" v-model="ticketNumberLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{errorsLoad.ticketNumberLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">First Stop Time</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeFirstStopTimeLoad_er" class="text-danger">{{errorsLoad.timeFirstStopTimeLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Last Stop Time</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLastStopTimeLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLastStopTimeLoad_er" class="text-danger">{{errorsLoad.timeLastStopTimeLoad_er}}</small>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="mb-3 col-md-6">
+          <label class="form-label">Landfill</label>
+          <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
+            :reduce="(landfill) => landfill.id" label="landfillName" class="form-control p-0"
+            :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
+          <small v-if="errorsLoad.selectedLandFillLoad_er" class="text-danger">{{errorsLoad.selectedLandFillLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Landfill Time In</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLandFillTimeInLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeInLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Landfill Time Out</label>
+          <div class="mt-0">
+            <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker placeholder="Select Time">
+              <template #input-icon>
+                <img class="input-slot-image" src="../assets/icons/clock2.png" />
+              </template>
+            </VueDatePicker>
+          </div>
+          <small v-if="errorsLoad.timeLandFillTimeOutLoad_er" class="text-danger">{{errorsLoad.timeLandFillTimeOutLoad_er}}</small>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Gross Weight</label>
+          <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Tare Weight</label>
+          <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
+        </div>
+        <div class="mb-3 col-md-3">
+          <label class="form-label">Tons</label>
+          <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
+        </div>
+      </div>
+
+      <div class="row d-flex align-items-center">
+
+        <div class="mb-3 col-md-9">
+         
+
+          <input v-show="false"
+            type="file"
+            ref="fileInput"
+            class="form-control form-control-sm border border-primary"
+            multiple
+            accept="image/*"
+            capture="environment"
+            @change="handleFileChange"
+            style="height: 38px; padding: 0.375rem 0.75rem;"
+          />
+
+                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-primary btn-rounded btn-sm">Add Photos<span
+                                        class="btn-icon-end"><i class="fa fa-camera"></i></span>
+                                </button>
+
+
+          <div v-if="selectedImages.length > 0" class="row mt-2">
+            <div v-for="(image, index) in selectedImages" :key="index" class="col-md-3">
+              <img :src="image.url" alt="Preview" style="max-width: 100px; margin-bottom: 10px;" />
+              <p>{{ image.name }} ({{ (image.size / 1024).toFixed(2) }} KB)</p>
+              <button @click.prevent="removeImage(index)" class="btn btn-danger btn-xs">Remove</button>
+            </div>
+          </div>
+         
+          <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
+        </div>
+
+
+        <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex">
+          <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
+            Update
+            <span class="btn-icon-end">
+              <i class='fa fa-save'></i>
+            </span>
+          </button>
+        </div>
+      </div>
+
+       <div class="row">
+
+        <div class="mb-3 col-md-12">
+          <label class="form-label">Note</label>
+          <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
+          <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
+        </div>
+
+       
+       </div>
+
+  
     </div>
   </div>
-</div> -->
+</div>  
+
+
+
                 </div>
               </div>
 
