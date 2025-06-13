@@ -148,6 +148,7 @@ const errorsDowntime = ref({
 const formData = new FormData();
 const selectedFiles = ref([]); // Store File objects for FormData
 const selectedImages = ref([]);
+const selectedLoadData = ref(null);
 const fileInput = ref(null);
 
 const loadList = ref([]);
@@ -446,6 +447,7 @@ const EditLoad = (item) => {
   tonsLoad.value = item.tons ? item.tons.toString() : "";
   selectedLandFillLoad.value = item.landFill_id ? item.landFill_id : "";
   ticketNumberLoad.value = item.ticketNumber ? item.ticketNumber : "";
+  selectedLoadData.value = item; // Store the entire item, including images
   noteLoad.value = item.note ? item.note : "";
   
 
@@ -754,6 +756,14 @@ const logout = () => {
   router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
 }
 
+const downloadImage = (imageUrl) => {
+  const link = document.createElement('a');
+  link.href = 'https://backend-fastapi-coversheet.onrender.com/' + imageUrl;
+  link.target = '_blank'; // Open in new tab
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 </script>
 
@@ -772,6 +782,8 @@ const logout = () => {
 
 
                 <div class="mb-3 col-md-4">
+
+
                   <label class="form-label">Route #</label>
                   <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose your Route"
                     :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
@@ -994,7 +1006,7 @@ const logout = () => {
                         <hr style="color: blue;" />
 
 
-                        <div style="background-color:#7e769e;" class="row">
+                        <div style="background-color:#cdc2f5;" class="row">
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Spare # </label>
@@ -1047,7 +1059,7 @@ const logout = () => {
 
 
 
-                                <div style="background-color: #7e769e;" class="row">
+                                <div style="background-color: #cdc2f5;" class="row">
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Fuel</label>
@@ -1167,7 +1179,7 @@ const logout = () => {
 
 
 
-                               <div class="row">
+                               <div style="background-color:#cdc2f5;" class="row">
 
 
 
@@ -1211,7 +1223,7 @@ const logout = () => {
 
 
 
-                               <div class="row">
+                               <div style="background-color:#cdc2f5;" class="row">
 
 
 
@@ -1265,7 +1277,7 @@ const logout = () => {
 
                    <Spinner v-if="isLoadingLoad" />
 
- <div class="accordion-item">
+<div class="accordion-item">
   <h2 class="accordion-header">
     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#bordered_collapseThree">
       Load
@@ -1273,8 +1285,7 @@ const logout = () => {
   </h2>
   <div id="bordered_collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
     <div class="accordion-body">
-
-        <div class="row">
+      <div class="row">
         <hr style="color: black" />
         <div class="table-responsive">
           <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
@@ -1316,8 +1327,9 @@ const logout = () => {
         </div>
       </div>
 
+ 
 
-      <div class="row">
+      <div style="background-color:#cdc2f5;" class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Route #</label>
           <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
@@ -1352,8 +1364,7 @@ const logout = () => {
         </div>
       </div>
 
-
-      <div class="row">
+      <div style="background-color:#cdc2f5;" class="row">
         <div class="mb-3 col-md-6">
           <label class="form-label">Landfill</label>
           <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad" placeholder="Choose your Landfill"
@@ -1385,8 +1396,7 @@ const logout = () => {
         </div>
       </div>
 
-
-      <div class="row">
+      <div style="background-color:#cdc2f5;" class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Gross Weight</label>
           <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
@@ -1404,11 +1414,8 @@ const logout = () => {
         </div>
       </div>
 
-      <div class="row d-flex align-items-center">
-
+      <!-- <div style="background-color:#cdc2f5;" class="row d-flex align-items-center">
         <div class="mb-3 col-md-9">
-         
-
           <input v-show="false"
             type="file"
             ref="fileInput"
@@ -1419,24 +1426,10 @@ const logout = () => {
             @change="handleFileChange"
             style="height: 38px; padding: 0.375rem 0.75rem;"
           />
-
-                         <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-primary btn-rounded btn-sm">Add Photos<span
-                                        class="btn-icon-end"><i class="fa fa-camera"></i></span>
-                                </button>
-
-
-          <div v-if="selectedImages.length > 0" class="row mt-2">
-            <div v-for="(image, index) in selectedImages" :key="index" class="col-md-3">
-              <img :src="image.url" alt="Preview" style="max-width: 100px; margin-bottom: 10px;" />
-              <p>{{ image.name }} ({{ (image.size / 1024).toFixed(2) }} KB)</p>
-              <button @click.prevent="removeImage(index)" class="btn btn-danger btn-xs">Remove</button>
-            </div>
-          </div>
-         
-          <small v-if="errorsLoad.imageLoad_er" class="text-danger">{{errorsLoad.imageLoad_er}}</small>
-        </div>
-
-
+          <button @click.prevent="fileInput.click()" style="height: 50px;" type="button" class="btn btn-primary btn-rounded btn-sm">Add Photos<span
+                  class="btn-icon-end"><i class="fa fa-camera"></i></span>
+          </button>
+        </div> 
         <div style="margin-bottom: -10px !important;" class="mb-0 col-md-3 d-flex">
           <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; padding: 0.375rem 0.75rem;">
             Update
@@ -1444,26 +1437,52 @@ const logout = () => {
               <i class='fa fa-save'></i>
             </span>
           </button>
-        </div>
-      </div>
+        </div> 
+      </div> -->
 
-       <div class="row">
+      <div style="background-color:#cdc2f5;" class="row">
 
-        <div class="mb-3 col-md-12">
+
+        <div class="mb-3 col-md-9">
           <label class="form-label">Note</label>
           <input type="text" v-model="noteLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{errorsLoad.noteLoad_er}}</small>
         </div>
 
-       
-       </div>
+              <div class="mb-3 col-md-3">
+          <button :disabled="isLoadingLoad" @click="HandleLoad" type="button" class="btn btn-info" style="height: 38px; margin-top: 28px; padding: 0.375rem 0.75rem;">
+            Update
+            <span class="btn-icon-end">
+              <i class='fa fa-save'></i>
+            </span>
+          </button>
+        </div>
 
-  
+
+           <div v-if="selectedLoadData && selectedLoadData.images && selectedLoadData.images.length > 0" class="row mt-3">
+        <h6>Image Previews:</h6>
+        <div class="col-md-12">
+          <div class="d-flex flex-wrap">
+            <img v-for="(image, index) in selectedLoadData.images" :key="index" :src="'https://backend-fastapi-coversheet.onrender.com/' + image" 
+                 style="max-width: 100px; margin: 10px; cursor: pointer;" 
+                 @click="downloadImage(image)" />
+          </div>
+        </div>
+      </div>
+      <!-- <div v-else class="row mt-3">
+        <p>No images available</p>
+      </div> -->
+
+
+
+
+      </div>
+
+
+
     </div>
   </div>
-</div>  
-
-
+</div>
 
                 </div>
               </div>
