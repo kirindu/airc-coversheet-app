@@ -773,8 +773,21 @@ const downloadImage = (imageUrl) => {
  <div class="container-fluid">  
     <div class="col-lg-12">
       <div class="card">
+
+            <div class="card-header">
+       
+
+        <button
+          @click.prevent="closeModal"
+          type="submit"
+          class="btn-close"
+          aria-label="Close"
+        ></button>
+      </div>
         <div class="card-body">
           <div class="basic-form">
+
+          
 
             <form @submit="onSubmit" autocomplete="off">
 
@@ -919,6 +932,9 @@ const downloadImage = (imageUrl) => {
                 Update CoverSheet
               </button>
 
+          <button @click.prevent="closeModal" style="margin-left: 20px;" type="submit" class="btn btn-danger">
+                Cancel
+              </button>
    
             </form>
           </div>
@@ -1478,18 +1494,25 @@ const downloadImage = (imageUrl) => {
 
       </div>
 
-
-
+     
     </div>
   </div>
 </div>
 
                 </div>
               </div>
+  
 
             </form>
+
           </div>
+                                <button @click.prevent="closeModal" style="margin-left: 20px;" type="submit" class="btn btn-danger">
+                Cancel
+              </button>
+          
+       
         </div>
+           
       </div>
     </div>
 
