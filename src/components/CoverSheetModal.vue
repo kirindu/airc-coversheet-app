@@ -897,7 +897,7 @@ const downloadImage = (imageUrl) => {
               <div class="row">
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Start Miles</label>
-                  <input type="number" v-model="startMiles"
+                  <input type="number" step="any" v-model="startMiles"
                     class="form-control form-control-sm border border-primary" />
                   <small v-if="errors.startMiles_er" class="text-danger">{{
                     errors.startMiles_er
@@ -906,7 +906,7 @@ const downloadImage = (imageUrl) => {
 
                 <div class="mb-3 col-md-3">
                   <label class="form-label">End Miles</label>
-                  <input type="number" v-model="endMiles" class="form-control form-control-sm border border-primary" />
+                  <input type="number" step="any" v-model="endMiles" class="form-control form-control-sm border border-primary" />
                   <small v-if="errors.endMiles_er" class="text-danger">{{
                     errors.endMiles_er
                   }}</small>
@@ -914,7 +914,7 @@ const downloadImage = (imageUrl) => {
 
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Fuel</label>
-                  <input type="number" v-model="fuel" class="form-control form-control-sm border border-primary" />
+                  <input type="number" step="any" v-model="fuel" class="form-control form-control-sm border border-primary" />
                   <small v-if="errors.fuel_er" class="text-danger">{{
                     errors.fuel_er
                   }}</small>
@@ -1049,7 +1049,7 @@ const downloadImage = (imageUrl) => {
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Start Miles</label>
-                            <input type="number" v-model="startMilesSpareTruckInfo"
+                            <input type="number" step="any" v-model="startMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="
                               errorsSpareTruckInfo.startMilesSpareTruckInfo_er
@@ -1060,7 +1060,7 @@ const downloadImage = (imageUrl) => {
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">End Miles</label>
-                            <input type="number" v-model="endMilesSpareTruckInfo"
+                            <input type="number" step="any" v-model="endMilesSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="
                               errorsSpareTruckInfo.endMilesSpareTruckInfo_er
@@ -1079,7 +1079,7 @@ const downloadImage = (imageUrl) => {
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Fuel</label>
-                            <input type="number" v-model="fuelSpareTruckInfo"
+                            <input type="number" step="any" v-model="fuelSpareTruckInfo"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{
                               errorsSpareTruckInfo.fuelSpareTruckInfo_er
@@ -1415,17 +1415,17 @@ const downloadImage = (imageUrl) => {
       <div style="background-color:#cdc2f5;" class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Gross Weight</label>
-          <input type="number" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
+          <input type="number" step="any" v-model="grossWeightLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{errorsLoad.grossWeightLoad_er}}</small>
         </div>
         <div class="mb-3 col-md-3">
           <label class="form-label">Tare Weight</label>
-          <input type="number" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
+          <input type="number" step="any" v-model="tareWeightLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{errorsLoad.tareWeightLoad_er}}</small>
         </div>
         <div class="mb-3 col-md-3">
           <label class="form-label">Tons</label>
-          <input type="number" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
+          <input type="number" step="any" v-model="tonsLoad" class="form-control form-control-sm border border-primary" />
           <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{errorsLoad.tonsLoad_er}}</small>
         </div>
       </div>
