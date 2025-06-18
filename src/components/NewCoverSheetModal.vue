@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { closeModal, confirmModal } from "@kolirt/vue-modal";
+
 
 import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 const router = useRouter() // Instanciamos el router
@@ -37,7 +39,7 @@ import { useTrucksStore } from "@/stores/trucks.js";
 const storeTruck = useTrucksStore();
 
 import { useDriversStore } from "@/stores/drivers.js";
-import { is } from "@vee-validate/rules";
+const storeDriver = useDriversStore();		
 
 const user = ref(null);
 
@@ -61,6 +63,9 @@ if (storedUser) {
 // General Info
 const selectedRoute = ref("");
 const selectedTruck = ref("");
+const selectedDriver = ref("");
+
+const date = ref(new Date());
 
 const timeClockIn = ref("");
 const timeLeaveYard = ref("");
@@ -78,6 +83,8 @@ const isVisibleAcordion = ref(false);
 const errors = ref({
   route_er: "",
   truck_er: "",
+  date_er: "",
+  driver_er: "",
   clockIn_er: "",
   leaveYard_er: "",
   backInYard_er: "",
@@ -88,7 +95,7 @@ const errors = ref({
 });
 
 // Modo de edición de la informaciongeneral para el coversheet
-const isEditModeCoverShet = ref(false);
+ const isEditModeCoverShet = ref(false);
 
 
 
@@ -196,69 +203,8 @@ imageLoad_er: "",
 
 
 onMounted(() => {
-  if (!sessionStorage.getItem("page_reloaded2")) {
-    sessionStorage.setItem("page_reloaded2", "true");
-    window.location.reload();
-  } else {
-    sessionStorage.removeItem("page_reloaded2");
-  }
 
-  let user_id = user.value.id;
-  let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
-  if (user_id !== coversheet_driver_id) {
-    localStorage.removeItem("COVERSHEET");
-  } else {
-    // Parse the date from localStorage (assumed to be in UTC)
-    const dbDate = DateTime.fromISO(JSON.parse(localStorage.getItem("COVERSHEET")).date, { zone: 'utc' });
-    const today = DateTime.now(); // Current time
-
-    // Convert both dates to Denver timezone for comparison
-    const dbDateDenver = dbDate.setZone('America/Denver');
-    const todayDenver = today.setZone('America/Denver');
-
-    // Compare year, month, and day
-    if (
-      dbDateDenver.year !== todayDenver.year ||
-      dbDateDenver.month !== todayDenver.month ||
-      dbDateDenver.day !== todayDenver.day
-    ) {
-      localStorage.removeItem("COVERSHEET");
-    } else {
-      isEditModeCoverShet.value = true;
-      const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
-
-      timeClockIn.value = setTimeFromDB(coversheet.clockIn);
-      timeLeaveYard.value = setTimeFromDB(coversheet.leaveYard);
-      timeBackInYard.value = setTimeFromDB(coversheet.backInYard);
-      timeClockOut.value = setTimeFromDB(coversheet.clockOut);
-
-      startMiles.value = coversheet.startMiles;
-      endMiles.value = coversheet.endMiles;
-      fuel.value = coversheet.fuel;
-      notes.value = coversheet.notes;
-      selectedRoute.value = coversheet.route_id;
-      selectedTruck.value = coversheet.truck_id;
-
-      selectedRouteSpareTruckInfo.value = coversheet.route_id;
-      selectedTruckDowntime.value = coversheet.truck_id;
-      selectedRouteLoad.value = coversheet.route_id;
-
-      handleVisibleAcordion();
-      loadSpareTruckInfo();
-      loadDowntime();
-      loadLoad();
-    }
-  }
-
-  // Si recuperamos el objeto que viene en un select , se lo pasamos directamente para que lo muestre en el input
-  // selectedRoute.value = {
-  //   id: "6802a8f922dd5e9980ae8c1f",
-  //   routeNumber: "100",
-  //   lob: "Front Load",
-  //   active: true,
-  //   createdAt: "2025-04-18T19:33:13.043000"
-  // };
 });
 
 // Metodos
@@ -271,6 +217,8 @@ const onSubmit = async (event) => {
   // Limpiar errores anteriores
   errors.value.route_er = "";
   errors.value.truck_er = "";
+  errors.value.date_er = "";
+  errors.value.driver_er = "";
   errors.value.clockIn_er = "";
   errors.value.leaveYard_er = "";
   errors.value.backInYard_er = "";
@@ -281,6 +229,11 @@ const onSubmit = async (event) => {
 
   let hasError = false;
 
+    if (!date.value) {
+    errors.value.date_er = "Required field";
+    hasError = true;
+  }
+
   if (!selectedRoute.value) {
     errors.value.route_er = "Required field";
     hasError = true;
@@ -288,6 +241,11 @@ const onSubmit = async (event) => {
 
   if (!selectedTruck.value) {
     errors.value.truck_er = "Required field";
+    hasError = true;
+  }
+
+  if (!selectedTruck.value) {
+    errors.value.driver_er = "Required field";
     hasError = true;
   }
 
@@ -311,18 +269,19 @@ const onSubmit = async (event) => {
     fuel: fuel.value.toString() || "",
     truck_id: selectedTruck.value,
     route_id: selectedRoute.value,
-    driver_id: user.value.id,
+    driver_id: selectedDriver.value,
     notes: notes.value,
-    date: getDenverTimeAsUTCISOString(),
+    date: date.value
   };
 
   try {
+
     if (!isEditModeCoverShet.value) {
       const response = await CoverSheetAPI.add(coverSheetData);
 
       if (response.data.ok) {
-        localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
-        const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+        localStorage.setItem("COVERSHEET2", JSON.stringify(response.data.data));
+        const coversheet = JSON.parse(localStorage.getItem("COVERSHEET2"));
 
         selectedRouteSpareTruckInfo.value = coversheet.route_id;
         selectedTruckDowntime.value = coversheet.truck_id;
@@ -354,12 +313,12 @@ const onSubmit = async (event) => {
         });
       }
     } else {
-      let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+      let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET2"))?.id || null;
       const response = await CoverSheetAPI.edit(coversheet_id, coverSheetData);
 
       if (response.data.ok) {
-        localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
-        const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+        localStorage.setItem("COVERSHEET2", JSON.stringify(response.data.data));
+        const coversheet = JSON.parse(localStorage.getItem("COVERSHEET2"));
 
         selectedRouteSpareTruckInfo.value = coversheet.route_id;
         selectedTruckDowntime.value = coversheet.truck_id;
@@ -503,8 +462,7 @@ const HandleSpareTruckInfo = async (event) => {
     return;
   }
 
-  let coversheet_id =
-    JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET2"))?.id || null;
 
   const spareTruckInfo = {
     spareTruckNumber: spareTruckSpareTruckInfo.value,
@@ -625,7 +583,7 @@ const HandleDowntime = async (event) => {
     return;
   }
 
-  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET2"))?.id || null;
 
   const downtime = {
     truck_id: selectedTruckDowntime.value,
@@ -745,7 +703,7 @@ const HandleLoad = async (event) => {
     return;
   }
 
-  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET2"))?.id || null;
 
   // Create a new FormData object
   const formData = new FormData();
@@ -899,7 +857,7 @@ const EditLoad = (item) => {
 };
 
 const loadSpareTruckInfo = async () => {
-  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  const rawCoverSheet = localStorage.getItem("COVERSHEET2");
   if (!rawCoverSheet) return;
 
   const coverSheet = JSON.parse(rawCoverSheet);
@@ -916,7 +874,7 @@ const loadSpareTruckInfo = async () => {
 };
 
 const loadDowntime = async () => {
-  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  const rawCoverSheet = localStorage.getItem("COVERSHEET2");
   if (!rawCoverSheet) return;
 
 
@@ -936,7 +894,7 @@ const loadDowntime = async () => {
 };
 
 const loadLoad = async () => {
-  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  const rawCoverSheet = localStorage.getItem("COVERSHEET2");
   if (!rawCoverSheet) return;
 
 
@@ -956,7 +914,7 @@ const loadLoad = async () => {
 };
 
 const handleVisibleAcordion = async () => {
-  const rawCoverSheet = localStorage.getItem("COVERSHEET");
+  const rawCoverSheet = localStorage.getItem("COVERSHEET2");
   if (!rawCoverSheet) return;
 
   isVisibleAcordion.value = true
@@ -1034,6 +992,20 @@ const currentDate = ref(
   })
 );
 
+const formatToYYYYMMDD = (inputDate) => {
+  const date = new Date(inputDate);
+  if (isNaN(date.getTime())) {
+    console.warn("Fecha inválida:", inputDate);
+    return null;
+  }
+
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 // Edit Spare Truck Info
 const formatTime = (controlTimeValue) => {
   if (!controlTimeValue) {
@@ -1094,7 +1066,7 @@ const getDenverTimeAsUTCISOString = () => {
 
 <template>
   <div class="container-fluid">
-    <div class="page-titles">
+    <!-- <div class="page-titles">
       <ol class="breadcrumb">
         <li class="breadcrumb-item">
           <a href="javascript:void(0)">Bootstrap</a>
@@ -1103,12 +1075,25 @@ const getDenverTimeAsUTCISOString = () => {
           <a href="javascript:void(0)">Accordion</a>
         </li>
       </ol>
-    </div>
+    </div> -->
 
     <Spinner v-if="storeRoute.loading || storeTruck.loading" />
 
     <div class="col-lg-12">
       <div class="card">
+
+            <div class="card-header">
+             Create a new Coversheet
+       
+
+        <button
+          @click.prevent="closeModal"
+          type="submit"
+          class="btn-close"
+          aria-label="Close"
+        ></button>
+      </div>
+
         <div class="card-body">
           <div class="basic-form">
 
@@ -1116,8 +1101,23 @@ const getDenverTimeAsUTCISOString = () => {
 
               <div class="row">
 
+              
+			                  <div class="mb-3 col-md-3">
+                  <label class="form-label">Date</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="date" :enable-time-picker="false" :max-date="new Date()" placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/calendar.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.date_er" class="text-danger">{{
+                    errors.date_er
+                  }}</small>
+                </div>
 
-                <div class="mb-3 col-md-4">
+
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Route #</label>
                   <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose your Route"
                     :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
@@ -1127,7 +1127,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-4">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Truck #</label>
                   <v-select :options="storeTruck.trucks" v-model="selectedTruck" placeholder="Choose your Truck"
                     :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
@@ -1137,13 +1137,14 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-4">
-                  <label class="form-label">Current Date</label>
-                  <div class="mt-2">
-                    <label class="form-label" style="color: brown">
-                      {{ currentDate }}
-                    </label>
-                  </div>
+                <div class="mb-3 col-md-3">
+                     <label class="form-label">Driver</label>
+                  <v-select :options="storeDriver.drivers" v-model="selectedDriver" placeholder="Choose Driver"
+                    :reduce="(driver) => driver.id" label="name" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedDriver }" />
+                                <small v-if="errors.driver_er" class="text-danger">{{
+                    errors.driver_er
+                  }}</small>
                 </div>
 
               </div>
@@ -1241,12 +1242,21 @@ const getDenverTimeAsUTCISOString = () => {
               </div>
 
               <button type="submit" class="btn btn-primary">
-                {{ isEditModeCoverShet ? "Update CoverSheet" : "Start CoverSheet" }}
+               {{ isEditModeCoverShet ? "Update CoverSheet" : "Start CoverSheet" }}
               </button>
 
-              <button style="margin-left: 20px;" class="btn btn-secondary" @click.prevent="logout">
-                Finalize CoverSheet
+                            <button
+                @click.prevent="closeModal"
+                style="margin-left: 20px"
+                type="submit"
+                class="btn btn-danger"
+              >
+                Close
               </button>
+
+              <!-- <button style="margin-left: 20px;" class="btn btn-secondary" @click.prevent="logout">
+                Finalize CoverSheet
+              </button> -->
             </form>
           </div>
         </div>

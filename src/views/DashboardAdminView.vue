@@ -150,6 +150,29 @@ const openCoverSheetModal = async (item) => {
 };
 
 
+const openNewCoverSheetModal = async () => {
+
+  await openModal(
+    defineAsyncComponent(() => import("@/components/NewCoverSheetModal.vue")),
+    {
+      // item: item,
+    }
+  )
+    // runs when modal is closed via confirmModal
+    .then((data) => {
+      console.log("success", data);
+    })
+    // runs when modal is closed via closeModal or esc
+    .catch(() => {
+      console.log("catch");
+    });
+
+};
+
+
+
+
+
 const EditCoverSheet = (item) => {
 
 
@@ -215,62 +238,11 @@ onMounted(() => {
 
     <Spinner v-if="storeRoute.loading || storeTruck.loading" />
 
-<!--
-    <div class="col-lg-12">
 
-              
-
-              <nav class="navbar navbar-expand-lg navbar-light" style="background-color:peru;">
-              
-  <div class="container-fluid">
-
-  <div class="row">
-    
-    <div class="collapse navbar-collapse" id="navbarScroll">
-      <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Link
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Link</a>
-        </li>
-      </ul>
-     
-    </div>
-  </div>
-  </div>
-</nav>
-
-       
-
-
-
-
-
-
-
-			
-
-    </div>
-
-<br>
--->
     <div class="col-lg-12">
       <div class="card">
+
+      
         <div class="card-body">
           <div class="basic-form">
           
@@ -331,16 +303,18 @@ onMounted(() => {
                             <button style="margin-bottom: -5px !important;" @click="SearchCoverSheet" type="button" class="btn btn-info">
                               Search CoverSheet
                               <span class="btn-icon-end">
-                                <i class= 'fa fa-save'></i>
+                                <i class= 'fa fa-search'></i>
                               </span>
                             </button>
 
 
-              <!-- <button type="submit" class="btn btn-primary">
-                Search
-              </button> -->
+           <button style="margin-bottom: -5px !important; margin-left: 15px;" @click="openNewCoverSheetModal" type="button" class="btn btn-warning ">
+                              New CoverSheet
+                              <span class="btn-icon-end">
+                                <i class= 'fa fa-table'></i>
+                              </span>
+                            </button>
 
-            <!-- </form> -->
 
 			
           </div>
