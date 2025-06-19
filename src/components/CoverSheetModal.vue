@@ -820,6 +820,7 @@ const downloadImage = (imageUrl) => {
     <div class="col-lg-12">
       <div class="card">
         <div class="card-header">
+        Coversheet
           <button
             @click.prevent="closeModal"
             type="submit"
