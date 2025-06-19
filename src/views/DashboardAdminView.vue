@@ -264,7 +264,6 @@ onMounted(() => {
                   }}</small>
                 </div>
 
-
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Route #</label>
                   <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose Route"
