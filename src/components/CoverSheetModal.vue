@@ -801,6 +801,7 @@ const getDenverTimeAsUTCISOString = () => {
 
 const logout = () => {
   localStorage.removeItem("USER"); // Eliminamos la variable USER del localStorage
+  localStorage.removeItem('COVERSHEET2') // Eliminamos la variable COVERSHEET2 del localStorage
   router.push({ name: "login" }); // Redirigimos al usuario a la página de login
 };
 

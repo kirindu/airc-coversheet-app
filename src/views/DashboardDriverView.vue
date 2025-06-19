@@ -41,22 +41,7 @@ import { is } from "@vee-validate/rules";
 
 const user = ref(null);
 
-// Recuperamos el usuario
-const storedUser = localStorage.getItem("USER");
 
-if (storedUser) {
-  try {
-    const parsed = JSON.parse(storedUser);
-
-    if (parsed.data.user) {
-      user.value = parsed.data.user; // ADMIN
-    } else {
-      user.value = parsed.data; // DRIVER
-    }
-  } catch (e) {
-    console.error("Error al parsear USER desde localStorage:", e);
-  }
-}
 
 // General Info
 const selectedRoute = ref("");
@@ -202,6 +187,33 @@ onMounted(() => {
   } else {
     sessionStorage.removeItem("page_reloaded2");
   }
+
+  // Recuperamos el usuario
+const storedUser = localStorage.getItem("USER");
+
+if (storedUser) {
+  try {
+    const parsed = JSON.parse(storedUser);
+
+    if (parsed.data.user) {
+      user.value = parsed.data.user; // ADMIN
+    } else {
+      user.value = parsed.data; // DRIVER
+    }
+  } catch (e) {
+    console.error("Error al parsear USER desde localStorage:", e);
+  }
+}
+
+if(user.value){
+
+  if(user.value.rol === "Admin"){
+    router.push({ name: 'dashboard-admin' }); // Redirigir al dashboard de Admin
+  }
+
+}
+
+
 
   let user_id = user.value.id;
   let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
@@ -1056,6 +1068,7 @@ const setTimeFromDB = (timeString) => {
 // Método para manejar el logout
 const logout = () => {
   localStorage.removeItem('USER') // Eliminamos la variable USER del localStorage
+  localStorage.removeItem('COVERSHEET2') // Eliminamos la variable COVERSHEET2 del localStorage
   router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
 }
 
