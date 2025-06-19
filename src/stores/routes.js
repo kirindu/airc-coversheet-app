@@ -12,7 +12,8 @@ export const useRoutesStore = defineStore("routes", () => {
 
     try {
       const { data } = await RouteAPI.all();
-      routes.value = data.data; // Recuerda que data es el wrap de axios
+    //  routes.value = data.data; // Recuerda que data es el wrap de axios
+      routes.value = data.data.sort(naturalSort);
 
       //   console.log(routes.value);
     } catch (err) {
@@ -21,6 +22,12 @@ export const useRoutesStore = defineStore("routes", () => {
       loading.value = false;
     }
   });
+
+
+
+  const naturalSort = (a, b) =>{
+  return a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true, sensitivity: 'base' });
+}
 
   return {
     routes,

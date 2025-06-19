@@ -12,7 +12,8 @@ export const useTrucksStore = defineStore("trucks", () => {
 
     try {
       const { data } = await TruckAPI.all();
-      trucks.value = data.data; // Recuerda que data es el wrap de axios
+     // trucks.value = data.data; // Recuerda que data es el wrap de axios
+     trucks.value = data.data.sort((a, b) => Number(a.truckNumber) - Number(b.truckNumber));
 
       //   console.log(trucks.value);
     } catch (err) {
