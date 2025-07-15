@@ -60,12 +60,22 @@ const logout = () => {
 <template>
   <div class="header">
     <div class="header-content">
+
       <nav class="navbar navbar-expand">
         <div class="collapse navbar-collapse justify-content-between">
+
           <div class="header-left">
-            <div class="dashboard_bar">Dashboard</div>
+            <!-- <div class="dashboard_bar">Dashboard</div> -->
+            <!-- <div style="margin-left: 20px; color:brown" class="dashboard_bar">Reports</div> -->
+
+           <a class="nav-link active" href="#" style="font-size: 15px; color: black;">Reports</a>
+
+           
           </div>
+
           <ul class="navbar-nav header-right">
+
+
             <li class="nav-item dropdown header-profile ps30">
               <a
                 class="nav-link"
@@ -105,8 +115,10 @@ const logout = () => {
               </div>
             </li>
           </ul>
+
         </div>
       </nav>
+
     </div>
   </div>
 </template>
