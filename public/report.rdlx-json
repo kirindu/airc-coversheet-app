@@ -1,0 +1,18 @@
+{
+  "Name": "sample-report",
+  "Body": {
+    "ReportItems": [
+      {
+        "Type": "Textbox",
+        "Name": "TestText",
+        "Value": "¡Hola, mundo!",
+        "Width": "2in",
+        "Height": "0.5in"
+      }
+    ]
+  },
+  "Page": {
+    "PageHeight": "11in",
+    "PageWidth": "8.5in"
+  }
+}

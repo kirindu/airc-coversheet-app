@@ -9,7 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@grapecity/activereports": "^5.2.3",
+    "@grapecity/activereports-localization": "^5.2.3",
+    "@grapecity/activereports-vue": "^5.2.3",
     "@kolirt/vue-modal": "^1.1.2",
+    "@mescius/activereportsjs": "^5.2.3",
+    "@mescius/activereportsjs-vue": "^5.2.3",
     "@vee-validate/i18n": "^4.15.0",
     "@vee-validate/rules": "^4.15.0",
     "@vee-validate/yup": "^4.15.0",

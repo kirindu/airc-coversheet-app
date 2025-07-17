@@ -6,8 +6,6 @@ import { useRouter } from 'vue-router' // Importamos useRouter para manejar la r
 const user = ref(null)
 const router = useRouter() // Instanciamos el router
 
-
-
 onMounted(() => {
   const storedUser = localStorage.getItem('USER')
 
@@ -27,8 +25,7 @@ onMounted(() => {
 })
 
 const avatarSrc = computed(() => {
-
-    const storedUser = localStorage.getItem('USER')
+  const storedUser = localStorage.getItem('USER')
 
   if (storedUser) {
     try {
@@ -45,9 +42,7 @@ const avatarSrc = computed(() => {
       console.error('Error al parsear USER desde localStorage:', e)
     }
   }
-
 })
-
 
 // Método para manejar el logout
 const logout = () => {
@@ -60,22 +55,26 @@ const logout = () => {
 <template>
   <div class="header">
     <div class="header-content">
-
       <nav class="navbar navbar-expand">
         <div class="collapse navbar-collapse justify-content-between">
-
           <div class="header-left">
-            <!-- <div class="dashboard_bar">Dashboard</div> -->
-            <!-- <div style="margin-left: 20px; color:brown" class="dashboard_bar">Reports</div> -->
-
-           <a class="nav-link active" href="#" style="font-size: 15px; color: black;">Reports</a>
-
-           
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                style="font-size: 15px; color:#00aff0;"
+              >
+                Reports
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports' })">Coversheets Report</a>
+              </div>
+            </div>
           </div>
 
           <ul class="navbar-nav header-right">
-
-
             <li class="nav-item dropdown header-profile ps30">
               <a
                 class="nav-link"
@@ -115,10 +114,8 @@ const logout = () => {
               </div>
             </li>
           </ul>
-
         </div>
       </nav>
-
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 <template>
   <div class="nav-header">
-    <a href="index.html" class="brand-logo">
+    <a href="/admin/dashboard" class="brand-logo">
       <img
         fetchpriority="high"
         decoding="async"

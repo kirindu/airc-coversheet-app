@@ -3,6 +3,8 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
+import '@mescius/activereportsjs/styles/ar-js-ui.css'
+
 import { createModal } from '@kolirt/vue-modal'
 
 import ToastPlugin from "vue-toast-notification";
