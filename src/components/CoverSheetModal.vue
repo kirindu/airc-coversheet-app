@@ -93,6 +93,8 @@ const selectedSpareTruckId = ref(null); // To store the ID of the spare truck be
 
 const isVisibleSpareTruckInfo = ref(false);
 
+const visibleDetailSpareTruckInfo = ref(false); // To control visibility of the Spare Truck Info section
+
 const spareTruckSpareTruckInfo = ref("");
 const selectedRouteSpareTruckInfo = ref("");
 
@@ -122,6 +124,8 @@ const selectedDowntimeId = ref(null); // To store the ID of the downtime being e
 
 const isVisibleDowntime = ref(false);
 
+const visibleDetailDowntime = ref(false); // To control visibility of the Downtime section
+
 const selectedTruckDowntime = ref("");
 const timeStartTimeDowntime = ref("");
 const timeEndTimeDowntime = ref("");
@@ -143,6 +147,8 @@ const selectedFiles = ref([]); // Store File objects for FormData
 const selectedImages = ref([]);
 const selectedLoadData = ref(null);
 const fileInput = ref(null);
+
+const visibleDetailLoad = ref(false); // To control visibility of the Load section
 
 const loadList = ref([]);
 const selectedLoadId = ref(null); // To store the ID of the load being edited
@@ -416,6 +422,8 @@ const EditSpareTruckInfo = (item) => {
   fuelSpareTruckInfo.value = item.fuel;
 
   selectedSpareTruckId.value = item.id || item._id; // Ensure the ID is captured
+
+  visibleDetailSpareTruckInfo.value = true; // Show the Spare Truck Info details section
 };
 
 const EditDowntime = (item) => {
@@ -425,6 +433,8 @@ const EditDowntime = (item) => {
   downtimeReasonDowntime.value = item.downtimeReason;
 
   selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
+
+  visibleDetailDowntime.value = true; // Show the Downtime details section
 };
 
 const EditLoad = (item) => {
@@ -449,6 +459,20 @@ const EditLoad = (item) => {
   noteLoad.value = item.note ? item.note : "";
 
   selectedLoadId.value = item.id || item._id; // Ensure the ID is captured
+
+  visibleDetailLoad.value = true; // Show the Load details section
+};
+
+const OcultamosSpareTruckInfo = () => {
+  visibleDetailSpareTruckInfo.value = false; // Hide the Spare Truck Info details section
+};
+
+const OcultamosDowntime = () => {
+  visibleDetailDowntime.value = false; // Hide the Downtime details section
+};
+
+const OcultamosLoad = () => {
+  visibleDetailLoad.value = false; // Hide the Load details section
 };
 
 const HandleSpareTruckInfo = async (event) => {
@@ -1061,6 +1085,7 @@ const downloadImage = (imageUrl) => {
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#bordered_collapseOne"
+                        v-on:click="OcultamosSpareTruckInfo"
                       >
                         Spare Truck Info
                       </button>
@@ -1080,7 +1105,7 @@ const downloadImage = (imageUrl) => {
                             <table
                               class="table table-bordered header-border table-striped table-hover table-responsive-md"
                             >
-                              <thead class="thead-primary">
+                              <thead class="thead-primary text-center">
                                 <tr>
                                   <!-- <th style="width:50px;"></th> -->
                                   <th>Spare #</th>
@@ -1109,11 +1134,11 @@ const downloadImage = (imageUrl) => {
                                   <td class="td">{{ item.leaveYard }}</td>
                                   <td class="td">{{ item.backInYard }}</td>
                                   <td>
-                                    <div>
+                                    <div style="text-align: center;">
                                       <a
                                         @click="EditSpareTruckInfo(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"
-                                        ><i class="fa fa-pencil"></i
+                                        ><i class="fa fa-sign-in"></i
                                       ></a>
                                     </div>
                                   </td>
@@ -1124,6 +1149,8 @@ const downloadImage = (imageUrl) => {
                         </div>
 
                         <hr style="color: blue" />
+
+                        <div v-if="visibleDetailSpareTruckInfo">
 
                         <div style="background-color: #cdc2f5" class="row">
                           <div class="mb-3 col-md-3">
@@ -1292,6 +1319,9 @@ const downloadImage = (imageUrl) => {
                             </button>
                           </div>
                         </div>
+
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -1304,6 +1334,7 @@ const downloadImage = (imageUrl) => {
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#bordered_collapseTwo"
+                        v-on:click="OcultamosDowntime"
                       >
                         Downtime
                       </button>
@@ -1320,12 +1351,12 @@ const downloadImage = (imageUrl) => {
                             <table
                               class="table table-bordered header-border table-striped table-hover table-responsive-md"
                             >
-                              <thead class="thead-primary">
+                              <thead class="thead-primary text-center">
                                 <tr>
                                   <th>Truck #</th>
                                   <th>Start Time #</th>
                                   <th>End Time</th>
-                                  <th>Dowtime Reason</th>
+                                  <th>Downtime Reason</th>
                                   <th>Action</th>
                                 </tr>
                               </thead>
@@ -1339,11 +1370,11 @@ const downloadImage = (imageUrl) => {
                                   <td class="td">{{ item.endTime }}</td>
                                   <td class="td">{{ item.downtimeReason }}</td>
                                   <td>
-                                    <div>
+                                    <div style="text-align: center;">
                                       <a
                                         @click="EditDowntime(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"
-                                        ><i class="fa fa-pencil"></i
+                                        ><i class="fa fa-sign-in"></i
                                       ></a>
                                     </div>
                                   </td>
@@ -1352,6 +1383,10 @@ const downloadImage = (imageUrl) => {
                             </table>
                           </div>
                         </div>
+
+                        <hr style="color: blue" />
+
+                        <div v-if="visibleDetailDowntime">
 
                         <div style="background-color: #cdc2f5" class="row">
                           <div class="mb-3 col-md-3">
@@ -1460,6 +1495,9 @@ const downloadImage = (imageUrl) => {
                             </button>
                           </div>
                         </div>
+
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -1473,6 +1511,7 @@ const downloadImage = (imageUrl) => {
                         type="button"
                         data-bs-toggle="collapse"
                         data-bs-target="#bordered_collapseThree"
+                        v-on:click="OcultamosLoad"
                       >
                         Load
                       </button>
@@ -1489,7 +1528,7 @@ const downloadImage = (imageUrl) => {
                             <table
                               class="table table-bordered header-border table-striped table-hover table-responsive-md"
                             >
-                              <thead class="thead-primary">
+                              <thead class="thead-primary text-center">
                                 <tr>
                                   <th>Route #</th>
                                   <th>First Stop Time</th>
@@ -1520,11 +1559,11 @@ const downloadImage = (imageUrl) => {
                                   <td class="td">{{ item.landfillName }}</td>
                                   <td class="td">{{ item.ticketNumber }}</td>
                                   <td>
-                                    <div>
+                                    <div style="text-align: center;">
                                       <a
                                         @click="EditLoad(item)"
                                         class="btn btn-primary shadow btn-xs sharp me-1"
-                                        ><i class="fa fa-pencil"></i
+                                        ><i class="fa fa-sign-in"></i
                                       ></a>
                                     </div>
                                   </td>
@@ -1533,6 +1572,10 @@ const downloadImage = (imageUrl) => {
                             </table>
                           </div>
                         </div>
+
+                        <hr style="color: blue" />
+
+                        <div v-if="visibleDetailLoad">
 
                         <div style="background-color: #cdc2f5" class="row">
                           <div class="mb-3 col-md-3">
@@ -1822,6 +1865,9 @@ const downloadImage = (imageUrl) => {
                   <p>No images available</p>
                 </div> -->
                         </div>
+
+                        </div>
+
                       </div>
                     </div>
                   </div>
