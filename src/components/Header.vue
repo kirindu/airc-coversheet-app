@@ -58,7 +58,7 @@ const logout = () => {
       <nav class="navbar navbar-expand">
         <div class="collapse navbar-collapse justify-content-between">
           <div class="header-left">
-            <!-- <div class="nav-item dropdown">
+            <div class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
                 href="#"
@@ -71,7 +71,7 @@ const logout = () => {
               <div class="dropdown-menu">
                 <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports' })">Coversheets Report</a>
               </div>
-            </div> -->
+            </div>
           </div>
 
           <ul class="navbar-nav header-right">
