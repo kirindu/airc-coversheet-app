@@ -69,7 +69,11 @@ const logout = () => {
                 Reports
               </a>
               <div class="dropdown-menu">
-                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports' })">Coversheets Report</a>
+                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports' })">Report by Single Date</a>
+                <!-- <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports' })">Report by Date Range</a>
+                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports' })">Report by Driver Name</a> -->
+
+
               </div>
             </div>
           </div>
