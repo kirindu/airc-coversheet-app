@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-const metabaseUrl = 'https://metabase.kizunadata.cloud/public/question/086522b2-93ce-479a-8938-eece62793d71'; // reemplaza con tu URL real
+const metabaseUrl = 'https://metabase.kizunadata.cloud/public/dashboard/80f68a3c-b4a4-4774-9718-e14910680240'; // reemplaza con tu URL real
 </script>
 
 <style scoped>
