@@ -39,7 +39,7 @@ const router = createRouter({
           component: () => import('../views/DashboardAdminView.vue'),
         },
         {
-          path: 'reports',
+          path: 'reports/:type?',
           name: 'admin-reports',
           component: () => import('../views/ReportView.vue'),
         },
@@ -155,6 +155,7 @@ router.beforeEach((to, from, next) => {
 
 //   } else {
 //     next();
+
 //   }
 
 // })
