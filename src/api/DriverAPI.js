@@ -5,6 +5,14 @@ export default {
  async all() {
     return api.get("/drivers/");
   },
+
+    async add(values) {
+
+
+    const data = await api.post('/drivers/', values);
+    return data;
+
+  },
   
   // async add(values) {
 

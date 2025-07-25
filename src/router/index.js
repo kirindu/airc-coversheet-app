@@ -44,6 +44,11 @@ const router = createRouter({
           component: () => import('../views/ReportView.vue'),
         },
         {
+          path: 'driver',
+          name: 'admin-drivers',
+          component: () => import('../views/Drivers.vue'),
+        },
+        {
           path: 'designer',
           name: 'admin-reports-designer',
           component: () => import('../views/ReportDesignerView.vue'),

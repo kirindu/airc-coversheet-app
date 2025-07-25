@@ -53,11 +53,13 @@ const logout = () => {
 </script>
 
 <template>
-  <div class="header">
+  <appdiv class="header">
     <div class="header-content">
       <nav class="navbar navbar-expand">
         <div class="collapse navbar-collapse justify-content-between">
           <div class="header-left">
+
+
             <div class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -74,6 +76,22 @@ const logout = () => {
                 <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'driver-name' } })">Report by Driver Name</a>
               </div>
             </div>
+
+                    <!-- <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
+              <a
+                class="nav-link"
+                style="font-size: 15px; color:#00aff0;"
+                @click.prevent="router.push({ name: 'admin-drivers' })"
+              >
+                Drivers
+              </a>
+            </div> -->
+
+
+            
+
+
+
           </div>
 
           <ul class="navbar-nav header-right">
@@ -119,5 +137,5 @@ const logout = () => {
         </div>
       </nav>
     </div>
-  </div>
+  </appdiv>
 </template>
