@@ -306,3 +306,18 @@ onMounted(() => {
  <ModalTarget/>
 </template>
 
+<style scoped>
+.table-responsive {
+  max-height: 600px;
+  overflow-y: auto;
+  display: block; /* Ensures the container behaves as a block */
+}
+
+.table-responsive thead th {
+  position: sticky;
+  top: 0;
+  background-color: #6f42c1; /* Matches your purple header */
+  color: white;
+  z-index: 1; /* Ensures header stays above content */
+}
+</style>
