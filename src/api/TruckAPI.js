@@ -5,46 +5,18 @@ export default {
  async all() {
     return api.get("/trucks/");
   },
-  
-  // async add(values) {
-
-  //   const currentUser = localStorage.getItem('USER') || '';
-  //   const token = JSON.parse(currentUser).token;
-
-  //   const data = await api.post('/categories/', values, {
-  //     headers: {
-  //       'x-token' : token
-  //     }
-  //   });
-  //   return data;
-
-  // },
-
-  // async edit(idCategory, values) {
-
-  //   const currentUser = localStorage.getItem('USER') || '';
-  //   const token = JSON.parse(currentUser).token;
-
-  //   const data = await api.put('/categories/' + idCategory, values, {
-  //     headers: {
-  //       'x-token' : token
-  //     }
-  //   });
-  //   return data;
-
-  // },
-
-  // async delete(idCategory) {
-
-  //   const currentUser = localStorage.getItem('USER') || '';
-  //   const token = JSON.parse(currentUser).token;
-
-  //   const data = await api.delete('/categories/' + idCategory, {
-  //     headers: {
-  //       'x-token' : token
-  //     }
-  //   });
-  //   return data;
-
-  // },
+  async add(values) {
+    const data = await api.post('/trucks/', values);
+    return data;
+  }
+,
+  async edit(idTruck, values) { 
+    const data = await api.put('/trucks/' + idTruck, values);
+    return data;
+  }
+,
+  async delete(idTruck) {
+    const data = await api.delete('/trucks/' + idTruck, {});
+    return data;
+  },
 };

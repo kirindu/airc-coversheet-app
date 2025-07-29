@@ -39,6 +39,7 @@ const storeTruck = useTrucksStore();
 
 import { useDriversStore } from "@/stores/drivers.js";
 import DriverAPI from "@/api/DriverAPI";
+import RouteAPI from "@/api/RouteAPI";
 const storeDriver = useDriversStore();		
 
 
@@ -61,83 +62,39 @@ if (storedUser) {
   }
 }
 
-// General Info
 const selectedRoute = ref("");
-const selectedTruck = ref("");
-const selectedDriver = ref("");
-
-const date = ref(new Date());
-
-
-const coverSheetList = ref([]);
-
-const driverList = ref([]);
-
+const routeList = ref([]);
 
 const formSubmitted = ref(false);
 
-const errors = ref({
-  date_er: "",
 
-});
-
-// Modo de edición de la informaciongeneral para el coversheet
-const isEditModeCoverShet = ref(false);
-
-
-const SearchDriver = async (event) => {
+const SearchRoute = async (event) => {
 
   if(event){
       event.preventDefault();
   }
 
     try {
-  
 
-    if(selectedDriver.value){
-
-
-      driverList.value = storeDriver.drivers.filter(c => c.id === selectedDriver.value);
-
+    if(selectedRoute.value){
+      routeList.value = storeRoute.routes.filter(c => c.id === selectedRoute.value);
 
     } else {
-      driverList.value = storeDriver.drivers;
+      routeList.value = storeRoute.routes;
     }
 
-    
 
   } catch (error) {
-    console.error("Error al obtener CoverSheet:", error);
+    console.error("Error al obtener las rutas:", error);
   }
 
 }
-// Abrir modal para ver el CoverSheet
-
-const openCoverSheetModal = async (item) => {
-
-  await openModal(
-    defineAsyncComponent(() => import("@/components/AddDriverModal.vue")),
-    {
-      item: item,
-    //  onUpdateSuccess: SearchCoverSheet, // Pass the function
-    }
-  )
-    // runs when modal is closed via confirmModal
-    .then((data) => {
-      console.log("success", data);
-    })
-    // runs when modal is closed via closeModal or esc
-    .catch(() => {
-      console.log("catch");
-    });
-
-};
 
 
-const openNewCoverSheetModal = async () => {
+const openNewRouteModal = async () => {
 
   await openModal(
-    defineAsyncComponent(() => import("@/components/NewCoverSheetModal.vue")),
+    defineAsyncComponent(() => import("@/components/AddRouteModal.vue")),
     {
       // item: item,
     }
@@ -153,47 +110,77 @@ const openNewCoverSheetModal = async () => {
 
 };
 
+const editRoute = async (item) => {
+
+  await openModal(
+    defineAsyncComponent(() => import("@/components/EditRouteModal.vue")),
+    {
+      item: item,
+      onUpdateSuccess: SearchRoute, // Pass the function
+    }
+  )
+    // runs when modal is closed via confirmModal
+    .then((data) => {
+      console.log("success", data);
+    })
+    // runs when modal is closed via closeModal or esc
+    .catch(() => {
+      console.log("catch");
+    });
+
+};
 
 
 
 
-const EditCoverSheet = (item) => {
+const deleteRoute = async (item) => {
 
+    showSweetAlert({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      allowOutsideClick: false,
+    }).then(async () => {
+      if (alertResult.value.isConfirmed) {
+        try {
+          const { data } = await RouteAPI.delete(item.id);
+          if (data.ok) {
+            showSweetAlert({
+              title: "Deleted!",
+              text: "Route has been deleted.",
+              icon: "success",
+              showCloseButton: true,
+              allowOutsideClick: false
+            }).then(() => {
+              router.go(); // recarga la página para reflejar los cambios
+            });
+          } else {
+            await showSweetAlert({
+              title: "Route hasn't been deleted!",
+              text: data.msg,
+              icon: "warning",
+              showCloseButton: true,
+              allowOutsideClick: false
+            }).then(() => {
+              router.go(); // recarga la página para reflejar los cambios
+            });
+          }
+        } catch (error) {
+          console.error("Error deleting driver:", error);
+          showSweetAlert({
+            title: "Error deleting driver!",
+            icon: "error",
+            confirmButtonText: "Ok",
+          });
+        }
+      }
+    });
 
-}
-// Metodos Utilitarios
-
-const currentDate = ref(
-  new Date().toLocaleDateString("en-US", {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })
-);
-
-const formatToYYYYMMDD = (inputDate) => {
-  const date = new Date(inputDate);
-  if (isNaN(date.getTime())) {
-    console.warn("Fecha inválida:", inputDate);
-    return null;
-  }
-
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-
-  return `${yyyy}-${mm}-${dd}`;
-}
-
-const filterDrivers = (filters) =>{
-  return storeDriver.drivers.filter(c => {
-    const matchDriver = !filters.driver_id || c.driver_id === filters.driver_id;
-    return matchDriver;
-  });
-}
-
-
+};
 onMounted(() => {
   if (!sessionStorage.getItem('page_reloaded')) {
     sessionStorage.setItem('page_reloaded', 'true')
@@ -232,10 +219,10 @@ onMounted(() => {
               <div class="row">
 
 				          <div class="mb-3 col-md-3">
-                  <label class="form-label">Driver</label>
-                  <v-select :options="storeDriver.drivers" v-model="selectedDriver" placeholder="Choose Driver"
-                    :reduce="(driver) => driver.id" label="name" class="form-control p-0"
-                    :class="{ 'is-invalid': formSubmitted && !selectedDriver }" />
+                  <label class="form-label">Routes</label>
+                  <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose Route"
+                    :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedRoute }" />
                   
                 </div>
 
@@ -246,10 +233,17 @@ onMounted(() => {
 
 
 										  
-                            <button style="margin-bottom: -5px !important;" @click="SearchDriver" type="button" class="btn btn-info">
-                              Search Driver
+                            <button style="margin-bottom: -5px !important;" @click="SearchRoute" type="button" class="btn btn-info">
+                              Search Route
                               <span class="btn-icon-end">
                                 <i class= 'fa fa-search'></i>
+                              </span>
+                            </button>
+
+                             <button style="margin-bottom: -5px !important; margin-left: 15px;" @click="openNewRouteModal" type="button" class="btn btn-primary">
+                              Add Route
+                              <span class="btn-icon-end">
+                                <i class= 'fa fa-add'></i>
                               </span>
                             </button>
 
@@ -272,22 +266,21 @@ onMounted(() => {
                               class="table table-bordered header-border table-striped table-hover table-responsive-md">
                               <thead class="thead-primary">
                                 <tr>
-                                  <th style="text-align: center;">Name</th>
-                                  <th style="text-align: center;">Email</th>         
+                                  <th style="text-align: center;">Route Number</th>
+                                  <th style="text-align: center;">Lob</th>         
 								                  <th style="text-align: center !important;">Action</th>
                                   
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr v-for="(item, index) in driverList" :key="index">
+                                <tr v-for="(item, index) in routeList" :key="index">
 
-                                  <td class="td">{{ item.name }}</td>
-                                  <td class="td">{{ item.email }}</td>
+                                  <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.lob }}</td>
                               <td>
                                 <div class="d-flex gap-1">
-                                  <a @click="addDriver" class="btn btn-primary shadow btn-xs sharp"><i class="fa fa-plus"></i></a>
-                                  <a @click="editDriver(item)" class="btn btn-warning shadow btn-xs sharp"><i class="fa fa-edit"></i></a>
-                                  <a @click="deleteDriver(item)" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
+                                  <a @click="editRoute(item)" class="btn btn-warning shadow btn-xs sharp"><i class="fa fa-edit"></i></a>
+                                  <a @click="deleteRoute(item)" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>
                                 </div>
                               </td>
                                 </tr>

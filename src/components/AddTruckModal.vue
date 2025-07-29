@@ -40,6 +40,8 @@ const storeTruck = useTrucksStore();
 import { useDriversStore } from "@/stores/drivers.js";
 import { is } from "@vee-validate/rules";
 import DriverAPI from "@/api/DriverAPI";
+import RouteAPI from "@/api/RouteAPI";
+import TruckAPI from "@/api/TruckAPI";
 
 const user = ref(null);
 
@@ -55,73 +57,50 @@ const props = defineProps({
 // Con esto hacemos los props reactivos
 const reactiveProps = toRefs(props);
 
-// Driver
-const driverName = ref("");
-const driverEmail = ref("");
-const driverPassword = ref("");
+// Truck
 
-const errorsDriver = ref({
-  name_er: "",
-  email_er: "",
-  password_er: "",
+const truckNumber = ref("");
+
+const errorsTruck = ref({
+  truckNumber_er: "",
 });
 
 
-// Handle form for adding a new driver
+
+// Handle form for adding a new truck
 const onSubmit = async (event) => {
   event.preventDefault();
   formSubmitted.value = true;
 
   // Limpiar errores anteriores
-
-  errorsDriver.value.name_er = "";
-  errorsDriver.value.email_er = ""; 
-  errorsDriver.value.password_er = "";
+  errorsTruck.value.truckNumber_er = "";
 
   let hasError = false;
 
-  if (!driverName.value) {
-    errorsDriver.value.name_er = "Required field";
+  if (!truckNumber.value) {
+    errorsTruck.value.truckNumber_er = "Required field";
     hasError = true;
-  } 
-  
-  // else {
-  //   errorsDriver.value.name_er = "";
-  // }
+  }
 
-  if (!driverEmail.value) {
-    errorsDriver.value.email_er = "Required field";
-    hasError = true;
-  } 
-  
-
-  if (!driverPassword.value) {
-    errorsDriver.value.password_er = "Required field";
-    hasError = true;
-  } else if (driverPassword.value.length < 6) {
-    errorsDriver.value.password_er = "Password must be at least 6 characters";
-    hasError = true;
-  } 
-  
 
   if (hasError) {
     return;
   }
 
-  const driverData = {
-    name: driverName.value,
-    email: driverEmail.value,
-    password: driverPassword.value,
+  // Creamos el objeto de datos del nuevo truck
+  const truckData = {
+    truckNumber: truckNumber.value,
   };
 
 
-  try {
 
-    const response = await DriverAPI.add(driverData);
+  try {
+    // Llamamos a la API para agregar el nuevo truck
+    const response = await TruckAPI.add(truckData);
 
     if (response.data.ok) {
       showSweetAlert({
-        title: "Driver added successfully!",
+        title: "Truck added successfully!",
         icon: "success",
         showDenyButton: false,
         showCancelButton: false,
@@ -129,11 +108,11 @@ const onSubmit = async (event) => {
         allowOutsideClick: false,
       }).then(() => {
         closeModal(); // Close the modal after successful addition
-        router.go(); // Recarga la página para reflejar los cambios
+         router.go(); // Recarga la página para reflejar los cambios
       });
     } else {
       showSweetAlert({
-        title: "Error adding Driver!",
+        title: "Error adding Truck!",
         icon: "warning",
         showDenyButton: false,
         showCancelButton: false,
@@ -147,7 +126,7 @@ const onSubmit = async (event) => {
    
   } catch (error) {
     showSweetAlert({
-      title: "Error adding Driver!",
+      title: "Error adding Truck!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
@@ -166,16 +145,6 @@ onMounted(async () => {
 
 
 
-// Utility functions
-
-
-
-const logout = () => {
-  localStorage.removeItem("USER"); // Eliminamos la variable USER del localStorage
-  localStorage.removeItem('COVERSHEET2') // Eliminamos la variable COVERSHEET2 del localStorage
-  router.push({ name: "login" }); // Redirigimos al usuario a la página de login
-};
-
 </script>
 
 <template>
@@ -183,7 +152,7 @@ const logout = () => {
     <div class="col-lg-12">
       <div class="card">
         <div class="card-header">
-        Add Driver
+        Add Truck
           <button
             @click.prevent="closeModal"
             type="submit"
@@ -197,39 +166,20 @@ const logout = () => {
 
               <div class="row">
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Name</label>
+                  <label class="form-label">Truck Number</label>
                   <input
                     type="text"
-                    v-model="driverName"
+                    v-model="truckNumber"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errorsDriver.name_er" class="text-danger">{{errorsDriver.name_er}}</small>
+                  <small v-if="errorsTruck.truckNumber_er" class="text-danger">{{errorsTruck.truckNumber_er}}</small>
                 </div>
 
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">Email</label>
-                  <input
-                    type="email"
-                    v-model="driverEmail"
-                    class="form-control form-control-sm border border-primary"
-                  />
-                  <small v-if="errorsDriver.email_er" class="text-danger">{{errorsDriver.email_er}}</small>
-                </div>
-
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">Password</label>
-                  <input
-                    type="password"
-                    v-model="driverPassword"
-                    class="form-control form-control-sm border border-primary"
-                  />
-                  <small v-if="errorsDriver.password_er" class="text-danger">{{errorsDriver.password_er}}</small>
-                </div>
               </div>
 
 
               <button type="submit" class="btn btn-primary">
-                Add Driver
+                Add Truck
               </button>
 
               <button

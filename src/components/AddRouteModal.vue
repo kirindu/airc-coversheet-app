@@ -40,6 +40,7 @@ const storeTruck = useTrucksStore();
 import { useDriversStore } from "@/stores/drivers.js";
 import { is } from "@vee-validate/rules";
 import DriverAPI from "@/api/DriverAPI";
+import RouteAPI from "@/api/RouteAPI";
 
 const user = ref(null);
 
@@ -55,16 +56,16 @@ const props = defineProps({
 // Con esto hacemos los props reactivos
 const reactiveProps = toRefs(props);
 
-// Driver
-const driverName = ref("");
-const driverEmail = ref("");
-const driverPassword = ref("");
+// Route
 
-const errorsDriver = ref({
-  name_er: "",
-  email_er: "",
-  password_er: "",
+const routeNumber = ref("");
+const lob = ref("");
+
+const errorsRoute = ref({
+  routeNumber_er: "",
+  lob_er: "",
 });
+
 
 
 // Handle form for adding a new driver
@@ -73,55 +74,41 @@ const onSubmit = async (event) => {
   formSubmitted.value = true;
 
   // Limpiar errores anteriores
-
-  errorsDriver.value.name_er = "";
-  errorsDriver.value.email_er = ""; 
-  errorsDriver.value.password_er = "";
+  errorsRoute.value.routeNumber_er = "";
+  errorsRoute.value.lob_er = "";
 
   let hasError = false;
 
-  if (!driverName.value) {
-    errorsDriver.value.name_er = "Required field";
+  if (!routeNumber.value) {
+    errorsRoute.value.routeNumber_er = "Required field";
     hasError = true;
-  } 
-  
-  // else {
-  //   errorsDriver.value.name_er = "";
-  // }
+  }
 
-  if (!driverEmail.value) {
-    errorsDriver.value.email_er = "Required field";
+  if (!lob.value) {
+    errorsRoute.value.lob_er = "Required field";
     hasError = true;
-  } 
-  
+  }
 
-  if (!driverPassword.value) {
-    errorsDriver.value.password_er = "Required field";
-    hasError = true;
-  } else if (driverPassword.value.length < 6) {
-    errorsDriver.value.password_er = "Password must be at least 6 characters";
-    hasError = true;
-  } 
-  
 
   if (hasError) {
     return;
   }
 
-  const driverData = {
-    name: driverName.value,
-    email: driverEmail.value,
-    password: driverPassword.value,
+  // Creamos el objeto de datos del nuevo route
+  const routeData = {
+    routeNumber: routeNumber.value,
+    lob: lob.value,
+    active: true,
   };
 
 
   try {
-
-    const response = await DriverAPI.add(driverData);
+    // Llamamos a la API para agregar el nuevo route
+    const response = await RouteAPI.add(routeData);
 
     if (response.data.ok) {
       showSweetAlert({
-        title: "Driver added successfully!",
+        title: "Route added successfully!",
         icon: "success",
         showDenyButton: false,
         showCancelButton: false,
@@ -129,11 +116,11 @@ const onSubmit = async (event) => {
         allowOutsideClick: false,
       }).then(() => {
         closeModal(); // Close the modal after successful addition
-        router.go(); // Recarga la página para reflejar los cambios
+         router.go(); // Recarga la página para reflejar los cambios
       });
     } else {
       showSweetAlert({
-        title: "Error adding Driver!",
+        title: "Error adding Route!",
         icon: "warning",
         showDenyButton: false,
         showCancelButton: false,
@@ -147,7 +134,7 @@ const onSubmit = async (event) => {
    
   } catch (error) {
     showSweetAlert({
-      title: "Error adding Driver!",
+      title: "Error adding Route!",
       icon: "warning",
       showDenyButton: false,
       showCancelButton: false,
@@ -166,16 +153,6 @@ onMounted(async () => {
 
 
 
-// Utility functions
-
-
-
-const logout = () => {
-  localStorage.removeItem("USER"); // Eliminamos la variable USER del localStorage
-  localStorage.removeItem('COVERSHEET2') // Eliminamos la variable COVERSHEET2 del localStorage
-  router.push({ name: "login" }); // Redirigimos al usuario a la página de login
-};
-
 </script>
 
 <template>
@@ -183,7 +160,7 @@ const logout = () => {
     <div class="col-lg-12">
       <div class="card">
         <div class="card-header">
-        Add Driver
+        Add Route
           <button
             @click.prevent="closeModal"
             type="submit"
@@ -197,39 +174,31 @@ const logout = () => {
 
               <div class="row">
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Name</label>
+                  <label class="form-label">Route Number</label>
                   <input
                     type="text"
-                    v-model="driverName"
+                    v-model="routeNumber"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errorsDriver.name_er" class="text-danger">{{errorsDriver.name_er}}</small>
+                  <small v-if="errorsRoute.routeNumber_er" class="text-danger">{{errorsRoute.routeNumber_er}}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Email</label>
+                  <label class="form-label">Lob</label>
                   <input
-                    type="email"
-                    v-model="driverEmail"
+                    type="test"
+                    v-model="lob"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errorsDriver.email_er" class="text-danger">{{errorsDriver.email_er}}</small>
+                  <small v-if="errorsRoute.lob_er" class="text-danger">{{errorsRoute.lob_er}}</small>
                 </div>
 
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">Password</label>
-                  <input
-                    type="password"
-                    v-model="driverPassword"
-                    class="form-control form-control-sm border border-primary"
-                  />
-                  <small v-if="errorsDriver.password_er" class="text-danger">{{errorsDriver.password_er}}</small>
-                </div>
+
               </div>
 
 
               <button type="submit" class="btn btn-primary">
-                Add Driver
+                Add Route
               </button>
 
               <button

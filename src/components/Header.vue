@@ -60,16 +60,23 @@ const logout = () => {
           <div class="header-left">
 
 
-            <div class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                style="font-size: 15px; color:#00aff0;"
-              >
-                Reports
-              </a>
+     
+
+            <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
+              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-drivers' })">Drivers</a>
+            </div>
+
+            <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
+              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-routes' })">| Routes</a>
+            </div>
+
+            <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
+              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-trucks' })">| Trucks</a>
+            </div>
+
+                   <div class="nav-item dropdown" style="margin-left: 10px; cursor:pointer;">
+            
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 15px; color:#00aff0;"> | Reports</a>
               <div class="dropdown-menu">
                 <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'single-date' } })">Report by Single Date</a>
                 <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'date-range' } })">Report by Date Range</a>
@@ -77,15 +84,6 @@ const logout = () => {
               </div>
             </div>
 
-                    <!-- <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
-              <a
-                class="nav-link"
-                style="font-size: 15px; color:#00aff0;"
-                @click.prevent="router.push({ name: 'admin-drivers' })"
-              >
-                Drivers
-              </a>
-            </div> -->
 
 
             

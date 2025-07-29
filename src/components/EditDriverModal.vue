@@ -49,7 +49,11 @@ const formSubmitted = ref(false);
 const props = defineProps({
   item: {
     type: Object,
-  }
+  },
+    onUpdateSuccess: {
+    type: Function,
+    default: () => {},
+  },
 });
 
 // Con esto hacemos los props reactivos
@@ -117,23 +121,25 @@ const onSubmit = async (event) => {
 
   try {
 
-    const response = await DriverAPI.add(driverData);
+       let driver_id = props.item.id;
+       const response = await DriverAPI.edit(driver_id, driverData);
 
     if (response.data.ok) {
       showSweetAlert({
-        title: "Driver added successfully!",
+        title: "Driver edited successfully!",
         icon: "success",
         showDenyButton: false,
         showCancelButton: false,
         confirmButtonText: "Ok",
         allowOutsideClick: false,
       }).then(() => {
+        props.onUpdateSuccess();
         closeModal(); // Close the modal after successful addition
-        router.go(); // Recarga la página para reflejar los cambios
+        return; 
       });
     } else {
       showSweetAlert({
-        title: "Error adding Driver!",
+        title: "Error editing Driver!",
         icon: "warning",
         showDenyButton: false,
         showCancelButton: false,
@@ -162,6 +168,28 @@ const onSubmit = async (event) => {
 // Una vez que se complete el mounted pintamos los campos con su informacion
 onMounted(async () => {
 
+  if (props.item) {
+    driverName.value = props.item.name;
+    driverEmail.value = props.item.email;
+    driverPassword.value = props.item.password; // Assuming password is not sensitive and can be shown
+  } else {
+    driverName.value = "";
+    driverEmail.value = "";
+    driverPassword.value = "";
+  }
+
+  const storedUser = localStorage.getItem("USER");
+
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+      user.value = parsed.data.user || parsed.data; // ADMIN or DRIVER
+    } catch (e) {
+      console.error("Error al parsear USER desde localStorage:", e);
+    }
+  }
+
+
 });
 
 
@@ -183,7 +211,7 @@ const logout = () => {
     <div class="col-lg-12">
       <div class="card">
         <div class="card-header">
-        Add Driver
+        Edit Driver
           <button
             @click.prevent="closeModal"
             type="submit"
@@ -229,7 +257,7 @@ const logout = () => {
 
 
               <button type="submit" class="btn btn-primary">
-                Add Driver
+                Update Driver
               </button>
 
               <button
