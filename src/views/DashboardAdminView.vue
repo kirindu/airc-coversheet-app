@@ -40,7 +40,40 @@ const storeTruck = useTrucksStore();
 import { useDriversStore } from "@/stores/drivers.js";
 const storeDriver = useDriversStore();		
 
+// Nuevo Composable para manejar la ordenación
+const sortKey = ref(null);
+const sortOrder = ref('asc');
 
+const sortCoverSheetList = (key) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortOrder.value = 'asc';
+  }
+
+  coverSheetList.value.sort((a, b) => {
+    let valueA = a[key] || '';
+    let valueB = b[key] || '';
+
+    // Convert to number for truckNumber, otherwise treat as string
+    if (key === 'truckNumber') {
+      valueA = parseInt(valueA, 10) || 0;
+      valueB = parseInt(valueB, 10) || 0;
+    } else if (typeof valueA === 'string') {
+      valueA = valueA.toLowerCase();
+      valueB = valueB.toLowerCase();
+    }
+
+    if (sortOrder.value === 'asc') {
+      return valueA > valueB ? 1 : -1;
+    } else {
+      return valueA < valueB ? 1 : -1;
+    }
+  });
+};
+
+//
 
 const user = ref(null);
 
@@ -322,72 +355,79 @@ onMounted(() => {
       </div>
     </div>
 
-	    <div class="col-lg-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="basic-form">
-          
-         
-               <div class="row">
-                          <hr style="color: black" />
-                          <div class="table-responsive">
-                            <table
-                              class="table table-bordered header-border table-striped table-hover table-responsive-md">
-                              <thead class="thead-primary">
-                                <tr>
-                                  <th>Driver</th>
-                                  <th>Route #</th>         
-                                  <th>Truck #</th>
-                                  <th>Clock In</th>
-                                  <th>Leave Yard</th>
-                                  <th>Start Miles</th>
-                                  <th>Back In Yard</th>
-                                  <th>Clock Out</th>
-                                  <th>Notes</th>
-								                  <th>Action</th>
-                                  
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr v-for="(item, index) in coverSheetList" :key="index">
-
-                                  <td class="td">{{ item.driverName }}</td>
-                                  <td class="td">{{ item.routeNumber }}</td>
-                                  <td class="td">{{ item.truckNumber }}</td>
-                                  <td class="td">{{ item.clockIn }}</td>
-                                  <td class="td">{{ item.leaveYard }}</td>
-                                  <td class="td">{{ item.startMiles }}</td>
-                                  <td class="td">{{ item.backInYard }}</td>                                  
-                                  <td class="td">{{ item.clockOut }}</td>
-                                  <td class="td">{{ item.notes }}</td>
-                                  <td>
-								  
-                                    <div>
-									        <a @click="openCoverSheetModal(item)"
-                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
-                                          class="fa fa-eye"></i></a>
-                                      <!-- <a @click="EditCoverSheet(item)"
-                                        class="btn btn-primary shadow btn-xs sharp me-1"><i
-                                          class="fa fa-pencil"></i></a> -->
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-
-
-
-										  
-        
-
-			
+        <div class="col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="basic-form">
+          <div class="row">
+            <hr style="color: black" />
+            <div class="table-responsive">
+              <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                <thead class="thead-primary">
+                  <tr>
+                    <th>
+                      <a @click="sortCoverSheetList('driverName')" style="cursor: pointer; text-decoration: none; color: inherit;">
+                        Driver
+                        <span v-if="sortKey === 'driverName'">
+                          <i v-if="sortOrder === 'asc'" class="fa fa-sort-asc"></i>
+                          <i v-else class="fa fa-sort-desc"></i>
+                        </span>
+                      </a>
+                    </th>
+                    <th>
+                      <a @click="sortCoverSheetList('routeNumber')" style="cursor: pointer; text-decoration: none; color: inherit;">
+                        Route #
+                        <span v-if="sortKey === 'routeNumber'">
+                          <i v-if="sortOrder === 'asc'" class="fa fa-sort-asc"></i>
+                          <i v-else class="fa fa-sort-desc"></i>
+                        </span>
+                      </a>
+                    </th>
+                    <th>
+                      <a @click="sortCoverSheetList('truckNumber')" style="cursor: pointer; text-decoration: none; color: inherit;">
+                        Truck #
+                        <span v-if="sortKey === 'truckNumber'">
+                          <i v-if="sortOrder === 'asc'" class="fa fa-sort-asc"></i>
+                          <i v-else class="fa fa-sort-desc"></i>
+                        </span>
+                      </a>
+                    </th>
+                    <th>Clock In</th>
+                    <th>Leave Yard</th>
+                    <th>Start Miles</th>
+                    <th>Back In Yard</th>
+                    <th>Clock Out</th>
+                    <th>Notes</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in coverSheetList" :key="index">
+                    <td class="td">{{ item.driverName }}</td>
+                    <td class="td">{{ item.routeNumber }}</td>
+                    <td class="td">{{ item.truckNumber }}</td>
+                    <td class="td">{{ item.clockIn }}</td>
+                    <td class="td">{{ item.leaveYard }}</td>
+                    <td class="td">{{ item.startMiles }}</td>
+                    <td class="td">{{ item.backInYard }}</td>
+                    <td class="td">{{ item.clockOut }}</td>
+                    <td class="td">{{ item.notes }}</td>
+                    <td>
+                      <div>
+                        <a @click="openCoverSheetModal(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fa fa-eye"></i></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-				
+  </div>
+
+
 			</div>
  <ModalTarget/>
 </template>
