@@ -1004,8 +1004,7 @@ const downloadImage = (imageUrl) => {
                     type="number"
                     step="any"
                     v-model="startMiles"
-                    class="form-control form-control-sm border border-primary"
-                  />
+                    class="form-control form-control-lg border border-primary" style="color: black;"/>
                   <small v-if="errors.startMiles_er" class="text-danger">{{
                     errors.startMiles_er
                   }}</small>
@@ -1017,8 +1016,7 @@ const downloadImage = (imageUrl) => {
                     type="number"
                     step="any"
                     v-model="endMiles"
-                    class="form-control form-control-sm border border-primary"
-                  />
+                    class="form-control form-control-lg border border-primary" style="color: black;"/>
                   <small v-if="errors.endMiles_er" class="text-danger">{{
                     errors.endMiles_er
                   }}</small>
@@ -1030,8 +1028,7 @@ const downloadImage = (imageUrl) => {
                     type="number"
                     step="any"
                     v-model="fuel"
-                    class="form-control form-control-sm border border-primary"
-                  />
+                    class="form-control form-control-lg border border-primary" style="color: black;"/>
                   <small v-if="errors.fuel_er" class="text-danger">{{
                     errors.fuel_er
                   }}</small>
@@ -1199,7 +1196,7 @@ const downloadImage = (imageUrl) => {
                               type="number"
                               step="any"
                               v-model="startMilesSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary"
+                              class="form-control form-control-lg border border-primary" style="color: black;"
                             />
                             <small
                               v-if="
@@ -1218,7 +1215,7 @@ const downloadImage = (imageUrl) => {
                               type="number"
                               step="any"
                               v-model="endMilesSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary"
+                              class="form-control form-control-lg border border-primary" style="color: black;"
                             />
                             <small
                               v-if="
@@ -1239,7 +1236,7 @@ const downloadImage = (imageUrl) => {
                               type="number"
                               step="any"
                               v-model="fuelSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary"
+                              class="form-control form-control-lg border border-primary" style="color: black;"
                             />
                             <small
                               v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er"

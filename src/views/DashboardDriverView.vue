@@ -1219,7 +1219,7 @@ const getDenverTimeAsUTCISOString = () => {
                 </div>
               </div>
 
-              <div class="row">
+              <!-- <div class="row">
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Start Miles</label>
                   <input type="number" step="any" v-model="startMiles"
@@ -1244,12 +1244,32 @@ const getDenverTimeAsUTCISOString = () => {
                     errors.fuel_er
                   }}</small>
                 </div>
+              </div> -->
+
+              <div class="row">
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Start Miles</label>
+                  <input type="number" step="any" v-model="startMiles" class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.startMiles_er" class="text-danger">{{ errors.startMiles_er }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">End Miles</label>
+                  <input type="number" step="any" v-model="endMiles" class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.endMiles_er" class="text-danger">{{ errors.endMiles_er }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Fuel</label>
+                  <input type="number" step="any" v-model="fuel" class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.fuel_er" class="text-danger">{{ errors.fuel_er }}</small>
+                </div>
               </div>
 
               <div class="row">
                 <div class="mb-3 col-md-12">
                   <label class="form-label">Notes</label>
-                  <textarea v-model="notes" class="form-control border border-primary"></textarea>
+                  <textarea style="color: black;" v-model="notes" class="form-control border border-primary"></textarea>
                 </div>
               </div>
 
@@ -1325,24 +1345,16 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Start Miles</label>
-                            <input type="number" step="any" v-model="startMilesSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary" />
-                            <small v-if="
-                              errorsSpareTruckInfo.startMilesSpareTruckInfo_er
-                            " class="text-danger">{{
-                                errorsSpareTruckInfo.startMilesSpareTruckInfo_er
-                              }}</small>
+                            <input type="number" step="any" v-model="startMilesSpareTruckInfo" class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.startMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.startMilesSpareTruckInfo_er}}</small>
                           </div>
 
+
+            
                           <div class="mb-3 col-md-3">
                             <label class="form-label">End Miles</label>
-                            <input type="number" step="any" v-model="endMilesSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary" />
-                            <small v-if="
-                              errorsSpareTruckInfo.endMilesSpareTruckInfo_er
-                            " class="text-danger">{{
-                                errorsSpareTruckInfo.endMilesSpareTruckInfo_er
-                              }}</small>
+                            <input type="number" step="any" v-model="endMilesSpareTruckInfo" class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.endMilesSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.endMilesSpareTruckInfo_er}}</small>
                           </div>
 
                
@@ -1350,16 +1362,12 @@ const getDenverTimeAsUTCISOString = () => {
 
                                 <div class="row">
 
-             
-
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Fuel</label>
-                            <input type="number" step="any" v-model="fuelSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{
-                              errorsSpareTruckInfo.fuelSpareTruckInfo_er
-                            }}</small>
+                            <input type="number" step="any" v-model="fuelSpareTruckInfo" class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.fuelSpareTruckInfo_er}}</small>
                           </div>
+                          
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Leave Yard</label>

@@ -106,11 +106,11 @@ const editRoute = async (item) => {
     {
       item: item,
       onUpdateSuccess: SearchRoute, // Pass the function
-    }
-  )
-    // runs when modal is closed via confirmModal
-    .then((data) => {
-      console.log("success", data);
+    } 
+  ) 
+    // runs when modal is closed via confirmModal 
+    .then((data) => { 
+      console.log("success", data); 
     })
     // runs when modal is closed via closeModal or esc
     .catch(() => {
