@@ -1269,7 +1269,7 @@ const getDenverTimeAsUTCISOString = () => {
               <div class="row">
                 <div class="mb-3 col-md-12">
                   <label class="form-label">Notes</label>
-                  <textarea style="color: black;" v-model="notes" class="form-control border border-primary"></textarea>
+                  <textarea style="color: black;" v-model="notes" class="form-control border border-primary" ></textarea>
                 </div>
               </div>
 
@@ -1367,7 +1367,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <input type="number" step="any" v-model="fuelSpareTruckInfo" class="form-control form-control-lg border border-primary" style="color: black;" />
                             <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{errorsSpareTruckInfo.fuelSpareTruckInfo_er}}</small>
                           </div>
-                          
+
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Leave Yard</label>

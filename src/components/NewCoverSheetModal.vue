@@ -1238,7 +1238,7 @@ const getDenverTimeAsUTCISOString = () => {
               <div class="row">
                 <div class="mb-3 col-md-12">
                   <label class="form-label">Notes</label>
-                  <textarea v-model="notes" class="form-control border border-primary"></textarea>
+                  <textarea v-model="notes" class="form-control border border-primary" style="color: black;"></textarea>
                 </div>
               </div>
 

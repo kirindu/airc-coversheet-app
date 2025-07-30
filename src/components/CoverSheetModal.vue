@@ -1040,7 +1040,7 @@ const downloadImage = (imageUrl) => {
                   <label class="form-label">Notes</label>
                   <textarea
                     v-model="notes"
-                    class="form-control border border-primary"
+                    class="form-control border border-primary" style="color: black;"
                   ></textarea>
                 </div>
               </div>
