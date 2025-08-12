@@ -209,6 +209,10 @@ onMounted(() => {
   } else {
     sessionStorage.removeItem("page_reloaded"); // limpia para futuras visitas
   }
+
+  setTimeout(() => {
+    SearchDriver();
+  }, 1000);
 });
 </script>
 
@@ -272,7 +276,7 @@ onMounted(() => {
       </div>
     </div>
 
-<div class="col-lg-12">
+    <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
           <div class="basic-form">
@@ -280,7 +284,8 @@ onMounted(() => {
               <hr style="color: black" />
               <div class="table-responsive">
                 <table
-                  class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                  class="table table-bordered header-border table-striped table-hover table-responsive-md"
+                >
                   <thead class="thead-primary">
                     <tr>
                       <th style="text-align: center">Name</th>

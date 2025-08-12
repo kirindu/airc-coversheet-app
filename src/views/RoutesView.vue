@@ -106,11 +106,11 @@ const editRoute = async (item) => {
     {
       item: item,
       onUpdateSuccess: SearchRoute, // Pass the function
-    } 
-  ) 
-    // runs when modal is closed via confirmModal 
-    .then((data) => { 
-      console.log("success", data); 
+    }
+  )
+    // runs when modal is closed via confirmModal
+    .then((data) => {
+      console.log("success", data);
     })
     // runs when modal is closed via closeModal or esc
     .catch(() => {
@@ -171,6 +171,10 @@ onMounted(() => {
   } else {
     sessionStorage.removeItem("page_reloaded"); // limpia para futuras visitas
   }
+
+  setTimeout(() => {
+    SearchRoute();
+  }, 1000);
 });
 </script>
 
@@ -242,7 +246,8 @@ onMounted(() => {
               <hr style="color: black" />
               <div class="table-responsive">
                 <table
-                  class="table table-bordered header-border table-striped table-hover table-responsive-md">
+                  class="table table-bordered header-border table-striped table-hover table-responsive-md"
+                >
                   <thead class="thead-primary">
                     <tr>
                       <th style="text-align: center">Route Number</th>
