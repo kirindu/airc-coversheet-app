@@ -355,11 +355,10 @@ onMounted(() => {
         <div class="card-body">
           <div class="basic-form">
             <div class="row">
+            <div style="text-align: end; color:blueviolet">{{ coverSheetList.length}} rows</div>
               <hr style="color: black" />
               <div class="table-responsive">
-                <table
-                  class="table table-bordered header-border table-striped table-hover table-responsive-md"
-                >
+                <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
                   <thead class="thead-primary">
                     <tr>
                       <th>

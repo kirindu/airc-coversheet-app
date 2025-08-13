@@ -243,6 +243,7 @@ onMounted(() => {
         <div class="card-body">
           <div class="basic-form">
             <div class="row">
+             <div style="text-align: end; color:blueviolet">{{ routeList.length}} rows</div>
               <hr style="color: black" />
               <div class="table-responsive">
                 <table
