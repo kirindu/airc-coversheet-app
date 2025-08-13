@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router' // Importamos useRouter para manejar la r
 const user = ref(null)
 const router = useRouter() // Instanciamos el router
 
+const menu_visible = ref(false);
+
 onMounted(() => {
   const storedUser = localStorage.getItem('USER')
 
@@ -21,6 +23,11 @@ onMounted(() => {
     } catch (e) {
       console.error('Error al parsear USER desde localStorage:', e)
     }
+  }
+  if (user.value.rol === 'Admin') {
+    menu_visible.value = true; // Mostrar el menú si el usuario es Admin
+  } else {
+    menu_visible.value = false; // Ocultar el menú si el usuario es Driver
   }
 })
 
@@ -57,10 +64,9 @@ const logout = () => {
     <div class="header-content">
       <nav class="navbar navbar-expand">
         <div class="collapse navbar-collapse justify-content-between">
-          <div class="header-left">
 
 
-     
+    <div v-show="menu_visible" class="header-left">
 
             <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
               <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-drivers' })">Drivers</a>
@@ -74,7 +80,7 @@ const logout = () => {
               <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-trucks' })">| Trucks</a>
             </div>
 
-                   <div class="nav-item dropdown" style="margin-left: 10px; cursor:pointer;">
+        <div class="nav-item dropdown" style="margin-left: 10px; cursor:pointer;">
             
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 15px; color:#00aff0;"> | Reports</a>
               <div class="dropdown-menu">
@@ -82,15 +88,13 @@ const logout = () => {
                 <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'date-range' } })">Report by Date Range</a>
                 <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'driver-name' } })">Report by Driver Name</a>
               </div>
-            </div>
+        </div>
+
+    </div>
 
 
 
-            
 
-
-
-          </div>
 
           <ul class="navbar-nav header-right">
             <li class="nav-item dropdown header-profile ps30">
