@@ -72,8 +72,6 @@ const sortCoverSheetList = (key) => {
   });
 };
 
-//
-
 const user = ref(null);
 
 // Recuperamos el usuario
