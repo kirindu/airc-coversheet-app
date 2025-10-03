@@ -137,12 +137,22 @@ const SearchCoverSheet = async (event) => {
     const allCoversheets = response.data.data || [];
 
     const filters = {
-      route_id: selectedRoute.value || null,
       truck_id: selectedTruck.value || null,
       driver_id: selectedDriver.value || null,
     };
 
-    // coverSheetList.value = response.data.data || [];
+    if (selectedRoute.value) {
+      const selectedRouteObj = storeRoute.routes.find(r => r.id === selectedRoute.value);
+      if (selectedRouteObj) {
+        const base = selectedRouteObj.routeNumber;
+        const matchingRoutes = storeRoute.routes.filter(r => r.routeNumber.startsWith(base));
+        filters.route_ids = matchingRoutes.map(r => r.id);
+      } else {
+        filters.route_ids = null;
+      }
+    } else {
+      filters.route_ids = null;
+    }
 
     coverSheetList.value = filterCoversheets(allCoversheets, filters);
   } catch (error) {
@@ -214,7 +224,7 @@ const formatToYYYYMMDD = (inputDate) => {
 
 const filterCoversheets = (coversheets, filters) => {
   return coversheets.filter((c) => {
-    const matchRoute = !filters.route_id || c.route_id === filters.route_id;
+    const matchRoute = !filters.route_ids || filters.route_ids.includes(c.route_id);
     const matchTruck = !filters.truck_id || c.truck_id === filters.truck_id;
     const matchDriver = !filters.driver_id || c.driver_id === filters.driver_id;
     return matchRoute && matchTruck && matchDriver;
