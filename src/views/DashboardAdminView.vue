@@ -108,56 +108,6 @@ const errors = ref({
 
 // Modo de edición de la informaciongeneral para el coversheet
 const isEditModeCoverShet = ref(false);
-/*
-const SearchCoverSheet = async (event) => {
-  if (event) {
-    event.preventDefault();
-  }
-
-  // Limpiar errores anteriores
-  errors.value.date_er = "";
-  let hasError = false;
-
-  if (!date.value) {
-    errors.value.date_er = "Required field";
-    hasError = true;
-  }
-
-  if (hasError) {
-    return;
-  }
-
-  try {
-    const response = await CoverSheetAPI.allByDate(
-      formatToYYYYMMDD(date.value)
-    );
-
-    const allCoversheets = response.data.data || [];
-
-    const filters = {
-      truck_id: selectedTruck.value || null,
-      driver_id: selectedDriver.value || null,
-    };
-
-    if (selectedRoute.value) {
-      const selectedRouteObj = storeRoute.routes.find(r => r.id === selectedRoute.value);
-      if (selectedRouteObj) {
-        const base = selectedRouteObj.routeNumber;
-        const matchingRoutes = storeRoute.routes.filter(r => r.routeNumber.startsWith(base));
-        filters.route_ids = matchingRoutes.map(r => r.id);
-      } else {
-        filters.route_ids = null;
-      }
-    } else {
-      filters.route_ids = null;
-    }
-
-    coverSheetList.value = filterCoversheets(allCoversheets, filters);
-  } catch (error) {
-    console.error("Error al obtener CoverSheet:", error);
-  }
-};
-*/
 
 const SearchCoverSheet = async (event) => {
   if (event) {
