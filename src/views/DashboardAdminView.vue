@@ -108,7 +108,7 @@ const errors = ref({
 
 // Modo de edición de la informaciongeneral para el coversheet
 const isEditModeCoverShet = ref(false);
-
+/*
 const SearchCoverSheet = async (event) => {
   if (event) {
     event.preventDefault();
@@ -157,6 +157,85 @@ const SearchCoverSheet = async (event) => {
     console.error("Error al obtener CoverSheet:", error);
   }
 };
+*/
+
+const SearchCoverSheet = async (event) => {
+  if (event) {
+    event.preventDefault();
+  }
+  // Limpiar errores anteriores
+  errors.value.date_er = "";
+  let hasError = false;
+  if (!date.value) {
+    errors.value.date_er = "Required field";
+    hasError = true;
+  }
+  if (hasError) {
+    return;
+  }
+  try {
+    const response = await CoverSheetAPI.allByDate(
+      formatToYYYYMMDD(date.value)
+    );
+    const allCoversheets = response.data.data || [];
+    const filters = {
+      truck_id: selectedTruck.value || null,
+      driver_id: selectedDriver.value || null,
+    };
+    if (selectedRoute.value) {
+      const selectedRouteObj = storeRoute.routes.find(r => r.id === selectedRoute.value);
+      if (selectedRouteObj) {
+        const base = selectedRouteObj.routeNumber;
+        let matchingRoutes = [];
+        if (base.startsWith('RO') && !base.includes('-')) {
+          const numberStr = base.substring(2);
+          const number = parseInt(numberStr, 10);
+          if (!isNaN(number)) {
+            let group_start;
+            if (number <= 4) {
+              group_start = 1;
+            } else {
+              group_start = Math.floor((number - 5) / 5) * 5 + 5;
+            }
+            if (group_start === number) { // is parent
+              let group_end = number === 1 ? 4 : number + 4;
+              for (let i = group_start; i <= group_end; i++) {
+                const sub_base = `RO${i}`;
+                const subs = storeRoute.routes.filter(
+                  r => r.routeNumber === sub_base || r.routeNumber.startsWith(sub_base + '-')
+                );
+                matchingRoutes = matchingRoutes.concat(subs);
+              }
+            } else { // not parent
+              matchingRoutes = storeRoute.routes.filter(
+                r => r.routeNumber === base || r.routeNumber.startsWith(base + '-')
+              );
+            }
+          } else {
+            matchingRoutes = storeRoute.routes.filter(
+              r => r.routeNumber === base || r.routeNumber.startsWith(base + '-')
+            );
+          }
+        } else {
+          matchingRoutes = storeRoute.routes.filter(
+            r => r.routeNumber === base || r.routeNumber.startsWith(base + '-')
+          );
+        }
+        filters.route_ids = matchingRoutes.map(r => r.id);
+      } else {
+        filters.route_ids = null;
+      }
+    } else {
+      filters.route_ids = null;
+    }
+    coverSheetList.value = filterCoversheets(allCoversheets, filters);
+  } catch (error) {
+    console.error("Error al obtener CoverSheet:", error);
+  }
+};
+
+
+
 // Abrir modal para ver el CoverSheet
 
 const openCoverSheetModal = async (item) => {
