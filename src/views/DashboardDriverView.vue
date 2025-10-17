@@ -237,8 +237,10 @@ if(user.value){
     ) {
       localStorage.removeItem("COVERSHEET");
     } else {
+      // Aqui esta la logica si el driver intenta entrar a un coversheet que ya tiene creado el mismo dia
+
       isEditModeCoverShet.value = true;
-      const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
+      const coversheet = JSON.parse(localStorage.getItem("COVERSHEET")); // Cargamos los datos del coversheet previamente guardado
 
       timeClockIn.value = setTimeFromDB(coversheet.clockIn);
       timeLeaveYard.value = setTimeFromDB(coversheet.leaveYard);

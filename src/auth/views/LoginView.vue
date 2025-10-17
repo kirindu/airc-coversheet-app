@@ -8,6 +8,9 @@ const router = useRouter();
 // Importamos el api
 import UserAPI from "@/api/UserAPI";
 
+// Importamos utilidades
+import { DateTime } from "luxon";
+
 // Importamos componentes
 import Spinner from "@/components/Spinner.vue";
 
@@ -18,6 +21,11 @@ const { showToast } = useToastNotification();
 // Reactividad
 const loading = ref(false);
 const rol = ref('Driver')  // valor por defecto
+
+// Variables Reactivas
+const selectedRoute = ref("");
+const user = ref(null);
+
 
 // Validaciones
 import { useForm } from "vee-validate";
@@ -61,6 +69,67 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
    if(data.ok) {
      localStorage.setItem("USER", JSON.stringify(data));
+
+
+/* Aqui vamos abrir el Option Driver Modal */
+
+ // Recuperamos el usuario
+const storedUser = localStorage.getItem("USER");
+
+
+if (storedUser) {
+  try {
+    const parsed = JSON.parse(storedUser);
+
+    if (parsed.data) {
+      user.value = parsed.data; 
+    } 
+  } catch (e) {
+    console.error("Error al parsear USER desde localStorage:", e);
+  }
+}
+
+
+  let user_id = user.value.id;
+  let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+
+if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
+
+  if (user_id !== coversheet_driver_id) {
+    localStorage.removeItem("COVERSHEET");
+  } else {
+    // Parse the date from localStorage (assumed to be in UTC)
+    const dbDate = DateTime.fromISO(JSON.parse(localStorage.getItem("COVERSHEET")).date, { zone: 'utc' });
+    const today = DateTime.now(); // Current time
+
+    // Convert both dates to Denver timezone for comparison
+    const dbDateDenver = dbDate.setZone('America/Denver');
+    const todayDenver = today.setZone('America/Denver');
+
+    // Compare year, month, and day
+    if (
+      dbDateDenver.year !== todayDenver.year ||
+      dbDateDenver.month !== todayDenver.month ||
+      dbDateDenver.day !== todayDenver.day
+    ) {
+      localStorage.removeItem("COVERSHEET");
+    } else {
+      // Aqui esta la logica si el driver intenta entrar a un coversheet que ya tiene creado el mismo dia
+
+
+      const coversheet = JSON.parse(localStorage.getItem("COVERSHEET")); // Cargamos los datos del coversheet previamente guardado
+
+      console.log('COVERSHEET loaded from localStorage:', coversheet);
+
+      selectedRoute.value = coversheet.route_id;
+      
+    }
+  }
+
+
+}
+
+
      router.push({name: 'dashboard'});
   }
 
