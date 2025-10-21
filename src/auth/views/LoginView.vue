@@ -170,7 +170,11 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
       //  router.push({ name: 'dashboard' });
 
-    } else if (rol.value === 'Admin') {
+    } 
+ 
+  } else {
+
+       if (rol.value === 'Admin') {
       const { data } = await UserAPI.loginAdmin({
         email: values.email,
         password: values.password,
@@ -181,6 +185,8 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
         router.push({ name: 'dashboard-admin' });
       }
     }
+
+
   }
 
   } catch (error) {
