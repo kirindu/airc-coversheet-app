@@ -119,6 +119,7 @@ const editRoute = async (item) => {
 };
 
 const deleteRoute = async (item) => {
+  
   showSweetAlert({
     title: "Are you sure?",
     text: "You won't be able to revert this!",

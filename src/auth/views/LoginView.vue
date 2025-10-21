@@ -18,6 +18,10 @@ import Spinner from "@/components/Spinner.vue";
 import useToastNotification from "@/composables/useToast";
 const { showToast } = useToastNotification();
 
+import useSweetAlert2Notification from "@/composables/useSweetAlert2";
+const { showSweetAlert, alertResult } = useSweetAlert2Notification();
+
+
 // Reactividad
 const loading = ref(false);
 const rol = ref('Driver')  // valor por defecto
@@ -63,75 +67,108 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
     if (rol.value === 'Driver') {
       const { data } = await UserAPI.loginDriver({
-      email: values.email,
-      password: values.password,
-   });
+        email: values.email,
+        password: values.password,
+      });
 
-   if(data.ok) {
-     localStorage.setItem("USER", JSON.stringify(data));
-
-
-/* Aqui vamos abrir el Option Driver Modal */
-
- // Recuperamos el usuario
-const storedUser = localStorage.getItem("USER");
+      if (data.ok) {
+        localStorage.setItem("USER", JSON.stringify(data));
 
 
-if (storedUser) {
-  try {
-    const parsed = JSON.parse(storedUser);
+        /* Aqui vamos abrir el Option Driver Modal */
 
-    if (parsed.data) {
-      user.value = parsed.data; 
-    } 
-  } catch (e) {
-    console.error("Error al parsear USER desde localStorage:", e);
-  }
-}
+        // Recuperamos el usuario
+        const storedUser = localStorage.getItem("USER");
 
 
-  let user_id = user.value.id;
-  let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
 
-if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
-
-  if (user_id !== coversheet_driver_id) {
-    localStorage.removeItem("COVERSHEET");
-  } else {
-    // Parse the date from localStorage (assumed to be in UTC)
-    const dbDate = DateTime.fromISO(JSON.parse(localStorage.getItem("COVERSHEET")).date, { zone: 'utc' });
-    const today = DateTime.now(); // Current time
-
-    // Convert both dates to Denver timezone for comparison
-    const dbDateDenver = dbDate.setZone('America/Denver');
-    const todayDenver = today.setZone('America/Denver');
-
-    // Compare year, month, and day
-    if (
-      dbDateDenver.year !== todayDenver.year ||
-      dbDateDenver.month !== todayDenver.month ||
-      dbDateDenver.day !== todayDenver.day
-    ) {
-      localStorage.removeItem("COVERSHEET");
-    } else {
-      // Aqui esta la logica si el driver intenta entrar a un coversheet que ya tiene creado el mismo dia
+            if (parsed.data) {
+              user.value = parsed.data;
+            }
+          } catch (e) {
+            console.error("Error al parsear USER desde localStorage:", e);
+          }
+        }
 
 
-      const coversheet = JSON.parse(localStorage.getItem("COVERSHEET")); // Cargamos los datos del coversheet previamente guardado
+        let user_id = user.value.id;
+        let coversheet_driver_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.driver_id || null;
 
-      console.log('COVERSHEET loaded from localStorage:', coversheet);
+        if (coversheet_driver_id) { // Si existe un coversheet en el localstorage
 
-      selectedRoute.value = coversheet.route_id;
+          if (user_id !== coversheet_driver_id) {
+            localStorage.removeItem("COVERSHEET");
+          } else {
+            // Parse the date from localStorage (assumed to be in UTC)
+            const dbDate = DateTime.fromISO(JSON.parse(localStorage.getItem("COVERSHEET")).date, { zone: 'utc' });
+            const today = DateTime.now(); // Current time
+
+            // Convert both dates to Denver timezone for comparison
+            const dbDateDenver = dbDate.setZone('America/Denver');
+            const todayDenver = today.setZone('America/Denver');
+
+            // Compare year, month, and day
+            if (
+              dbDateDenver.year !== todayDenver.year ||
+              dbDateDenver.month !== todayDenver.month ||
+              dbDateDenver.day !== todayDenver.day
+            ) {
+              localStorage.removeItem("COVERSHEET");
+            } else {
+              // Aqui esta la logica si el driver intenta entrar a un coversheet que ya tiene creado el mismo dia
+
+
+              // const coversheet = JSON.parse(localStorage.getItem("COVERSHEET")); 
+              // console.log('COVERSHEET loaded from localStorage:', coversheet);
+              // selectedRoute.value = coversheet.route_id;
+
+
+
+              showSweetAlert({
+                title: "A current cover sheet has been detected",
+                text: "Do you want to continue working with it or create a new cover sheet?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#ff4949",
+                confirmButtonText: "Yes, continue working with it",
+                cancelButtonText: "Create a new cover sheet", // 👈 texto personalizado
+                allowOutsideClick: false,
+              }).then(async () => {
+                if (alertResult.value.isConfirmed) {
+                  try {
+
+                    router.push({ name: 'dashboard' });
+
+                  } catch (error) {
+                    console.error("Error :", error);
+                    showSweetAlert({
+                      title: "Error!",
+                      icon: "error",
+                      confirmButtonText: "Ok",
+                    });
+                  }
+                } else {
+                  // Eliminar el coversheet existente y crear uno nuevo
+                  localStorage.removeItem("COVERSHEET");
+                  router.push({ name: 'dashboard' });
+                }
+              });
+
+            }
+          }
+
+
+        } else {
+          router.push({ name: 'dashboard' });
+
+      }   
       
-    }
-  }
 
-
-}
-
-
-     router.push({name: 'dashboard'});
-  }
+      //  router.push({ name: 'dashboard' });
 
     } else if (rol.value === 'Admin') {
       const { data } = await UserAPI.loginAdmin({
@@ -139,17 +176,16 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
         password: values.password,
       });
 
-      if(data.ok) {
+      if (data.ok) {
         localStorage.setItem("USER", JSON.stringify(data));
-        router.push({name: 'dashboard-admin'});
-     }
-    } 
-
+        router.push({ name: 'dashboard-admin' });
+      }
+    }
+  }
 
   } catch (error) {
-    const data = error.response.data.msg;
     showToast({
-      message: data,
+      message: "Invalid credentials, please try again.",
       type: "error",
       position: "top",
       duration: 3000,
@@ -168,31 +204,21 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
 
 <template>
   <div class="authincation d-flex flex-column flex-lg-row flex-column-fluid">
-    <div
-      class="login-aside text-center d-none d-sm-flex flex-column flex-row-auto"
-    >
+    <div class="login-aside text-center d-none d-sm-flex flex-column flex-row-auto">
       <div class="d-flex flex-column-auto flex-column pt-lg-40 pt-15">
         <div class="text-center mb-4 pt-5">
           <a href="index.html" class="brand-logo">
-            <img
-              fetchpriority="high"
-              decoding="async"
-              width="188"
-              height="110"
-              src="@/assets/logo/acedisposal-logo.png"
-            />
+            <img fetchpriority="high" decoding="async" width="188" height="110"
+              src="@/assets/logo/acedisposal-logo.png" />
 
             <div>
               <div class="brand-title">
-                <span
-                  style="
+                <span style="
                     font-size: 20px;
                     font-weight: bold;
                     margin-left: 10px;
                     color: black;
-                  "
-                  >CoverSheet</span
-                >
+                  ">CoverSheet</span>
               </div>
             </div>
           </a>
@@ -200,15 +226,13 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
         <h3 class="mb-2">Welcome back!</h3>
         <p>IT Department</p>
       </div>
-      <div
-        class="aside-image"
-        style="background-image: url(images/pic1.svg)"
-      ></div>
+      <div class="aside-image" style="background-image: url(images/pic1.svg)"></div>
     </div>
 
 
 
-    <div class="container flex-row-fluid d-flex flex-column justify-content-center position-relative overflow-hidden p-7 mx-auto">
+    <div
+      class="container flex-row-fluid d-flex flex-column justify-content-center position-relative overflow-hidden p-7 mx-auto">
       <div class="d-flex justify-content-center h-100 align-items-center">
         <div class="authincation-content style-2">
           <div class="row no-gutters">
@@ -217,25 +241,17 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
                 <div class="text-center d-block d-lg-none mb-4 pt-5">
 
                   <a href="index.html" class="brand-logo">
-                    <img
-                      fetchpriority="high"
-                      decoding="async"
-                      width="188"
-                      height="110"
-                      src="@/assets/logo/acedisposal-logo.png"
-                    />
+                    <img fetchpriority="high" decoding="async" width="188" height="110"
+                      src="@/assets/logo/acedisposal-logo.png" />
 
                     <div>
                       <div class="brand-title">
-                        <span
-                          style="
+                        <span style="
                             font-size: 20px;
                             font-weight: bold;
                             margin-left: 10px;
                             color: black;
-                          "
-                          >CoverSheet</span
-                        >
+                          ">CoverSheet</span>
                       </div>
                     </div>
                   </a>
@@ -248,34 +264,39 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
                 <form @submit="onSubmit" autocomplete="off">
 
                   <div class="mb-3">
-                    <label class="mb-1 form-label" for="validationCustomEmail">Email<span class="text-danger">*</span></label>
+                    <label class="mb-1 form-label" for="validationCustomEmail">Email<span
+                        class="text-danger">*</span></label>
                     <!-- <input v-model="email" v-bind="emailAttrs" type="email" class="form-control" id="validationCustomEmail" requiredautocomplete="off"/> -->
 
 
                     <div class="input-group">
-												<span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
-                        <input v-model="email" v-bind="emailAttrs" type="email" class="form-control" id="validationCustomEmail" requiredautocomplete="off"/>		
+                      <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+                      <input v-model="email" v-bind="emailAttrs" type="email" class="form-control"
+                        id="validationCustomEmail" requiredautocomplete="off" />
                     </div>
 
-                    <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{ errors.email }}</div>
-                   
+                    <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{ errors.email
+                    }}</div>
+
                   </div>
-                  
+
                   <div class="mb-3">
                     <label class="mb-1 form-label">Password<span class="text-danger">*</span></label>
                     <div class="position-relative">
 
 
-                      
-                        <div class="input-group">
-												<span class="input-group-text"> <i class="fa fa-lock"></i> </span>
-                        <input type="password" v-model="password" v-bind="passwordAttrs" class="form-control" id="validationCustomPassword" required autocomplete="off"/>
-                    </div>
-                      
-                      
-                      
-                      
-                      <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{ errors.password }}</div>
+
+                      <div class="input-group">
+                        <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                        <input type="password" v-model="password" v-bind="passwordAttrs" class="form-control"
+                          id="validationCustomPassword" required autocomplete="off" />
+                      </div>
+
+
+
+
+                      <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{
+                        errors.password }}</div>
                     </div>
                   </div>
 
@@ -284,7 +305,8 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
                       <label class="col-form-label col-sm-3 pt-0">User Role</label>
                       <div class="col-sm-9">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" v-model="rol" name="gridRadios" value="Driver" checked />
+                          <input class="form-check-input" type="radio" v-model="rol" name="gridRadios" value="Driver"
+                            checked />
                           <label class="form-check-label"> Driver </label>
                         </div>
                         <div class="form-check">
@@ -295,9 +317,9 @@ if(coversheet_driver_id) { // Si existe un coversheet en el localstorage
                     </div>
                   </fieldset>
 
-                 
+
                   <div class="text-center">
-                    <button :disabled="loading"  type="submit" class="btn btn-primary btn-block">Sign In</button>
+                    <button :disabled="loading" type="submit" class="btn btn-primary btn-block">Sign In</button>
                     <Spinner v-if="loading" />
                   </div>
 
