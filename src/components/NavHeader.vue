@@ -1,6 +1,6 @@
 <template>
-  <div class="nav-header">
-    <a href="/admin/dashboard" class="brand-logo">
+  <div class="nav-header" @click="handleRedirect">
+    <a class="brand-logo">
       <img
         fetchpriority="high"
         decoding="async"
@@ -25,3 +25,36 @@
     </a>
   </div>
 </template>
+
+<script>
+export default {
+  methods: {
+    handleRedirect() {
+      const userRaw = localStorage.getItem('USER');
+      if (userRaw) {
+        let user;
+        try {
+          user = JSON.parse(userRaw);
+          let role = user?.data?.rol || user?.data?.user?.rol;
+          if (role === 'Driver') {
+            window.location.href = '/';
+          } else {
+            window.location.href = '/admin/dashboard';
+          }
+        } catch (e) {
+          console.warn('Error parsing user data:', e);
+          window.location.href = '/auth/login';
+        }
+      } else {
+        window.location.href = '/auth/login';
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.nav-header {
+  cursor: pointer;
+}
+</style>

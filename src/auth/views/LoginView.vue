@@ -213,7 +213,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
     <div class="login-aside text-center d-none d-sm-flex flex-column flex-row-auto">
       <div class="d-flex flex-column-auto flex-column pt-lg-40 pt-15">
         <div class="text-center mb-4 pt-5">
-          <a href="index.html" class="brand-logo">
+          <a href="/" class="brand-logo">
             <img fetchpriority="high" decoding="async" width="188" height="110"
               src="@/assets/logo/acedisposal-logo.png" />
 
@@ -246,7 +246,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
               <div class="auth-form">
                 <div class="text-center d-block d-lg-none mb-4 pt-5">
 
-                  <a href="index.html" class="brand-logo">
+                  <a href="/" class="brand-logo">
                     <img fetchpriority="high" decoding="async" width="188" height="110"
                       src="@/assets/logo/acedisposal-logo.png" />
 
