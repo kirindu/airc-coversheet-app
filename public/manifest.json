@@ -1,7 +1,7 @@
 {
-  "name": "CoverSheet App",
+  "name": "AIRC CoverSheet App",
   "permissions": ["camera"],
-  "short_name": "CoverSheet",
+  "short_name": "AIRC CoverSheet",
   "start_url": ".",
   "display": "standalone",
   "orientation": "any",

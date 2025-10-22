@@ -831,7 +831,7 @@ const logout = () => {
 
 const downloadImage = (imageUrl) => {
   const link = document.createElement("a");
-  link.href = "https://backend-fastapi-coversheet.onrender.com/" + imageUrl;
+  link.href = "https://backend-fastapi-airc-coversheet.onrender.com/" + imageUrl;
   link.target = "_blank"; // Open in new tab
   document.body.appendChild(link);
   link.click();
@@ -1845,7 +1845,7 @@ const downloadImage = (imageUrl) => {
                                   ) in selectedLoadData.images"
                                   :key="index"
                                   :src="
-                                    'https://backend-fastapi-coversheet.onrender.com/' +
+                                    'https://backend-fastapi-airc-coversheet.onrender.com/' +
                                     image
                                   "
                                   style="

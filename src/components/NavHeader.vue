@@ -6,7 +6,7 @@
         decoding="async"
         width="188"
         height="56"
-        src="@/assets/logo/acedisposal-logo.png"
+        src="@/assets/logo/AIRC-logo.png"
       />
 
       <div>
@@ -18,7 +18,7 @@
               margin-left: 5px;
               color: black;
             "
-            >CoverSheet</span
+            >AIRC CoverSheet</span
           >
         </div>
       </div>

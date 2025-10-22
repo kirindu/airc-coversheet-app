@@ -23,7 +23,7 @@
 				</ul>
 
 				<div class="copyright">
-					<p><strong>CoverSheet Admin Dashboard</strong></p>
+					<p><strong>AIRC CoverSheet Admin Dashboard</strong></p>
 					<p class="fs-12">Developed by ACE DISPOSAL</p>
 				</div>
 			</div>

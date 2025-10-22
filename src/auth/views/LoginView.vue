@@ -215,7 +215,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
         <div class="text-center mb-4 pt-5">
           <a href="/" class="brand-logo">
             <img fetchpriority="high" decoding="async" width="188" height="110"
-              src="@/assets/logo/acedisposal-logo.png" />
+              src="@/assets/logo/AIRC-logo.png" />
 
             <div>
               <div class="brand-title">
@@ -224,7 +224,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                     font-weight: bold;
                     margin-left: 10px;
                     color: black;
-                  ">CoverSheet</span>
+                  ">AIRC CoverSheet</span>
               </div>
             </div>
           </a>
@@ -248,7 +248,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
                   <a href="/" class="brand-logo">
                     <img fetchpriority="high" decoding="async" width="188" height="110"
-                      src="@/assets/logo/acedisposal-logo.png" />
+                      src="@/assets/logo/AIRC-logo.png" />
 
                     <div>
                       <div class="brand-title">
@@ -257,7 +257,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                             font-weight: bold;
                             margin-left: 10px;
                             color: black;
-                          ">CoverSheet</span>
+                          ">AIRC CoverSheet</span>
                       </div>
                     </div>
                   </a>
