@@ -16,13 +16,7 @@ import Footer from '@/components/Footer.vue'
     <NavHeader />
     <Header />
     <!-- <SideBar /> -->
-
 </div>
-
-
-
-
-
 <RouterView />
 
 <Footer />
@@ -30,7 +24,7 @@ import Footer from '@/components/Footer.vue'
 
 
 
-  
+
 </template>
 
 
