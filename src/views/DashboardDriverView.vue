@@ -1132,9 +1132,9 @@ const getDenverTimeAsUTCISOString = () => {
               <div class="row">
 
 
-                <div class="mb-3 col-md-4">
-                  <label class="form-label">Route #</label>
-                  <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose your Route"
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Source/Route</label>
+                  <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose your Source/Route"
                     :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }" />
                   <small v-if="errors.route_er" class="text-danger">{{
@@ -1142,7 +1142,7 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-4">
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Truck #</label>
                   <v-select :options="storeTruck.trucks" v-model="selectedTruck" placeholder="Choose your Truck"
                     :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
@@ -1152,7 +1152,17 @@ const getDenverTimeAsUTCISOString = () => {
                   }}</small>
                 </div>
 
-                <div class="mb-3 col-md-4">
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Trailer #</label>
+                  <v-select :options="storeTruck.trucks" v-model="selectedTruck" placeholder="Choose your Trailer"
+                    :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
+                    :class="{ 'is-invalid': formSubmitted && !selectedTruck }" />
+                  <small v-if="errors.truck_er" class="text-danger">{{
+                    errors.truck_er
+                  }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
                   <label class="form-label">Current Date</label>
                   <div class="mt-2">
                     <label class="form-label" style="color: brown">
