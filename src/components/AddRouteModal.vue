@@ -58,11 +58,11 @@ const reactiveProps = toRefs(props);
 
 // Route
 
-const routeNumber = ref("");
+const routeName = ref("");
 const lob = ref("");
 
 const errorsRoute = ref({
-  routeNumber_er: "",
+  routeName_er: "",
   lob_er: "",
 });
 
@@ -74,13 +74,13 @@ const onSubmit = async (event) => {
   formSubmitted.value = true;
 
   // Limpiar errores anteriores
-  errorsRoute.value.routeNumber_er = "";
+  errorsRoute.value.routeName_er = "";
   errorsRoute.value.lob_er = "";
 
   let hasError = false;
 
-  if (!routeNumber.value) {
-    errorsRoute.value.routeNumber_er = "Required field";
+  if (!routeName.value) {
+    errorsRoute.value.routeName_er = "Required field";
     hasError = true;
   }
 
@@ -96,7 +96,7 @@ const onSubmit = async (event) => {
 
   // Creamos el objeto de datos del nuevo route
   const routeData = {
-    routeNumber: routeNumber.value,
+    routeName: routeName.value,
     lob: lob.value,
     active: true,
   };
@@ -174,13 +174,13 @@ onMounted(async () => {
 
               <div class="row">
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Route Number</label>
+                  <label class="form-label">Route Name</label>
                   <input
                     type="text"
-                    v-model="routeNumber"
+                    v-model="routeName"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errorsRoute.routeNumber_er" class="text-danger">{{errorsRoute.routeNumber_er}}</small>
+                  <small v-if="errorsRoute.routeName_er" class="text-danger">{{errorsRoute.routeName_er}}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">

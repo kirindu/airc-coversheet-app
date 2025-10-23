@@ -204,7 +204,7 @@ onMounted(() => {
                   v-model="selectedRoute"
                   placeholder="Choose Route"
                   :reduce="(route) => route.id"
-                  label="routeNumber"
+                  label="routeName"
                   class="form-control p-0"
                   :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                 />
@@ -252,14 +252,14 @@ onMounted(() => {
                 >
                   <thead class="thead-primary">
                     <tr>
-                      <th style="text-align: center">Route Number</th>
+                      <th style="text-align: center">Route Name</th>
                       <th style="text-align: center">Lob</th>
                       <th style="text-align: center !important">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in routeList" :key="index">
-                      <td class="td">{{ item.routeNumber }}</td>
+                      <td class="td">{{ item.routeName }}</td>
                       <td class="td">{{ item.lob }}</td>
                       <td>
                         <div class="d-flex gap-1">

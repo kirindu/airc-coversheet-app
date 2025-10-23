@@ -132,10 +132,11 @@ const SearchCoverSheet = async (event) => {
       truck_id: selectedTruck.value || null,
       driver_id: selectedDriver.value || null,
     };
+    
     if (selectedRoute.value) {
       const selectedRouteObj = storeRoute.routes.find(r => r.id === selectedRoute.value);
       if (selectedRouteObj) {
-        const base = selectedRouteObj.routeNumber;
+        const base = selectedRouteObj.routeName;
         let matchingRoutes = [];
         if (base.startsWith('RO') && !base.includes('-')) {
           const numberStr = base.substring(2);
@@ -152,23 +153,23 @@ const SearchCoverSheet = async (event) => {
               for (let i = group_start; i <= group_end; i++) {
                 const sub_base = `RO${i}`;
                 const subs = storeRoute.routes.filter(
-                  r => r.routeNumber === sub_base || r.routeNumber.startsWith(sub_base + '-')
+                  r => r.routeName === sub_base || r.routeName.startsWith(sub_base + '-')
                 );
                 matchingRoutes = matchingRoutes.concat(subs);
               }
             } else { // not parent
               matchingRoutes = storeRoute.routes.filter(
-                r => r.routeNumber === base || r.routeNumber.startsWith(base + '-')
+                r => r.routeName === base || r.routeName.startsWith(base + '-')
               );
             }
           } else {
             matchingRoutes = storeRoute.routes.filter(
-              r => r.routeNumber === base || r.routeNumber.startsWith(base + '-')
+              r => r.routeName === base || r.routeName.startsWith(base + '-')
             );
           }
         } else {
           matchingRoutes = storeRoute.routes.filter(
-            r => r.routeNumber === base || r.routeNumber.startsWith(base + '-')
+            r => r.routeName === base || r.routeName.startsWith(base + '-')
           );
         }
         filters.route_ids = matchingRoutes.map(r => r.id);
@@ -320,7 +321,7 @@ onMounted(() => {
                   v-model="selectedRoute"
                   placeholder="Choose Route"
                   :reduce="(route) => route.id"
-                  label="routeNumber"
+                  label="routeName"
                   class="form-control p-0"
                   :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                 />
@@ -419,7 +420,7 @@ onMounted(() => {
                       </th>
                       <th>
                         <a
-                          @click="sortCoverSheetList('routeNumber')"
+                          @click="sortCoverSheetList('routeName')"
                           style="
                             cursor: pointer;
                             text-decoration: none;
@@ -427,7 +428,7 @@ onMounted(() => {
                           "
                         >
                           Route #
-                          <span v-if="sortKey === 'routeNumber'">
+                          <span v-if="sortKey === 'routeName'">
                             <i
                               v-if="sortOrder === 'asc'"
                               class="fa fa-sort-asc"
@@ -467,7 +468,7 @@ onMounted(() => {
                   <tbody>
                     <tr v-for="(item, index) in coverSheetList" :key="index">
                       <td class="td">{{ item.driverName }}</td>
-                      <td class="td">{{ item.routeNumber }}</td>
+                      <td class="td">{{ item.routeName }}</td>
                       <td class="td">{{ item.truckNumber }}</td>
                       <td class="td">{{ item.clockIn }}</td>
                       <td class="td">{{ item.leaveYard }}</td>

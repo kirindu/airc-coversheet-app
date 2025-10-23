@@ -26,7 +26,7 @@ export const useRoutesStore = defineStore("routes", () => {
 
 
   const naturalSort = (a, b) =>{
-  return a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true, sensitivity: 'base' });
+  return a.routeName.localeCompare(b.routeName, undefined, { numeric: true, sensitivity: 'base' });
 }
 
   return {

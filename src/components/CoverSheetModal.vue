@@ -863,7 +863,7 @@ const downloadImage = (imageUrl) => {
                     v-model="selectedRoute"
                     placeholder="Choose your Route"
                     :reduce="(route) => route.id"
-                    label="routeNumber"
+                    label="routeName"
                     class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
                   />
@@ -1124,7 +1124,7 @@ const downloadImage = (imageUrl) => {
                                   <td class="td">
                                     {{ item.spareTruckNumber }}
                                   </td>
-                                  <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.routeName }}</td>
                                   <td class="td">{{ item.startMiles }}</td>
                                   <td class="td">{{ item.endMiles }}</td>
                                   <td class="td">{{ item.fuel }}</td>
@@ -1175,7 +1175,7 @@ const downloadImage = (imageUrl) => {
                               v-model="selectedRouteSpareTruckInfo"
                               placeholder="Choose your Route"
                               :reduce="(route) => route.id"
-                              label="routeNumber"
+                              label="routeName"
                               class="form-control p-0"
                               :class="{
                                 'is-invalid': formSubmitted && !selectedRoute,
@@ -1545,7 +1545,7 @@ const downloadImage = (imageUrl) => {
                                   v-for="(item, index) in loadList"
                                   :key="index"
                                 >
-                                  <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.routeName }}</td>
                                   <td class="td">{{ item.firstStopTime }}</td>
                                   <td class="td">{{ item.lastStopTime }}</td>
                                   <td class="td">{{ item.landFillTimeIn }}</td>
@@ -1582,7 +1582,7 @@ const downloadImage = (imageUrl) => {
                               v-model="selectedRouteLoad"
                               placeholder="Choose your Route"
                               :reduce="(route) => route.id"
-                              label="routeNumber"
+                              label="routeName"
                               class="form-control p-0"
                               :class="{
                                 'is-invalid':

@@ -1121,7 +1121,7 @@ const getDenverTimeAsUTCISOString = () => {
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Route #</label>
                   <v-select :options="storeRoute.routes" v-model="selectedRoute" placeholder="Choose your Route"
-                    :reduce="(route) => route.id" label="routeNumber" class="form-control p-0"
+                    :reduce="(route) => route.id" label="routeName" class="form-control p-0"
                     :class="{ 'is-invalid': formSubmitted && !selectedRoute }" />
                   <small v-if="errors.route_er" class="text-danger">{{
                     errors.route_er
@@ -1312,7 +1312,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Route #</label>
                             <v-select :options="storeRoute.routes" v-model="selectedRouteSpareTruckInfo"
-                              placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber"
+                              placeholder="Choose your Route" :reduce="(route) => route.id" label="routeName"
                               class="form-control p-0" :class="{
                                 'is-invalid': formSubmitted && !selectedRoute,
                               }" />
@@ -1432,7 +1432,7 @@ const getDenverTimeAsUTCISOString = () => {
                                   <td class="td">
                                     {{ item.spareTruckNumber }}
                                   </td>
-                                  <td class="td">{{ item.routeNumber }}</td>
+                                  <td class="td">{{ item.routeName }}</td>
                                   <td class="td">{{ item.startMiles }}</td>
                                   <td class="td">{{ item.endMiles }}</td>
                                   <td class="td">{{ item.fuel }}</td>
@@ -1606,7 +1606,7 @@ const getDenverTimeAsUTCISOString = () => {
       <div class="row">
         <div class="mb-3 col-md-3">
           <label class="form-label">Route #</label>
-          <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeNumber" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
+          <v-select :options="storeRoute.routes" v-model="selectedRouteLoad" placeholder="Choose your Route" :reduce="(route) => route.id" label="routeName" class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
           <small v-if="errorsLoad.selectedRouteLoad_er" class="text-danger">{{errorsLoad.selectedRouteLoad_er}}</small>
         </div>
         <div class="mb-3 col-md-3">
@@ -1769,7 +1769,7 @@ const getDenverTimeAsUTCISOString = () => {
             </thead>
             <tbody>
               <tr v-for="(item, index) in loadList" :key="index">
-                <td class="td">{{ item.routeNumber }}</td>
+                <td class="td">{{ item.routeName }}</td>
                 <td class="td">{{ item.firstStopTime }}</td>
                 <td class="td">{{ item.lastStopTime }}</td>
                 <td class="td">{{ item.landFillTimeIn }}</td>
