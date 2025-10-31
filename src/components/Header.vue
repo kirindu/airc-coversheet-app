@@ -72,8 +72,12 @@ const logout = () => {
               <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-drivers' })">Drivers</a>
             </div>
 
+          <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
+              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-users' })">| Users</a>
+            </div>
+
             <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
-              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-routes' })">| Routes</a>
+              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-trailers' })">| Trailers</a>
             </div>
 
             <div class="nav-item" style="margin-left: 10px; cursor:pointer;">

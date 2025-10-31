@@ -44,11 +44,11 @@ export default {
   async auth() {
 
     const currentUser = localStorage.getItem('USER') || '';
-    const token = JSON.parse(currentUser).token;
+    const token = JSON.parse(currentUser).data.access_token;
 
     const data = await api.get('/auth/user', {
       headers: {
-        'x-token' : token
+        'Authorization': `Bearer ${token}`
       }
     });
     return data;
@@ -59,11 +59,11 @@ export default {
 
   async add(values) {
     const currentUser = localStorage.getItem('USER') || '';
-    const token = JSON.parse(currentUser).token;
+    const token = JSON.parse(currentUser).data.access_token;
 
     const data = await api.post('/users/', values, {
       headers: {
-        'x-token' : token
+        'Authorization': `Bearer ${token}`
       }
     });
     return data;
@@ -72,11 +72,12 @@ export default {
   async delete(idUser) {
 
     const currentUser = localStorage.getItem('USER') || '';
-    const token = JSON.parse(currentUser).token;
+    const token = JSON.parse(currentUser).data.access_token;
+
 
     const data = await api.delete('/users/' + idUser, {
-      headers: {
-        'x-token' : token
+     headers: {
+        'Authorization': `Bearer ${token}`
       }
     });
     return data;
@@ -86,19 +87,15 @@ export default {
   async edit(idUser, values) {
 
     const currentUser = localStorage.getItem('USER') || '';
-    const token = JSON.parse(currentUser).token;
+    const token = JSON.parse(currentUser).data.access_token;
 
     const data = await api.put('/users/' + idUser, values, {
       headers: {
-        'x-token' : token
+        'Authorization': `Bearer ${token}`
       }
     });
     return data;
 
   },
   
-
-
-
-
 };
