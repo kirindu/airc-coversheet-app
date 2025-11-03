@@ -51,40 +51,69 @@ const user = ref(null);
 
 
 // General Info
-const selectedRoute = ref("");
+const selectedRoute = ref(""); // Considerar su borrado
+const timeLeaveYard = ref(""); // Considerar su borrado
+const timeBackInYard = ref(""); // Considerar su borrado
+const startMiles = ref(""); // Considerar su borrado
+const endMiles = ref(""); // Considerar su borrado
+
+
+
 const selectedHomeBase = ref("");
 const selectedTruck = ref("");
 const selectedTrailer = ref("");
 
 const timeClockIn = ref("");
-const timeLeaveYard = ref("");
-const timeBackInYard = ref("");
 const timeClockOut = ref("");
+const trainee = ref("");
 
-const startMiles = ref("");
-const dieselExhaustFluid = ref("");
-const helper = ref("");
-const endMiles = ref("");
+const timePreTripStart = ref("");
+const timePreTripEnd = ref("");
+const timePostTripStart = ref("");
+const timePostTripEnd = ref("");
+
+const truckStartMiles = ref(""); 
+const truckEndtMiles = ref(""); 
+const truckStartHours = ref("");
+const truckEndHours = ref("");
+
+const trailerStartMiles = ref("");
+const trailerEndtMiles = ref("");
 const fuel = ref("");
+const dieselExhaustFluid = ref("");
+
 const notes = ref("");
 
 const formSubmitted = ref(false);
 const isVisibleAcordion = ref(false);
 
 const errors = ref({
-  route_er: "",
+  route_er: "", // Considerar su borrado
+  leaveYard_er: "",// Considerar su borrado
+  backInYard_er: "",// Considerar su borrado
+  startMiles_er: "",// Considerar su borrado
+  endMiles_er: "",// Considerar su borrado
+
+
   homebase_er: "",
-  dieselExhaustFluid_er: "",
-  helper_er: "",
   truck_er: "",
   trailer_er: "",
   clockIn_er: "",
-  leaveYard_er: "",
-  backInYard_er: "",
   clockOut_er: "",
-  startMiles_er: "",
-  endMiles_er: "",
+  trainee_er: "",
+  preTripStart_er: "",
+  preTripEnd_er: "",
+  postTripStart_er: "",
+  postTripEnd_er: "",
+  truckStartMiles_er: "",
+  truckEndtMiles_er: "",
+  truckStartHours_er: "",
+  truckEndHours_er: "",
+  trailerStartMiles_er: "",
+  trailerEndtMiles_er: "",
   fuel_er: "",
+  dieselExhaustFluid_er: "",
+  
 });
 
 // Modo de edición de la informaciongeneral para el coversheet
@@ -257,25 +286,41 @@ onMounted(() => {
       isEditModeCoverShet.value = true;
       const coversheet = JSON.parse(localStorage.getItem("COVERSHEET")); // Cargamos los datos del coversheet previamente guardado
 
-      timeClockIn.value = setTimeFromDB(coversheet.clockIn);
-      timeLeaveYard.value = setTimeFromDB(coversheet.leaveYard);
-      timeBackInYard.value = setTimeFromDB(coversheet.backInYard);
-      timeClockOut.value = setTimeFromDB(coversheet.clockOut);
+      // timeLeaveYard.value = setTimeFromDB(coversheet.leaveYard);
+      // timeBackInYard.value = setTimeFromDB(coversheet.backInYard);
+      // startMiles.value = coversheet.startMiles;
+      // endMiles.value = coversheet.endMiles;
+      // selectedRoute.value = coversheet.route_id;
+      // selectedRouteSpareTruckInfo.value = coversheet.route_id;
+      // selectedRouteLoad.value = coversheet.route_id;
 
-      startMiles.value = coversheet.startMiles;
-      dieselExhaustFluid.value = coversheet.dieselExhaustFluid;
-      helper.value = coversheet.helper;
-      endMiles.value = coversheet.endMiles;
-      fuel.value = coversheet.fuel;
-      notes.value = coversheet.notes;
-      selectedRoute.value = coversheet.route_id;
       selectedHomeBase.value = coversheet.homebase_id;
       selectedTruck.value = coversheet.truck_id;
       selectedTrailer.value = coversheet.trailer_id;
 
-      selectedRouteSpareTruckInfo.value = coversheet.route_id;
+      timeClockIn.value = setTimeFromDB(coversheet.clockIn);
+      timeClockOut.value = setTimeFromDB(coversheet.clockOut);
+      trainee.value = coversheet.trainee;
+      timePreTripStart.value = setTimeFromDB(coversheet.timePreTripStart);
+      timePreTripEnd.value = setTimeFromDB(coversheet.timePreTripEnd);
+      timePostTripStart.value = setTimeFromDB(coversheet.timePostTripStart);
+      timePostTripEnd.value = setTimeFromDB(coversheet.timePostTripEnd);
+      truckStartMiles.value = coversheet.truckStartMiles;
+      truckEndtMiles.value = coversheet.truckEndtMiles;
+      truckStartHours.value = coversheet.truckStartHours;
+      truckEndHours.value = coversheet.truckEndHours;
+      trailerStartMiles.value = coversheet.trailerStartMiles;
+      trailerEndtMiles.value = coversheet.trailerEndtMiles;
+      fuel.value = coversheet.fuel;
+      dieselExhaustFluid.value = coversheet.dieselExhaustFluid;
+      notes.value = coversheet.notes;
+      
+      
+      
+
+
       selectedTruckDowntime.value = coversheet.truck_id;
-      selectedRouteLoad.value = coversheet.route_id;
+      
 
       handleVisibleAcordion();
       loadSpareTruckInfo();
@@ -302,19 +347,34 @@ const onSubmit = async (event) => {
   formSubmitted.value = true;
 
   // Limpiar errores anteriores
-  errors.value.route_er = "";
+  // errors.value.route_er = "";
+    // errors.value.leaveYard_er = "";
+  // errors.value.backInYard_er = "";
+  // errors.value.startMiles_er = "";
+  // errors.value.endMiles_er = "";
+
+
   errors.value.homebase_er = "";
   errors.value.truck_er = "";
   errors.value.trailer_er = "";
   errors.value.clockIn_er = "";
-  errors.value.leaveYard_er = "";
-  errors.value.backInYard_er = "";
   errors.value.clockOut_er = "";
-  errors.value.startMiles_er = "";
-  errors.value.dieselExhaustFluid_er = "";
-  errors.value.helper_er = "";
-  errors.value.endMiles_er = "";
+  errors.value.trainee_er = "";
+  errors.value.preTripStart_er = "";
+  errors.value.preTripEnd_er = "";
+  errors.value.postTripStart_er = "";
+  errors.value.postTripEnd_er = "";
+  errors.value.truckStartMiles_er = "";
+  errors.value.truckEndtMiles_er = "";
+  errors.value.truckStartHours_er = "";
+  errors.value.truckEndHours_er = "";
+  errors.value.trailerStartMiles_er = "";
+  errors.value.trailerEndtMiles_er = "";
   errors.value.fuel_er = "";
+  errors.value.dieselExhaustFluid_er = "";
+  
+  
+ 
 
   let hasError = false;
 
@@ -348,20 +408,34 @@ const onSubmit = async (event) => {
   }
 
   const coverSheetData = {
-    clockIn: formatTime(timeClockIn.value),
-    leaveYard: formatTime(timeLeaveYard.value) || "",
-    backInYard: formatTime(timeBackInYard.value) || "",
-    clockOut: formatTime(timeClockOut.value) || "",
 
-    startMiles: startMiles.value.toString() || "",
-    dieselExhaustFluid: dieselExhaustFluid.value.toString() || "",
-    helper: helper.value.toString() || "",
-    endMiles: endMiles.value.toString() || "",
-    fuel: fuel.value.toString() || "",
+    homebase_id: selectedHomeBase.value,
     truck_id: selectedTruck.value,
     trailer_id: selectedTrailer.value,
-    route_id: selectedRoute.value,
-    homebase_id: selectedHomeBase.value,
+    clockIn: formatTime(timeClockIn.value),
+    clockOut: formatTime(timeClockOut.value) || "",
+    trainee: trainee.value.toString() || "",
+    timePreTripStart: formatTime(timePreTripStart.value) || "",
+    timePreTripEnd: formatTime(timePreTripEnd.value) || "",
+    timePostTripStart: formatTime(timePostTripStart.value) || "",
+    timePostTripEnd: formatTime(timePostTripEnd.value) || "",
+    truckStartMiles: truckStartMiles.value.toString() || "",
+    truckEndtMiles: truckEndtMiles.value.toString() || "",
+    truckStartHours: truckStartHours.value.toString() || "",
+    truckEndHours: truckEndHours.value.toString() || "",
+    trailerStartMiles: trailerStartMiles.value.toString() || "",
+    trailerEndtMiles: trailerEndtMiles.value.toString() || "",
+    fuel: fuel.value.toString() || "",
+    dieselExhaustFluid: dieselExhaustFluid.value.toString() || "",
+
+
+    // leaveYard: formatTime(timeLeaveYard.value) || "",
+    // backInYard: formatTime(timeBackInYard.value) || "",
+    // startMiles: startMiles.value.toString() || "",
+    // endMiles: endMiles.value.toString() || "",
+    // route_id: selectedRoute.value,
+
+    
     driver_id: user.value.id,
     notes: notes.value,
     date: getDenverTimeAsUTCISOString(),
@@ -375,9 +449,9 @@ const onSubmit = async (event) => {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
 
-        selectedRouteSpareTruckInfo.value = coversheet.route_id;
+        // selectedRouteSpareTruckInfo.value = coversheet.route_id;
         selectedTruckDowntime.value = coversheet.truck_id;
-        selectedRouteLoad.value = coversheet.route_id;
+        // selectedRouteLoad.value = coversheet.route_id;
 
         isEditModeCoverShet.value = true;
 
@@ -412,9 +486,9 @@ const onSubmit = async (event) => {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
 
-        selectedRouteSpareTruckInfo.value = coversheet.route_id;
+        // selectedRouteSpareTruckInfo.value = coversheet.route_id;
         selectedTruckDowntime.value = coversheet.truck_id;
-        selectedRouteLoad.value = coversheet.route_id;
+        // selectedRouteLoad.value = coversheet.route_id;
 
         showSweetAlert({
           title: "General information edited successfully!",
@@ -456,20 +530,34 @@ const onSubmit = async (event) => {
 
 // Reset form after successful submission
 const resetForm = () => {
-  timeClockIn.value = "";
-  timeLeaveYard.value = "";
-  timeBackInYard.value = "";
-  timeClockOut.value = "";
-  startMiles.value = "";
-  dieselExhaustFluid.value = "";
-  helper.value = "";
-  endMiles.value = "";
-  fuel.value = "";
-  notes.value = "";
-  selectedRoute.value = "";
+
   selectedHomeBase.value = "";
   selectedTruck.value = "";
   selectedTrailer.value = "";
+  timeClockIn.value = "";
+  timeClockOut.value = "";
+  trainee.value = "";
+  timePreTripStart.value = "";
+  timePreTripEnd.value = "";
+  timePostTripStart.value = "";
+  timePostTripEnd.value = "";
+  truckStartMiles.value = "";
+  truckEndtMiles.value = "";
+  truckStartHours.value = "";
+  truckEndHours.value = "";
+  trailerStartMiles.value = "";
+  trailerEndtMiles.value = "";
+  fuel.value = "";
+  dieselExhaustFluid.value = "";
+  notes.value = "";
+
+
+  // timeLeaveYard.value = "";
+  // timeBackInYard.value = "";
+  // startMiles.value = "";
+  // endMiles.value = "";
+  // selectedRoute.value = "";
+  
   formSubmitted.value = false;
 };
 
@@ -1115,31 +1203,6 @@ const logout = () => {
   router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
 }
 
-// const getDenverTimeAsUTCISOString = () => {
-//   const now = new Date();
-
-//   // Obtiene la diferencia entre Denver y UTC en milisegundos
-//   const options = { timeZone: "America/Denver" };
-//   const parts = Intl.DateTimeFormat("en-US", {
-//     ...options,
-//     year: "numeric",
-//     month: "2-digit",
-//     day: "2-digit",
-//     hour: "2-digit",
-//     minute: "2-digit",
-//     second: "2-digit",
-//     hour12: false,
-//   }).formatToParts(now);
-
-//   const extract = (type) => parts.find((p) => p.type === type)?.value;
-//   const formattedString = `${extract("year")}-${extract("month")}-${extract(
-//     "day"
-//   )}T${extract("hour")}:${extract("minute")}:${extract("second")}`;
-
-//   // Convertimos ese string a Date y sacamos su ISO (que es UTC)
-//   const localDenverDate = new Date(formattedString);
-//   return localDenverDate.toISOString(); // <-- esto lo mandas al backend
-// };
 
 const getDenverTimeAsUTCISOString = () => {
   const now = DateTime.now().setZone('America/Denver'); // Get current time in Denver
@@ -1243,66 +1306,147 @@ const getDenverTimeAsUTCISOString = () => {
                     }}</small>
                 </div>
 
-                <div class="mb-3 col-md-3">
+                       <div class="mb-3 col-md-6">
+                  <label class="form-label">Trainee</label>
+                  <input type="text" v-model="trainee" class="form-control form-control-lg border border-primary"
+                    style="color: black;" />
+                  <small v-if="errors.trainee_er" class="text-danger">{{ errors.trainee_er }}</small>
+                </div>
+
+          
+
+             
+
+
+
+                <!-- <div class="mb-3 col-md-3">
                   <label class="form-label">DEF</label>
                   <input type="number" step="any" v-model="dieselExhaustFluid"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
                   <small v-if="errors.dieselExhaustFluid_er" class="text-danger">{{ errors.dieselExhaustFluid_er
                     }}</small>
+                </div> -->
+
+
+              </div>
+
+                  <div class="row">
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Pre Trip Start</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="timePreTripStart" time-picker placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.preTripStart_er" class="text-danger">{{
+                    errors.preTripStart_er
+                    }}</small>
+                </div>
+
+
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Pre Trip End</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="timePreTripEnd" time-picker placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.preTripEnd_er" class="text-danger">{{
+                    errors.preTripEnd_er
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Helper</label>
-                  <input type="text" v-model="helper" class="form-control form-control-lg border border-primary"
-                    style="color: black;" />
-                  <small v-if="errors.helper_er" class="text-danger">{{ errors.helper_er }}</small>
+                  <label class="form-label">Post Trip Start</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="timePostTripStart" time-picker placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.postTripStart_er" class="text-danger">{{
+                    errors.postTripStart_er
+                    }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Post Trip End</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="timePostTripEnd" time-picker placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.postTripEnd_er" class="text-danger">{{
+                    errors.postTripEnd_er
+                    }}</small>
+                </div>
+
+          
+
+         
+
+
+
+              </div>
+
+
+
+              <div class="row">
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Truck Start Miles</label>
+                  <input type="number" step="any" v-model="truckStartMiles"
+                    class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.truckStartMiles_er" class="text-danger">{{ errors.truckStartMiles_er }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Truck End Miles</label>
+                  <input type="number" step="any" v-model="truckEndMiles"
+                    class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.truckEndtMiles_er" class="text-danger">{{ errors.truckEndtMiles_er }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Truck Start Hours</label>
+                  <input type="number" step="any" v-model="truckStartHours"
+                    class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.truckStartHours_er" class="text-danger">{{ errors.truckStartHours_er }}</small>
+                </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Truck End Hours</label>
+                  <input type="number" step="any" v-model="truckEndHours"
+                    class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.truckEndHours_er" class="text-danger">{{ errors.truckEndHours_er }}</small>
                 </div>
 
 
 
               </div>
 
-              <!-- <div class="row">
+               <div class="row">
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Start Miles</label>
-                  <input type="number" step="any" v-model="startMiles"
-                    class="form-control form-control-sm border border-primary" />
-                  <small v-if="errors.startMiles_er" class="text-danger">{{
-                    errors.startMiles_er
-                  }}</small>
-                </div>
-
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">End Miles</label>
-                  <input type="number" step="any" v-model="endMiles" class="form-control form-control-sm border border-primary" />
-                  <small v-if="errors.endMiles_er" class="text-danger">{{
-                    errors.endMiles_er
-                  }}</small>
-                </div>
-
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">Fuel</label>
-                  <input type="number" step="any" v-model="fuel" class="form-control form-control-sm border border-primary" />
-                  <small v-if="errors.fuel_er" class="text-danger">{{
-                    errors.fuel_er
-                  }}</small>
-                </div>
-              </div> -->
-
-              <div class="row">
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">Start Miles</label>
-                  <input type="number" step="any" v-model="startMiles"
+                  <label class="form-label">Trailer Start Miles</label>
+                  <input type="number" step="any" v-model="trailerStartMiles"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.startMiles_er" class="text-danger">{{ errors.startMiles_er }}</small>
+                  <small v-if="errors.trailerStartMiles_er" class="text-danger">{{ errors.trailerStartMiles_er }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">End Miles</label>
-                  <input type="number" step="any" v-model="endMiles"
+                  <label class="form-label">Trailer End Miles</label>
+                  <input type="number" step="any" v-model="trailerEndMiles"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.endMiles_er" class="text-danger">{{ errors.endMiles_er }}</small>
+                  <small v-if="errors.trailerEndtMiles_er" class="text-danger">{{ errors.trailerEndtMiles_er }}</small>
                 </div>
+
 
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Fuel</label>
@@ -1310,6 +1454,15 @@ const getDenverTimeAsUTCISOString = () => {
                     class="form-control form-control-lg border border-primary" style="color: black;" />
                   <small v-if="errors.fuel_er" class="text-danger">{{ errors.fuel_er }}</small>
                 </div>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">DEF</label>
+                  <input type="number" step="any" v-model="dieselExhaustFluid"
+                    class="form-control form-control-lg border border-primary" style="color: black;" />
+                  <small v-if="errors.dieselExhaustFluid_er" class="text-danger">{{ errors.dieselExhaustFluid_er }}</small>
+                </div>
+
+
               </div>
 
               <div class="row">
