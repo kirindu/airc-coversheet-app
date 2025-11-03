@@ -73,12 +73,12 @@ const timePostTripStart = ref("");
 const timePostTripEnd = ref("");
 
 const truckStartMiles = ref(""); 
-const truckEndtMiles = ref(""); 
+const truckEndMiles = ref(""); 
 const truckStartHours = ref("");
 const truckEndHours = ref("");
 
 const trailerStartMiles = ref("");
-const trailerEndtMiles = ref("");
+const trailerEndMiles = ref("");
 const fuel = ref("");
 const dieselExhaustFluid = ref("");
 
@@ -106,11 +106,11 @@ const errors = ref({
   postTripStart_er: "",
   postTripEnd_er: "",
   truckStartMiles_er: "",
-  truckEndtMiles_er: "",
+  truckEndMiles_er: "",
   truckStartHours_er: "",
   truckEndHours_er: "",
   trailerStartMiles_er: "",
-  trailerEndtMiles_er: "",
+  trailerEndMiles_er: "",
   fuel_er: "",
   dieselExhaustFluid_er: "",
   
@@ -306,11 +306,11 @@ onMounted(() => {
       timePostTripStart.value = setTimeFromDB(coversheet.timePostTripStart);
       timePostTripEnd.value = setTimeFromDB(coversheet.timePostTripEnd);
       truckStartMiles.value = coversheet.truckStartMiles;
-      truckEndtMiles.value = coversheet.truckEndtMiles;
+      truckEndMiles.value = coversheet.truckEndMiles;
       truckStartHours.value = coversheet.truckStartHours;
       truckEndHours.value = coversheet.truckEndHours;
       trailerStartMiles.value = coversheet.trailerStartMiles;
-      trailerEndtMiles.value = coversheet.trailerEndtMiles;
+      trailerEndMiles.value = coversheet.trailerEndMiles;
       fuel.value = coversheet.fuel;
       dieselExhaustFluid.value = coversheet.dieselExhaustFluid;
       notes.value = coversheet.notes;
@@ -365,11 +365,11 @@ const onSubmit = async (event) => {
   errors.value.postTripStart_er = "";
   errors.value.postTripEnd_er = "";
   errors.value.truckStartMiles_er = "";
-  errors.value.truckEndtMiles_er = "";
+  errors.value.truckEndMiles_er = "";
   errors.value.truckStartHours_er = "";
   errors.value.truckEndHours_er = "";
   errors.value.trailerStartMiles_er = "";
-  errors.value.trailerEndtMiles_er = "";
+  errors.value.trailerEndMiles_er = "";
   errors.value.fuel_er = "";
   errors.value.dieselExhaustFluid_er = "";
   
@@ -420,11 +420,11 @@ const onSubmit = async (event) => {
     timePostTripStart: formatTime(timePostTripStart.value) || "",
     timePostTripEnd: formatTime(timePostTripEnd.value) || "",
     truckStartMiles: truckStartMiles.value.toString() || "",
-    truckEndtMiles: truckEndtMiles.value.toString() || "",
+    truckEndMiles: truckEndMiles.value.toString() || "",
     truckStartHours: truckStartHours.value.toString() || "",
     truckEndHours: truckEndHours.value.toString() || "",
     trailerStartMiles: trailerStartMiles.value.toString() || "",
-    trailerEndtMiles: trailerEndtMiles.value.toString() || "",
+    trailerEndMiles: trailerEndMiles.value.toString() || "",
     fuel: fuel.value.toString() || "",
     dieselExhaustFluid: dieselExhaustFluid.value.toString() || "",
 
@@ -542,11 +542,11 @@ const resetForm = () => {
   timePostTripStart.value = "";
   timePostTripEnd.value = "";
   truckStartMiles.value = "";
-  truckEndtMiles.value = "";
+  truckEndMiles.value = "";
   truckStartHours.value = "";
   truckEndHours.value = "";
   trailerStartMiles.value = "";
-  trailerEndtMiles.value = "";
+  trailerEndMiles.value = "";
   fuel.value = "";
   dieselExhaustFluid.value = "";
   notes.value = "";
@@ -1411,7 +1411,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <label class="form-label">Truck End Miles</label>
                   <input type="number" step="any" v-model="truckEndMiles"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.truckEndtMiles_er" class="text-danger">{{ errors.truckEndtMiles_er }}</small>
+                  <small v-if="errors.truckEndMiles_er" class="text-danger">{{ errors.truckEndMiles_er }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1444,7 +1444,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <label class="form-label">Trailer End Miles</label>
                   <input type="number" step="any" v-model="trailerEndMiles"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.trailerEndtMiles_er" class="text-danger">{{ errors.trailerEndtMiles_er }}</small>
+                  <small v-if="errors.trailerEndMiles_er" class="text-danger">{{ errors.trailerEndMiles_er }}</small>
                 </div>
 
 
