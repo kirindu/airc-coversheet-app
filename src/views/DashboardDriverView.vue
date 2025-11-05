@@ -43,8 +43,6 @@ const storeTruck = useTrucksStore();
 import { useTrailersStore } from "@/stores/trailers.js";
 const storeTrailer = useTrailersStore();
 
-import { useDriversStore } from "@/stores/drivers.js";
-import { is } from "@vee-validate/rules";
 
 const user = ref(null);
 
@@ -127,15 +125,25 @@ const spareTruckList = ref([]);
 const isEditingSpareTruckInfo = ref(false); // To track if we are editing a spare truck record
 const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
 
-const spareTruckSpareTruckInfo = ref("");
-const selectedRouteSpareTruckInfo = ref("");
+const selectedHomeBaseSpareTruckInfo = ref("");
+const selectedTruckSpareTruckInfo = ref("");
+const selectedTrailerSpareTruckInfo = ref("");
+
 
 const timeLeaveYardSpareTruckInfo = ref("");
 const timeBackInYardSpareTruckInfo = ref("");
+const fuelSpareTruckInfo= ref("");
+const dieselExhaustFluidSpareTruckInfo= ref("");
+    
+const truckStartMilesSpareTruckInfo = ref("");
+const truckEndMilesSpareTruckInfo= ref("");
+const truckStartHoursSpareTruckInfo= ref("");
+const truckEndHoursSpareTruckInfo= ref("");
 
-const startMilesSpareTruckInfo = ref("");
-const endMilesSpareTruckInfo = ref("");
-const fuelSpareTruckInfo = ref("");
+const trailerStartMilesSpareTruckInfo= ref("");
+const trailerEndMilesSpareTruckInfo= ref("");
+
+
 
 const isLoadingSpareTruckInfo = ref(false); // To show loading spinner when fetching spare truck info
 
