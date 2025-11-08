@@ -157,13 +157,22 @@ const isLoadingSpareTruckInfo = ref(false); // To show loading spinner when fetc
 // const timeLeaveYardSpareTruckInfo = ref({hours: 15, minutes: 26});
 
 const errorsSpareTruckInfo = ref({
-  spareTruckSpareTruckInfo_er: "",
-  routeSpareTruckInfo_er: "",
+  homebaseSpareTruckInfo_er: "",
   leaveYardSpareTruckInfo_er: "",
   backInYardSpareTruckInfo_er: "",
-  startMilesSpareTruckInfo_er: "",
-  endMilesSpareTruckInfo_er: "",
   fuelSpareTruckInfo_er: "",
+  dieselExhaustFluidSpareTruckInfo_er: "",
+
+  spareTruckSpareTruckInfo_er: "",
+  truckStartMilesSpareTruckInfo_er: "",
+  truckEndMilesSpareTruckInfo_er: "",
+  truckStartHoursSpareTruckInfo_er: "",
+  truckEndHoursSpareTruckInfo_er: "",
+
+  spareTrailerSpareTruckInfo_er: "",
+  trailerStartMilesSpareTruckInfo_er: "",
+  trailerEndMilesSpareTruckInfo_er: "",
+  
 });
 
 // Downtime
@@ -571,18 +580,25 @@ const resetForm = () => {
 
 // Reset Spare Truck Info form
 const resetSpareTruckInfo = () => {
-  spareTruckSpareTruckInfo.value = "";
 
-  selectedRouteSpareTruckInfo.value = "";
+  selectedHomeBaseSpareTruckInfo.value = "";
+  selectedTruckSpareTruckInfo.value = "";
+  selectedTrailerSpareTruckInfo.value = "";
 
   timeLeaveYardSpareTruckInfo.value = "";
   timeBackInYardSpareTruckInfo.value = "";
-
-  startMilesSpareTruckInfo.value = ""
-  endMilesSpareTruckInfo.value = "";
   fuelSpareTruckInfo.value = "";
-  selectedSpareTruckId.value = null;
+  dieselExhaustFluidSpareTruckInfo.value = "";
 
+  truckStartMilesSpareTruckInfo.value = "";
+  truckEndMilesSpareTruckInfo.value = "";
+  truckStartHoursSpareTruckInfo.value = "";
+  truckEndHoursSpareTruckInfo.value = "";
+
+  trailerStartMilesSpareTruckInfo.value = "";
+  trailerEndMilesSpareTruckInfo.value = "";
+
+  selectedSpareTruckId.value = null;
   isEditingSpareTruckInfo.value = false;
 
 };
@@ -625,30 +641,30 @@ const HandleSpareTruckInfo = async (event) => {
   event.preventDefault();
 
   // Limpiar errores anteriores
-  errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "";
-  errorsSpareTruckInfo.value.routeSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.homebaseSpareTruckInfo_er = "";
   errorsSpareTruckInfo.value.leaveYardSpareTruckInfo_er = "";
   errorsSpareTruckInfo.value.backInYardSpareTruckInfo_er = "";
-  errorsSpareTruckInfo.value.startMilesSpareTruckInfo_er = "";
-  errorsSpareTruckInfo.value.endMilesSpareTruckInfo_er = "";
   errorsSpareTruckInfo.value.fuelSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.dieselExhaustFluidSpareTruckInfo_er = "";
+
+  errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.truckStartMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.truckEndMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.truckStartHoursSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.truckEndHoursSpareTruckInfo_er = "";
+
+  errorsSpareTruckInfo.value.spareTrailerSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.trailerStartMilesSpareTruckInfo_er = "";
+  errorsSpareTruckInfo.value.trailerEndMilesSpareTruckInfo_er = "";
 
   let hasError = false;
 
-  if (!spareTruckSpareTruckInfo.value) {
-    errorsSpareTruckInfo.value.spareTruckSpareTruckInfo_er = "Required field";
+  if (!selectedHomeBaseSpareTruckInfo .value) {
+    errorsSpareTruckInfo.value.homebaseSpareTruckInfo_er = "Required field";
     hasError = true;
   }
 
-  if (!selectedRouteSpareTruckInfo.value) {
-    errorsSpareTruckInfo.value.routeSpareTruckInfo_er = "Required field";
-    hasError = true;
-  }
 
-  if (!startMilesSpareTruckInfo.value) {
-    errorsSpareTruckInfo.value.startMilesSpareTruckInfo_er = "Required field";
-    hasError = true;
-  }
 
   if (hasError) {
     return;
@@ -1514,7 +1530,7 @@ const getDenverTimeAsUTCISOString = () => {
                     <h2 class="accordion-header">
                       <button class="accordion-button" type="button" data-bs-toggle="collapse"
                         data-bs-target="#bordered_collapseOne">
-                        Spare Truck Info
+                        Spare
                       </button>
                     </h2>
 
@@ -1527,62 +1543,17 @@ const getDenverTimeAsUTCISOString = () => {
 
                         <div class="row">
 
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Spare # </label>
-                            <input type="text" v-model="spareTruckSpareTruckInfo"
-                              class="form-control form-control-sm border border-primary" />
-                            <small v-if="
-                              errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
-                            " class="text-danger">{{
-                              errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
-                            }}</small>
-                          </div>
-
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Route #</label>
-                            <v-select :options="storeRoute.routes" v-model="selectedRouteSpareTruckInfo"
-                              placeholder="Choose your Route" :reduce="(route) => route.id" label="routeName"
-                              class="form-control p-0" :class="{
-                                'is-invalid': formSubmitted && !selectedRoute,
-                              }" />
-                            <small v-if="errorsSpareTruckInfo.routeSpareTruckInfo_er" class="text-danger">{{
-                              errorsSpareTruckInfo.routeSpareTruckInfo_er
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">HomeBase</label>
+                            <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseSpareTruckInfo"
+                              placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id" label="homeBaseName"
+                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseSpareTruckInfo }" />
+                            <small v-if="errorsSpareTruckInfo.homebaseSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.homebaseSpareTruckInfo_er
                               }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Start Miles</label>
-                            <input type="number" step="any" v-model="startMilesSpareTruckInfo"
-                              class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.startMilesSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.startMilesSpareTruckInfo_er }}</small>
-                          </div>
-
-
-
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">End Miles</label>
-                            <input type="number" step="any" v-model="endMilesSpareTruckInfo"
-                              class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.endMilesSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.endMilesSpareTruckInfo_er }}</small>
-                          </div>
-
-
-                        </div>
-
-                        <div class="row">
-
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Fuel</label>
-                            <input type="number" step="any" v-model="fuelSpareTruckInfo"
-                              class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.fuelSpareTruckInfo_er }}</small>
-                          </div>
-
-
-                          <div class="mb-3 col-md-3">
+                          <div class="mb-3 col-md-2">
                             <label class="form-label">Leave Yard</label>
                             <div class="mt-0">
                               <VueDatePicker v-model="timeLeaveYardSpareTruckInfo" time-picker
@@ -1599,7 +1570,7 @@ const getDenverTimeAsUTCISOString = () => {
                             }}</small>
                           </div>
 
-                          <div class="mb-3 col-md-3">
+                          <div class="mb-3 col-md-2">
                             <label class="form-label">Back In Yard</label>
                             <div class="mt-0">
                               <VueDatePicker v-model="timeBackInYardSpareTruckInfo" time-picker
@@ -1616,9 +1587,71 @@ const getDenverTimeAsUTCISOString = () => {
                             }}</small>
                           </div>
 
-                          <div class="mb-4 col-md-3 align-self-end">
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Fuel</label>
+                            <input type="number" step="any" v-model="fuelSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.fuelSpareTruckInfo_er }}</small>
+                          </div>
 
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">DEF</label>
+                            <input type="number" step="any" v-model="dieselExhaustFluidSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.dieselExhaustFluidSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.dieselExhaustFluidSpareTruckInfo_er }}</small>
+                          </div>
 
+         
+                        </div>
+
+                        <div class="row">
+
+                        <div class="mb-3 col-md-2">
+                          <label class="form-label">Spare Truck #</label>
+                          <v-select :options="storeTruck.trucks" v-model="selectedTruckSpareTruckInfo" placeholder="Choose your Truck"
+                            :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
+                            :class="{ 'is-invalid': formSubmitted && !selectedTruckSpareTruckInfo }" />
+                          <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{
+                            errors.spareTruckSpareTruckInfo_er
+                            }}</small>
+                        </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Truck Start Miles</label>
+                            <input type="number" step="any" v-model="truckStartMilesSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.truckStartMilesSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.truckStartMilesSpareTruckInfo_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Truck End Miles</label>
+                            <input type="number" step="any" v-model="truckEndMilesSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.truckEndMilesSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.truckEndMilesSpareTruckInfo_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Truck Start Hours</label>
+                            <input type="number" step="any" v-model="truckStartHoursSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.truckStartHoursSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.truckStartHoursSpareTruckInfo_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Truck End Hours</label>
+                            <input type="number" step="any" v-model="truckEndHoursSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.truckEndHoursSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.truckEndHoursSpareTruckInfo_er }}</small>
+                          </div>
+
+                  
+                          <!-- <div class="mb-4 col-md-3 align-self-end">
                             <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;"
                               @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
                               {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
@@ -1626,10 +1659,53 @@ const getDenverTimeAsUTCISOString = () => {
                                 <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
                               </span>
                             </button>
+                          </div> -->
 
 
 
+                        </div>
+
+                        <div class="row"> 
+
+                        <div class="mb-3 col-md-2">
+                          <label class="form-label">Spare Trailer #</label>
+                          <v-select :options="storeTrailer.trailers" v-model="selectedTrailerSpareTruckInfo" placeholder="Choose your Truck"
+                            :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
+                            :class="{ 'is-invalid': formSubmitted && !selectedTrailerSpareTruckInfo }" />
+                          <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
+                            errors.spareTrailerSpareTruckInfo_er
+                            }}</small>
+                        </div>
+
+              
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Trailer Start Miles</label>
+                            <input type="number" step="any" v-model="trailerStartMilesSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.trailerStartMilesSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.trailerStartMilesSpareTruckInfo_er }}</small>
                           </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Trailer End Miles</label>
+                            <input type="number" step="any" v-model="trailerEndMilesSpareTruckInfo"
+                              class="form-control form-control-lg border border-primary" style="color: black;" />
+                            <small v-if="errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er"
+                              class="text-danger">{{ errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er }}</small>
+                          </div>
+
+                          <div class="mb-4 col-md-3 align-self-end">
+                            <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;"
+                              @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
+                              {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
+                              <span class="btn-icon-end">
+                                <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
+                              </span>
+                            </button>
+                          </div>
+                        
+                        
                         </div>
 
                         <div class="row">
@@ -1640,28 +1716,25 @@ const getDenverTimeAsUTCISOString = () => {
                               <thead class="thead-primary">
                                 <tr>
                                   <!-- <th style="width:50px;"></th> -->
-                                  <th>Spare #</th>
-                                  <th>Route #</th>
-                                  <th>Start Miles</th>
-                                  <th>End Miles</th>
-                                  <th>Fuel</th>
+                                  <th>HomeBase</th>
+                                  <th>Spare Truck</th>
+                                  <th>Spare Trailer</th>
                                   <th>Leave Yard</th>
-                                  <th>Back in Yard</th>
-                                  <th>Action</th>
+                                  <th>Back In Yard</th>
+                                  <th>Fuel</th>
+                                  <th>DEF</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 <tr v-for="(item, index) in spareTruckList" :key="index">
                                   <!-- <td></td> -->
-                                  <td class="td">
-                                    {{ item.spareTruckNumber }}
-                                  </td>
-                                  <td class="td">{{ item.routeName }}</td>
-                                  <td class="td">{{ item.startMiles }}</td>
-                                  <td class="td">{{ item.endMiles }}</td>
-                                  <td class="td">{{ item.fuel }}</td>
-                                  <td class="td">{{ item.leaveYard }}</td>
-                                  <td class="td">{{ item.backInYard }}</td>
+                                  <td class="td">{{ item.homeBaseName }}</td>
+                                  <td class="td">{{ item.truckNumber }}</td>
+                                  <td class="td">{{ item.trailerNumber }}</td>
+                                  <td class="td">{{ item.timeLeaveYardSpareTruckInfo }}</td>
+                                  <td class="td">{{ item.timeBackInYardSpareTruckInfo }}</td>
+                                  <td class="td">{{ item.fuelSpareTruckInfo }}</td>
+                                  <td class="td">{{ item.dieselExhaustFluidSpareTruckInfo }}</td>
                                   <td>
                                     <div>
                                       <a @click="EditSpareTruckInfo(item)"

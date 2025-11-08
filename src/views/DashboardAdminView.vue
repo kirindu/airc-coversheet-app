@@ -372,7 +372,7 @@ onMounted(() => {
               </span>
             </button>
 
-            <button
+            <!-- <button
               style="margin-bottom: -5px !important; margin-left: 15px"
               @click="openNewCoverSheetModal"
               type="button"
@@ -382,7 +382,9 @@ onMounted(() => {
               <span class="btn-icon-end">
                 <i class="fa fa-table"></i>
               </span>
-            </button>
+            </button> -->
+
+            
           </div>
         </div>
       </div>
