@@ -86,12 +86,6 @@ const formSubmitted = ref(false);
 const isVisibleAcordion = ref(false);
 
 const errors = ref({
-  route_er: "", // Considerar su borrado
-  leaveYard_er: "",// Considerar su borrado
-  backInYard_er: "",// Considerar su borrado
-  startMiles_er: "",// Considerar su borrado
-  endMiles_er: "",// Considerar su borrado
-
 
   homebase_er: "",
   truck_er: "",
@@ -354,6 +348,8 @@ onMounted(() => {
   //   active: true,
   //   createdAt: "2025-04-18T19:33:13.043000"
   // };
+
+
 });
 
 // Metodos
@@ -674,16 +670,25 @@ const HandleSpareTruckInfo = async (event) => {
     JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
   const spareTruckInfo = {
-    spareTruckNumber: spareTruckSpareTruckInfo.value,
-    route_id: selectedRouteSpareTruckInfo.value,
 
-    leaveYard: formatTime(timeLeaveYardSpareTruckInfo.value) || "",
-    backInYard: formatTime(timeBackInYardSpareTruckInfo.value) || "",
+    homebase_id: selectedHomeBaseSpareTruckInfo.value,
+    timeLeaveYardSpareTruckInfo: formatTime(timeLeaveYardSpareTruckInfo.value) || "",
+    timeBackInYardSpareTruckInfo: formatTime(timeBackInYardSpareTruckInfo.value) || "",
+    fuelSpareTruckInfo: fuelSpareTruckInfo.value.toString() || "",
+    dieselExhaustFluidSpareTruckInfo: dieselExhaustFluidSpareTruckInfo.value.toString() || "",
 
-    startMiles: startMilesSpareTruckInfo.value.toString() || "",
-    endMiles: endMilesSpareTruckInfo.value.toString() || "",
-    fuel: fuelSpareTruckInfo.value.toString() || "",
+    truck_id: selectedTruckSpareTruckInfo.value,
+    truckStartMilesSpareTruckInfo: truckStartMilesSpareTruckInfo.value.toString() || "",
+    truckEndMilesSpareTruckInfo: truckEndMilesSpareTruckInfo.value.toString() || "",
+    truckStartHoursSpareTruckInfo: truckStartHoursSpareTruckInfo.value.toString() || "",
+    truckEndHoursSpareTruckInfo: truckEndHoursSpareTruckInfo.value.toString() || "",
+
+    trailer_id: selectedTrailerSpareTruckInfo.value,
+    trailerStartMilesSpareTruckInfo: trailerStartMilesSpareTruckInfo.value.toString() || "",
+    trailerEndMilesSpareTruckInfo: trailerEndMilesSpareTruckInfo.value.toString() || "",
+
     coversheet_id: coversheet_id,
+
   };
 
   try {
@@ -1613,9 +1618,11 @@ const getDenverTimeAsUTCISOString = () => {
                           <v-select :options="storeTruck.trucks" v-model="selectedTruckSpareTruckInfo" placeholder="Choose your Truck"
                             :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
                             :class="{ 'is-invalid': formSubmitted && !selectedTruckSpareTruckInfo }" />
-                          <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{
-                            errors.spareTruckSpareTruckInfo_er
-                            }}</small>
+
+                          <!-- <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{
+                            errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
+                            }}</small> -->
+
                         </div>
 
                           <div class="mb-3 col-md-2">
@@ -1670,11 +1677,13 @@ const getDenverTimeAsUTCISOString = () => {
                         <div class="mb-3 col-md-2">
                           <label class="form-label">Spare Trailer #</label>
                           <v-select :options="storeTrailer.trailers" v-model="selectedTrailerSpareTruckInfo" placeholder="Choose your Truck"
-                            :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
+                            :reduce="(trailer) => trailer.id" label="trailerNumber" class="form-control p-0"
                             :class="{ 'is-invalid': formSubmitted && !selectedTrailerSpareTruckInfo }" />
-                          <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
+
+                          <!-- <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
                             errors.spareTrailerSpareTruckInfo_er
-                            }}</small>
+                            }}</small> -->
+
                         </div>
 
               
