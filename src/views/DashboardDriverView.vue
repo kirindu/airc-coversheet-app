@@ -462,9 +462,7 @@ const onSubmit = async (event) => {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
 
-        // selectedRouteSpareTruckInfo.value = coversheet.route_id;
         selectedTruckDowntime.value = coversheet.truck_id;
-        // selectedRouteLoad.value = coversheet.route_id;
 
         isEditModeCoverShet.value = true;
 
@@ -1020,17 +1018,22 @@ const HandleLoad = async (event) => {
 
 
 const EditSpareTruckInfo = (item) => {
-  // Populate the form with the selected Spare Truck Info
-  spareTruckSpareTruckInfo.value = item.spareTruckNumber;
-  selectedRouteSpareTruckInfo.value = item.route_id;
 
-  timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.leaveYard);
+selectedHomeBaseSpareTruckInfo.value = item.homebase_id;
+timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.timeLeaveYardSpareTruckInfo);
+timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.timeBackInYardSpareTruckInfo);
+fuelSpareTruckInfo.value = item.fuelSpareTruckInfo;
+dieselExhaustFluidSpareTruckInfo.value = item.dieselExhaustFluidSpareTruckInfo;
 
-  timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.backInYard);
+selectedTruckSpareTruckInfo.value = item.truck_id;
+truckStartMilesSpareTruckInfo.value = item.truckStartMilesSpareTruckInfo;
+truckEndMilesSpareTruckInfo.value = item.truckEndMilesSpareTruckInfo;
+truckStartHoursSpareTruckInfo.value = item.truckStartHoursSpareTruckInfo;
+truckEndHoursSpareTruckInfo.value = item.truckEndHoursSpareTruckInfo;
 
-  startMilesSpareTruckInfo.value = item.startMiles;
-  endMilesSpareTruckInfo.value = item.endMiles;
-  fuelSpareTruckInfo.value = item.fuel;
+selectedTrailerSpareTruckInfo.value = item.trailer_id;
+trailerStartMilesSpareTruckInfo.value = item.trailerStartMilesSpareTruckInfo;
+trailerEndMilesSpareTruckInfo.value = item.trailerEndMilesSpareTruckInfo;
 
   // Set editing mode
   isEditingSpareTruckInfo.value = true;
@@ -1616,8 +1619,7 @@ const getDenverTimeAsUTCISOString = () => {
                         <div class="mb-3 col-md-2">
                           <label class="form-label">Spare Truck #</label>
                           <v-select :options="storeTruck.trucks" v-model="selectedTruckSpareTruckInfo" placeholder="Choose your Truck"
-                            :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
-                            :class="{ 'is-invalid': formSubmitted && !selectedTruckSpareTruckInfo }" />
+                            :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"/>
 
                           <!-- <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{
                             errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
@@ -1677,8 +1679,7 @@ const getDenverTimeAsUTCISOString = () => {
                         <div class="mb-3 col-md-2">
                           <label class="form-label">Spare Trailer #</label>
                           <v-select :options="storeTrailer.trailers" v-model="selectedTrailerSpareTruckInfo" placeholder="Choose your Truck"
-                            :reduce="(trailer) => trailer.id" label="trailerNumber" class="form-control p-0"
-                            :class="{ 'is-invalid': formSubmitted && !selectedTrailerSpareTruckInfo }" />
+                            :reduce="(trailer) => trailer.id" label="trailerNumber" class="form-control p-0"/>
 
                           <!-- <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
                             errors.spareTrailerSpareTruckInfo_er
@@ -1732,6 +1733,7 @@ const getDenverTimeAsUTCISOString = () => {
                                   <th>Back In Yard</th>
                                   <th>Fuel</th>
                                   <th>DEF</th>
+                                  <th>Actions</th>
                                 </tr>
                               </thead>
                               <tbody>
