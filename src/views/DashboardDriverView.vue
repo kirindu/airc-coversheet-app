@@ -175,18 +175,34 @@ const downtimeList = ref([]);
 const isEditingDowntime = ref(false); // To track if we are editing a downtime record
 const selectedDowntimeId = ref(null); // To store the ID of the downtime being edited
 
-const selectedTruckDowntime = ref("");
-const timeStartTimeDowntime = ref("");
-const timeEndTimeDowntime = ref("");
-const downtimeReasonDowntime = ref("");
+
+const selectedTruckDownTime = ref("");
+const selectedTrailerDownTime = ref("");
+
+const selectedTypeTruckDownTime = ref("");
+const selectedTypeTrailerDownTime = ref("");
+
+const truckDownTimeStartDownTime = ref("");
+const truckDownTimeEndDownTime = ref("");
+const trailerDownTimeStartDownTime = ref("");
+const trailerDownTimeEndDownTime = ref("");
+const downTimeReasonDownTime = ref("");
+
 
 const isLoadingDowntime = ref(false); // To show loading spinner when fetching downtime info
 
+
+
 const errorsDowntime = ref({
-  selectedTruckDowntime_er: "",
-  timeStartTimeDowntime_er: "",
-  timeEndTimeDowntime_er: "",
-  downtimeReasonDowntime_er: "",
+  selectedTruckDownTime_er: "",
+  selectedTrailerDownTime_er: "",
+  selectedTypeTruckDownTime_er: "",
+  selectedTypeTrailerDownTime_er: "",
+  truckDownTimeStartDownTime_er: "",
+  truckDownTimeEndDownTime_er: "",
+  trailerDownTimeStartDownTime_er: "",
+  trailerDownTimeEndDownTime_er: "",
+  downTimeReasonDownTime_er: "",
 });
 
 
@@ -297,13 +313,6 @@ onMounted(() => {
       isEditModeCoverShet.value = true;
       const coversheet = JSON.parse(localStorage.getItem("COVERSHEET")); // Cargamos los datos del coversheet previamente guardado
 
-      // timeLeaveYard.value = setTimeFromDB(coversheet.leaveYard);
-      // timeBackInYard.value = setTimeFromDB(coversheet.backInYard);
-      // startMiles.value = coversheet.startMiles;
-      // endMiles.value = coversheet.endMiles;
-      // selectedRoute.value = coversheet.route_id;
-      // selectedRouteSpareTruckInfo.value = coversheet.route_id;
-      // selectedRouteLoad.value = coversheet.route_id;
 
       selectedHomeBase.value = coversheet.homebase_id;
       selectedTruck.value = coversheet.truck_id;
@@ -330,7 +339,8 @@ onMounted(() => {
       
 
 
-      selectedTruckDowntime.value = coversheet.truck_id;
+      selectedTruckDownTime.value = coversheet.truck_id;
+      selectedTrailerDownTime.value = coversheet.trailer_id;
       
 
       handleVisibleAcordion();
@@ -391,11 +401,6 @@ const onSubmit = async (event) => {
 
   let hasError = false;
 
-  // if (!selectedRoute.value) {
-  //   errors.value.route_er = "Required field";
-  //   hasError = true;
-  // }
-
   if (!selectedHomeBase.value) {
     errors.value.homebase_er = "Required field";
     hasError = true;
@@ -441,14 +446,6 @@ const onSubmit = async (event) => {
     fuel: fuel.value.toString() || "",
     dieselExhaustFluid: dieselExhaustFluid.value.toString() || "",
 
-
-    // leaveYard: formatTime(timeLeaveYard.value) || "",
-    // backInYard: formatTime(timeBackInYard.value) || "",
-    // startMiles: startMiles.value.toString() || "",
-    // endMiles: endMiles.value.toString() || "",
-    // route_id: selectedRoute.value,
-
-    
     driver_id: user.value.id,
     notes: notes.value,
     date: getDenverTimeAsUTCISOString(),
@@ -462,7 +459,8 @@ const onSubmit = async (event) => {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
 
-        selectedTruckDowntime.value = coversheet.truck_id;
+        selectedTruckDownTime.value = coversheet.truck_id;
+        selectedTrailerDownTime.value = coversheet.trailer_id;
 
         isEditModeCoverShet.value = true;
 
@@ -497,9 +495,8 @@ const onSubmit = async (event) => {
         localStorage.setItem("COVERSHEET", JSON.stringify(response.data.data));
         const coversheet = JSON.parse(localStorage.getItem("COVERSHEET"));
 
-        // selectedRouteSpareTruckInfo.value = coversheet.route_id;
-        selectedTruckDowntime.value = coversheet.truck_id;
-        // selectedRouteLoad.value = coversheet.route_id;
+        selectedTruckDownTime.value = coversheet.truck_id;
+        selectedTrailerDownTime.value = coversheet.trailer_id;
 
         showSweetAlert({
           title: "General information edited successfully!",
@@ -599,12 +596,18 @@ const resetSpareTruckInfo = () => {
 
 const resetDowntime = () => {
 
-  timeStartTimeDowntime.value = "";
-  timeEndTimeDowntime.value = "";
-  downtimeReasonDowntime.value = "";
+  selectedTruckDownTime.value = "";
+  selectedTrailerDownTime.value = "";
+  selectedTypeTruckDownTime.value = "";
+  selectedTypeTrailerDownTime.value = "";
+
+  truckDownTimeStartDownTime.value = "";
+  truckDownTimeEndDownTime.value = "";
+  trailerDownTimeStartDownTime.value = "";
+  trailerDownTimeEndDownTime.value = "";
+  downTimeReasonDownTime.value = "";
 
   selectedDowntimeId.value = null;
-
   isEditingDowntime.value = false;
 
 };
@@ -664,8 +667,7 @@ const HandleSpareTruckInfo = async (event) => {
     return;
   }
 
-  let coversheet_id =
-    JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
+  let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
   const spareTruckInfo = {
 
@@ -773,23 +775,24 @@ const HandleDowntime = async (event) => {
 
   // Limpiar errores anteriores
 
-  errorsDowntime.value.selectedTruckDowntime_er = "";
-  errorsDowntime.value.timeStartTimeDowntime_er = "";
-  errorsDowntime.value.timeEndTimeDowntime_er = "";
-  errorsDowntime.value.downtimeReasonDowntime_er = "";
+  errorsDowntime.value.selectedTruckDownTime_er = "";
+  errorsDowntime.value.selectedTrailerDownTime_er = "";
+  errorsDowntime.value.selectedTypeTruckDownTime_er = "";
+  errorsDowntime.value.selectedTypeTrailerDownTime_er = "";
+  errorsDowntime.value.truckDownTimeStartDownTime_er = "";
+  errorsDowntime.value.truckDownTimeEndDownTime_er = "";
+  errorsDowntime.value.trailerDownTimeStartDownTime_er = "";
+  errorsDowntime.value.trailerDownTimeEndDownTime_er = "";
+  errorsDowntime.value.downTimeReasonDownTime_er = "";
 
 
   let hasError = false;
 
-  if (!selectedTruckDowntime.value) {
-    errorsDowntime.value.selectedTruckDowntime_er = "Required field";
-    hasError = true;
-  }
+  // if (!selectedTruckDownTime.value) {
+  //   errorsDowntime.value.selectedTruckDownTime_er = "Required field";
+  //   hasError = true;
+  // }
 
-  if (!timeStartTimeDowntime.value) {
-    errorsDowntime.value.timeStartTimeDowntime_er = "Required field";
-    hasError = true;
-  }
 
   if (hasError) {
     return;
@@ -798,10 +801,17 @@ const HandleDowntime = async (event) => {
   let coversheet_id = JSON.parse(localStorage.getItem("COVERSHEET"))?.id || null;
 
   const downtime = {
-    truck_id: selectedTruckDowntime.value,
-    startTime: formatTime(timeStartTimeDowntime.value),
-    endTime: formatTime(timeEndTimeDowntime.value) || "",
-    downtimeReason: downtimeReasonDowntime.value || "",
+    truck_id: selectedTruckDownTime.value,
+    trailer_id: selectedTrailerDownTime.value,
+    typeTruckDownTime_id: selectedTypeTruckDownTime.value || "",
+    typeTrailerDownTime_id: selectedTypeTrailerDownTime.value || "",
+
+    truckDownTimeStartDownTime: formatTime(truckDownTimeStartDownTime.value) || "",
+    truckDownTimeEndDownTime: formatTime(truckDownTimeEndDownTime.value) || "",
+    trailerDownTimeStartDownTime: formatTime(trailerDownTimeStartDownTime.value) || "",
+    trailerDownTimeEndDownTime: formatTime(trailerDownTimeEndDownTime.value) || "",
+    downTimeReasonDownTime: downTimeReasonDownTime.value || "",
+
     coversheet_id: coversheet_id,
   };
 
@@ -1042,10 +1052,16 @@ trailerEndMilesSpareTruckInfo.value = item.trailerEndMilesSpareTruckInfo;
 
 const EditDowntime = (item) => {
 
-  selectedTruckDowntime.value = item.truck_id;
-  timeStartTimeDowntime.value = setTimeFromDB(item.startTime);
-  timeEndTimeDowntime.value = setTimeFromDB(item.endTime);
-  downtimeReasonDowntime.value = item.downtimeReason;
+  selectedTruckDownTime.value = item.truck_id;
+  selectedTrailerDownTime.value = item.trailer_id;
+  selectedTypeTruckDownTime.value = item.typeTruckDownTime_id || "";
+  selectedTypeTrailerDownTime.value = item.typeTrailerDownTime_id || "";
+  truckDownTimeStartDownTime.value = setTimeFromDB(item.truckDownTimeStartDownTime);
+  truckDownTimeEndDownTime.value = setTimeFromDB(item.truckDownTimeEndDownTime);
+  trailerDownTimeStartDownTime.value = setTimeFromDB(item.trailerDownTimeStartDownTime);
+  trailerDownTimeEndDownTime.value = setTimeFromDB(item.trailerDownTimeEndDownTime);
+  downTimeReasonDownTime.value = item.downTimeReasonDownTime || ""; 
+
 
   // Set editing mode
   isEditingDowntime.value = true;
@@ -1785,22 +1801,23 @@ const getDenverTimeAsUTCISOString = () => {
                               placeholder="Choose your Truck" :reduce="(truck) => truck.id" label="truckNumber"
                               class="form-control p-0"
                               :class="{ 'is-invalid': formSubmitted && !selectedTruckDowntime }" />
-                            <small v-if="errorsDowntime.selectedTruckDowntime_er"
-                              class="text-danger">{{ errorsDowntime.selectedTruckDowntime_er }}</small>
+                            <small v-if="errorsDowntime.selectedTruckDownTime_er"
+                              class="text-danger">{{ errorsDowntime.selectedTruckDownTime_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-3">
-                            <label class="form-label">Start Time</label>
+                            <label class="form-label">Truck Downtime Start</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="timeStartTimeDowntime" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="truckDownTimeStartDownTime" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsDowntime.timeStartTimeDowntime_er"
-                              class="text-danger">{{ errorsDowntime.timeStartTimeDowntime_er }}</small>
+                            <small v-if="errorsDowntime.truckDownTimeStartDownTime_er"
+                              class="text-danger">{{ errorsDowntime.truckDownTimeStartDownTime_er }}</small>
                           </div>
+                          
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">End Time</label>
