@@ -43,6 +43,8 @@ const storeTruck = useTrucksStore();
 import { useTrailersStore } from "@/stores/trailers.js";
 const storeTrailer = useTrailersStore();
 
+import { useTypeDownTimeStore } from "@/stores/typeDowntime.js";
+const storeTypeDowntime = useTypeDownTimeStore();
 
 const user = ref(null);
 
@@ -1793,14 +1795,12 @@ const getDenverTimeAsUTCISOString = () => {
 
                         <div class="row">
 
-
-
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Truck #</label>
-                            <v-select :options="storeTruck.trucks" v-model="selectedTruckDowntime"
+                            <v-select :options="storeTruck.trucks" v-model="selectedTruckDownTime"
                               placeholder="Choose your Truck" :reduce="(truck) => truck.id" label="truckNumber"
                               class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedTruckDowntime }" />
+                              :class="{ 'is-invalid': formSubmitted && !selectedTruckDownTime }" />
                             <small v-if="errorsDowntime.selectedTruckDownTime_er"
                               class="text-danger">{{ errorsDowntime.selectedTruckDownTime_er }}</small>
                           </div>
@@ -1817,22 +1817,83 @@ const getDenverTimeAsUTCISOString = () => {
                             <small v-if="errorsDowntime.truckDownTimeStartDownTime_er"
                               class="text-danger">{{ errorsDowntime.truckDownTimeStartDownTime_er }}</small>
                           </div>
-                          
+
 
                           <div class="mb-3 col-md-3">
-                            <label class="form-label">End Time</label>
+                            <label class="form-label">Truck Downtime End</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="timeEndTimeDowntime" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="truckDownTimeEndDownTime" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsDowntime.timeEndTimeDowntime_er"
-                              class="text-danger">{{ errorsDowntime.timeEndTimeDowntime_er }}</small>
+                            <small v-if="errorsDowntime.truckDownTimeEndDownTime_er"
+                              class="text-danger">{{ errorsDowntime.truckDownTimeEndDownTime_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Type</label>
+                            <v-select :options="storeTypeDowntime.typeDownTimes" v-model="selectedTypeTruckDownTime"
+                              placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id" label="typeDownTimeName"
+                              class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedTypeTruckDownTime }" />
+                            <small v-if="errorsDowntime.selectedTypeTruckDownTime_er"
+                              class="text-danger">{{ errorsDowntime.selectedTypeTruckDownTime_er }}</small>
+                          </div>
+                          
+
+                        </div>
+
+                        <div class="row">
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Trailer #</label>
+                            <v-select :options="storeTrailer.trailers" v-model="selectedTrailerDownTime"
+                              placeholder="Choose your Trailer" :reduce="(trailer) => trailer.id" label="trailerNumber"
+                              class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedTrailerDownTime }" />
+                            <small v-if="errorsDowntime.selectedTrailerDownTime_er"
+                              class="text-danger">{{ errorsDowntime.selectedTrailerDownTime_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Trailer Downtime Start</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="trailerDownTimeStartDownTime" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsDowntime.trailerDownTimeStartDownTime_er"
+                              class="text-danger">{{ errorsDowntime.trailerDownTimeStartDownTime_er }}</small>
                           </div>
 
 
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Trailer Downtime End</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="trailerDownTimeEndDownTime" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsDowntime.trailerDownTimeEndDownTime_er"
+                              class="text-danger">{{ errorsDowntime.trailerDownTimeEndDownTime_er }}</small>
+                          </div>
+
+           
+                          <div class="mb-3 col-md-3">
+                            <label class="form-label">Type</label>
+                            <v-select :options="storeTypeDowntime.typeDownTimes" v-model="selectedTypeTrailerDownTime"
+                              placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id" label="typeDownTimeName"
+                              class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedTypeTrailerDownTime }" />
+                            <small v-if="errorsDowntime.selectedTypeTrailerDownTime_er"
+                              class="text-danger">{{ errorsDowntime.selectedTypeTrailerDownTime_er }}</small>
+                          </div>
+                          
 
                         </div>
 
@@ -1848,10 +1909,10 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-9">
                             <label class="form-label">Downtime Reason</label>
-                            <input type="text" v-model="downtimeReasonDowntime"
+                            <input type="text" v-model="downTimeReasonDownTime"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsDowntime.downtimeReasonDowntime_er"
-                              class="text-danger">{{ errorsDowntime.downtimeReasonDowntime_er }}</small>
+                            <small v-if="errorsDowntime.downTimeReasonDownTime_er"
+                              class="text-danger">{{ errorsDowntime.downTimeReasonDownTime_er }}</small>
                           </div>
 
                           <div class="mb-4 col-md-3 align-self-end">
@@ -1887,9 +1948,11 @@ const getDenverTimeAsUTCISOString = () => {
                                 <tr>
                                   <!-- <th style="width:50px;"></th> -->
                                   <th>Truck #</th>
-                                  <th>Start Time #</th>
-                                  <th>End Time</th>
-                                  <th>Dowtime Reason</th>
+                                  <th>Truck Downtime Start</th>
+                                  <th>Truck Downtime End</th>
+                                  <th>Trailer #</th>
+                                  <th>Trailer Downtime Start</th>
+                                  <th>Trailer Downtime End</th>
                                   <th>Action</th>
                                 </tr>
                               </thead>
@@ -1897,9 +1960,11 @@ const getDenverTimeAsUTCISOString = () => {
                                 <tr v-for="(item, index) in downtimeList" :key="index">
                                   <!-- <td></td> -->
                                   <td class="td">{{ item.truckNumber }}</td>
-                                  <td class="td">{{ item.startTime }}</td>
-                                  <td class="td">{{ item.endTime }}</td>
-                                  <td class="td">{{ item.downtimeReason }}</td>
+                                  <td class="td">{{ item.truckDownTimeStartDownTime }}</td>
+                                  <td class="td">{{ item.truckDownTimeEndDownTime }}</td>
+                                  <td class="td">{{ item.trailerNumber }}</td>
+                                  <td class="td">{{ item.trailerDownTimeStartDownTime }}</td>
+                                  <td class="td">{{ item.trailerDownTimeEndDownTime }}</td>
                                   <td>
                                     <div>
                                       <a @click="EditDowntime(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i
