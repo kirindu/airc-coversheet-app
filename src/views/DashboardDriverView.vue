@@ -1357,7 +1357,7 @@ const getDenverTimeAsUTCISOString = () => {
                 </div>
 
                        <div class="mb-3 col-md-6">
-                  <label class="form-label">Trainee/Trainer</label>
+                  <label class="form-label">Trainee (or Trainer)</label>
                   <input type="text" v-model="trainee" class="form-control form-control-lg border border-primary"
                     style="color: black;" />
                   <small v-if="errors.trainee_er" class="text-danger">{{ errors.trainee_er }}</small>
