@@ -65,6 +65,8 @@ const selectedTrailer = ref("");
 
 const timeClockIn = ref("");
 const timeClockOut = ref("");
+const timeClockInTrainee = ref("");
+const timeClockOutTrainee = ref("");
 const trainee = ref("");
 
 const timePreTripStart = ref("");
@@ -94,6 +96,8 @@ const errors = ref({
   trailer_er: "",
   clockIn_er: "",
   clockOut_er: "",
+  clockInTrainee_er: "",
+  clockOutTrainee_er: "",
   trainee_er: "",
   preTripStart_er: "",
   preTripEnd_er: "",
@@ -322,6 +326,8 @@ onMounted(() => {
 
       timeClockIn.value = setTimeFromDB(coversheet.clockIn);
       timeClockOut.value = setTimeFromDB(coversheet.clockOut);
+      timeClockInTrainee.value = setTimeFromDB(coversheet.clockInTrainee);
+      timeClockOutTrainee.value = setTimeFromDB(coversheet.clockOutTrainee);
       trainee.value = coversheet.trainee;
       timePreTripStart.value = setTimeFromDB(coversheet.timePreTripStart);
       timePreTripEnd.value = setTimeFromDB(coversheet.timePreTripEnd);
@@ -384,6 +390,8 @@ const onSubmit = async (event) => {
   errors.value.trailer_er = "";
   errors.value.clockIn_er = "";
   errors.value.clockOut_er = "";
+  errors.value.clockInTrainee_er = "";
+  errors.value.clockOutTrainee_er = "";
   errors.value.trainee_er = "";
   errors.value.preTripStart_er = "";
   errors.value.preTripEnd_er = "";
@@ -423,6 +431,18 @@ const onSubmit = async (event) => {
     hasError = true;
   }
 
+  // if (!timeClockInTrainee.value) {
+  //   errors.value.clockInTrainee_er = "Required field";
+  //   hasError = true;
+  // }
+
+  //   if (!timeClockOutTrainee.value) {
+  //   errors.value.clockOutTrainee_er = "Required field";
+  //   hasError = true;
+  // }
+
+
+
   if (hasError) {
     return;
   }
@@ -434,6 +454,8 @@ const onSubmit = async (event) => {
     trailer_id: selectedTrailer.value,
     clockIn: formatTime(timeClockIn.value),
     clockOut: formatTime(timeClockOut.value) || "",
+    clockInTrainee: formatTime(timeClockInTrainee.value) || "",
+    clockOutTrainee: formatTime(timeClockOutTrainee.value) || "",
     trainee: trainee.value.toString() || "",
     timePreTripStart: formatTime(timePreTripStart.value) || "",
     timePreTripEnd: formatTime(timePreTripEnd.value) || "",
@@ -546,6 +568,8 @@ const resetForm = () => {
   selectedTrailer.value = "";
   timeClockIn.value = "";
   timeClockOut.value = "";
+  timeClockInTrainee.value = "";
+  timeClockOutTrainee.value = "";
   trainee.value = "";
   timePreTripStart.value = "";
   timePreTripEnd.value = "";
@@ -1296,7 +1320,7 @@ const getDenverTimeAsUTCISOString = () => {
                     }}</small>
                 </div>
 
-                <div class="mb-3 col-md-3">
+                <div class="mb-3 col-md-2">
                   <label class="form-label">Truck #</label>
                   <v-select :options="storeTruck.trucks" v-model="selectedTruck" placeholder="Choose your Truck"
                     :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"
@@ -1306,7 +1330,7 @@ const getDenverTimeAsUTCISOString = () => {
                     }}</small>
                 </div>
 
-                <div class="mb-3 col-md-3">
+                <div class="mb-3 col-md-2">
                   <label class="form-label">Trailer #</label>
                   <v-select :options="storeTrailer.trailers" v-model="selectedTrailer" placeholder="Choose your Trailer"
                     :reduce="(trailer) => trailer.id" label="trailerNumber" class="form-control p-0"
@@ -1316,22 +1340,23 @@ const getDenverTimeAsUTCISOString = () => {
                     }}</small>
                 </div>
 
-                <div class="mb-3 col-md-3">
-                  <label class="form-label">Current Date</label>
-                  <div class="mt-2">
-                    <label class="form-label" style="color: brown">
-                      {{ currentDate }}
-                    </label>
-                  </div>
+                <div class="mb-3 col-md-5">
+                  <label class="form-label">Trainee (or Trainer)</label>
+                  <input type="text" v-model="trainee" class="form-control form-control-lg border border-primary"
+                    style="color: black;" />
+                  <small v-if="errors.trainee_er" class="text-danger">{{ errors.trainee_er }}</small>
                 </div>
+
+       
 
               </div>
 
               <div class="row">
+
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Clock In</label>
                   <div class="mt-0">
-                    <VueDatePicker v-model="timeClockIn" time-picker placeholder="Select Time">
+                    <VueDatePicker light="true" v-model="timeClockIn" time-picker placeholder="Select Time">
                       <template #input-icon>
                         <img class="input-slot-image" src="../assets/icons/clock2.png" />
                       </template>
@@ -1356,26 +1381,38 @@ const getDenverTimeAsUTCISOString = () => {
                     }}</small>
                 </div>
 
-                       <div class="mb-3 col-md-6">
-                  <label class="form-label">Trainee (or Trainer)</label>
-                  <input type="text" v-model="trainee" class="form-control form-control-lg border border-primary"
-                    style="color: black;" />
-                  <small v-if="errors.trainee_er" class="text-danger">{{ errors.trainee_er }}</small>
+
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Clock In (Trainee or Trainer)</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="timeClockInTrainee" time-picker placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.clockInTrainee_er" class="text-danger">{{
+                    errors.clockInTrainee_er
+                    }}</small>
                 </div>
 
-          
-
-             
-
-
-
-                <!-- <div class="mb-3 col-md-3">
-                  <label class="form-label">DEF</label>
-                  <input type="number" step="any" v-model="dieselExhaustFluid"
-                    class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.dieselExhaustFluid_er" class="text-danger">{{ errors.dieselExhaustFluid_er
+                <div class="mb-3 col-md-3">
+                  <label class="form-label">Clock Out (Trainee or Trainer)</label>
+                  <div class="mt-0">
+                    <VueDatePicker v-model="timeClockOutTrainee" time-picker placeholder="Select Time">
+                      <template #input-icon>
+                        <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                      </template>
+                    </VueDatePicker>
+                  </div>
+                  <small v-if="errors.clockOutTrainee_er" class="text-danger">{{
+                    errors.clockOutTrainee_er
                     }}</small>
-                </div> -->
+                </div>
+
+     
+
+          
 
 
               </div>
@@ -2275,4 +2312,40 @@ const getDenverTimeAsUTCISOString = () => {
   min-height: 38px !important;
   padding: 0.375rem 0.75rem !important;
 }
+
+
+
+.dp__theme_light {
+    --dp-background-color: #ffffff;
+    --dp-text-color: #212121;
+    --dp-hover-color: #f3f3f3;
+    --dp-hover-text-color: #212121;
+    --dp-hover-icon-color: #959595;
+    --dp-primary-color: #1976d2;
+    --dp-primary-disabled-color: #6bacea;
+    --dp-primary-text-color: #f8f5f5;
+    --dp-secondary-color: #c0c4cc;
+    --dp-border-color: #ddd;
+    --dp-menu-border-color: #ddd;
+    --dp-border-color-hover: #aaaeb7;
+    --dp-border-color-focus: #aaaeb7;
+    --dp-disabled-color: #f6f6f6;
+    --dp-scroll-bar-background: #f3f3f3;
+    --dp-scroll-bar-color: #959595;
+    --dp-success-color: #76d275;
+    --dp-success-color-disabled: #a3d9b1;
+    --dp-icon-color: #959595;
+    --dp-danger-color: #ff6f60;
+    --dp-marker-color: #ff6f60;
+    --dp-tooltip-color: #fafafa;
+    --dp-disabled-color-text: #8e8e8e;
+    --dp-highlight-color: rgb(25 118 210 / 10%);
+    --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
+    --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
+    --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
+}
+
+
+
+
 </style>

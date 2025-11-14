@@ -458,10 +458,11 @@ onMounted(() => {
                           </span>
                         </a>
                       </th>
+                      <th>HomeBase</th>
+                      <th>Driver Name</th>
+                      <th>Truck</th>
+                      <th>Trailer</th>
                       <th>Clock In</th>
-                      <th>Leave Yard</th>
-                      <th>Start Miles</th>
-                      <th>Back In Yard</th>
                       <th>Clock Out</th>
                       <th>Notes</th>
                       <th>Action</th>
@@ -469,13 +470,11 @@ onMounted(() => {
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in coverSheetList" :key="index">
+                      <td class="td">{{ item.homeBaseName }}</td>
                       <td class="td">{{ item.driverName }}</td>
-                      <td class="td">{{ item.routeName }}</td>
                       <td class="td">{{ item.truckNumber }}</td>
+                      <td class="td">{{ item.trailerNumber }}</td>
                       <td class="td">{{ item.clockIn }}</td>
-                      <td class="td">{{ item.leaveYard }}</td>
-                      <td class="td">{{ item.startMiles }}</td>
-                      <td class="td">{{ item.backInYard }}</td>
                       <td class="td">{{ item.clockOut }}</td>
                       <td class="td">{{ item.notes }}</td>
                       <td>

@@ -1,31 +1,3 @@
-<template>
-  <div class="nav-header" @click="handleRedirect">
-    <a class="brand-logo">
-      <img
-        fetchpriority="high"
-        decoding="async"
-        width="188"
-        height="56"
-        src="@/assets/logo/AIRC-logo.png"
-      />
-
-      <div>
-        <div class="brand-title">
-          <span
-            style="
-              font-size: 18px;
-              font-weight: bold;
-              margin-left: 5px;
-              color: black;
-            "
-            >AIRC CoverSheet</span
-          >
-        </div>
-      </div>
-    </a>
-  </div>
-</template>
-
 <script>
 export default {
   methods: {
@@ -53,8 +25,49 @@ export default {
 }
 </script>
 
+<template>
+  <div class="nav-header" @click="handleRedirect">
+    <a class="brand-logo">
+      <img
+        fetchpriority="high"
+        decoding="async"
+        width="188"
+        height="56"
+        src="@/assets/logo/AIRC-logo.png"
+      />
+
+      <div class="brand-title-container">
+        <span class="brand-title-text">AIRC CoverSheet</span>
+      </div>
+    </a>
+  </div>
+</template>
+
+
 <style scoped>
 .nav-header {
   cursor: pointer;
+  background-color: #cdc7e5;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-title-container {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.brand-title-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: black;
+  white-space: nowrap;
 }
 </style>
