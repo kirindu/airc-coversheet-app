@@ -110,7 +110,16 @@ const logout = () => {
 
           <ul class="navbar-nav header-right" style="display: flex; width: 100%;">
 
-            <li class="nav-item dropdown header-profile ps30">
+          <!-- Fecha actual -->
+            <li class="nav-item" style="margin-left: auto; margin-right: 8px;">
+              <div class="current-date-display">
+                <i class="far fa-calendar-alt me-2"></i>
+                <span class="date-text">{{ currentDate }}</span>
+              </div>
+            </li>
+<!-- Fin Fecha actual -->
+
+            <li class="nav-item">
               <a
                 class="nav-link user-profile-link"
                 href="javascript:void(0);"
@@ -159,14 +168,7 @@ const logout = () => {
             </li>
 
 
-<!-- Fecha actual -->
-            <li class="nav-item me-4" style="margin-left: auto;">
-              <div class="current-date-display">
-                <i class="far fa-calendar-alt me-2"></i>
-                <span class="date-text">{{ currentDate }}</span>
-              </div>
-            </li>
-<!-- Fin Fecha actual -->
+
 
 
 
@@ -298,7 +300,7 @@ const logout = () => {
 }
 
 .logout-item:hover {
-  background-color: #fef2f2;
+  background-color: #e8abab;
   color: #b91c1c;
 }
 
