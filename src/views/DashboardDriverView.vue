@@ -31,6 +31,17 @@ const storeRoute = useRoutesStore();
 import { useHomeBasesStore } from "@/stores/homebase.js";
 const storeHomeBase = useHomeBasesStore();
 
+import { useOperatorsStore } from "@/stores/operator.js";
+const storeOperator = useOperatorsStore();
+
+import { useSourcesStore } from "@/stores/source.js";
+const storeSource = useSourcesStore();
+
+import { useDestinationsStore } from "@/stores/destination.js";
+const storeDestination = useDestinationsStore();
+
+import { useMaterialsStore } from "@/stores/material.js";
+const storeMaterial = useMaterialsStore();
 
 import { useLandFillsStore } from "@/stores/landfills";
 const storeLandFill = useLandFillsStore();
@@ -223,37 +234,50 @@ const loadList = ref([]);
 const isEditingLoad = ref(false); // To track if we are editing a load record
 const selectedLoadId = ref(null); // To store the ID of the load being edited
 
-
-
-const timeFirstStopTimeLoad = ref("");
-const selectedRouteLoad = ref("");
-const timeLastStopTimeLoad = ref("");
-const timeLandtFillTimeInLoad = ref("");
-const timeLandFillTimeOutLoad = ref("");
+const tunnelTimeInLoad = ref("");
+const tunnelTimeOutLoad = ref("");
+const leaveYardLoad = ref("");
+const timeInLoad = ref("");
+const timeOutLoad = ref("");
+const ticketNumberLoad = ref("");
 const grossWeightLoad = ref("");
 const tareWeightLoad = ref("");
 const tonsLoad = ref("");
-const selectedLandFillLoad = ref("");
-const ticketNumberLoad = ref("");
-const noteLoad = ref("");
-const imageLoad = ref([]);
+const backYardLoad = ref("");
+const imagesLoad = ref([]); // Se tiene que pasar como images en el formdata
+const noteLoad = ref(""); // Se tiene que pasar como note en el formdata
+const preloadedLoad = ref("");
+const preloadedNextDayLoad = ref("");
+
+const selectedHomeBaseLoad = ref("");
+const selectedOperatorLoad = ref("");
+const selectedSourceLoad = ref("");
+const selectedDestinationLoad = ref("");
+const selectedMaterialLoad = ref("");
 
 const isLoadingLoad = ref(false); // To show loading spinner when fetching load info
 
 
 const errorsLoad = ref({
-  selectedRouteLoad_er: "",
-  timeFirstStopTimeLoad_er: "",
-  timeLastStopTimeLoad_er: "",
-  timeLandFillTimeInLoad_er: "",
-  timeLandFillTimeOutLoad_er: "",
+  tunnelTimeInLoad_er: "",
+  tunnelTimeOutLoad_er: "",
+  leaveYardLoad_er: "",
+  timeInLoad_er: "",
+  timeOutLoad_er: "",
+  ticketNumberLoad_er: "",
   grossWeightLoad_er: "",
   tareWeightLoad_er: "",
   tonsLoad_er: "",
-  selectedLandFillLoad_er: "",
-  ticketNumberLoad_er: "",
+  backYardLoad_er: "",
+  imagesLoad_er: "",
   noteLoad_er: "",
-  imageLoad_er: "",
+  preloadedLoad_er: "",
+  preloadedNextDayLoad_er: "",
+  selectedHomeBaseLoad_er: "",
+  selectedOperatorLoad_er: "",
+  selectedSourceLoad_er: "",
+  selectedDestinationLoad_er: "",
+  selectedMaterialLoad_er: "",
 });
 
 
@@ -430,17 +454,6 @@ const onSubmit = async (event) => {
     errors.value.clockIn_er = "Required field";
     hasError = true;
   }
-
-  // if (!timeClockInTrainee.value) {
-  //   errors.value.clockInTrainee_er = "Required field";
-  //   hasError = true;
-  // }
-
-  //   if (!timeClockOutTrainee.value) {
-  //   errors.value.clockOutTrainee_er = "Required field";
-  //   hasError = true;
-  // }
-
 
 
   if (hasError) {
@@ -639,17 +652,26 @@ const resetDowntime = () => {
 };
 
 const resetLoad = () => {
-  selectedRouteLoad.value = "";
-  timeFirstStopTimeLoad.value = "";
-  timeLastStopTimeLoad.value = "";
-  timeLandtFillTimeInLoad.value = "";
-  timeLandFillTimeOutLoad.value = "";
+
+  tunnelTimeInLoad.value = "";
+  tunnelTimeOutLoad.value = "";
+  leaveYardLoad.value = "";
+  timeInLoad.value = "";
+  timeOutLoad.value = "";
+  ticketNumberLoad.value = "";
   grossWeightLoad.value = "";
   tareWeightLoad.value = "";
   tonsLoad.value = "";
-  selectedLandFillLoad.value = "";
-  ticketNumberLoad.value = "";
+  backYardLoad.value = "";
   noteLoad.value = "";
+  preloadedLoad.value = "";
+  preloadedNextDayLoad.value = "";
+  selectedHomeBaseLoad.value = "";
+  selectedOperatorLoad.value = "";
+  selectedSourceLoad.value = "";
+  selectedDestinationLoad.value = "";
+  selectedMaterialLoad.value = "";
+
   selectedImages.value = [];
   selectedFiles.value = []; // Clear files as well
   if (fileInput.value) {
@@ -922,28 +944,30 @@ const HandleLoad = async (event) => {
   event.preventDefault();
 
   // Clear previous errors
-  errorsLoad.value.selectedRouteLoad_er = "";
-  errorsLoad.value.timeFirstStopTimeLoad_er = "";
-  errorsLoad.value.timeLastStopTimeLoad_er = "";
-  errorsLoad.value.timeLandFillTimeInLoad_er = "";
-  errorsLoad.value.timeLandFillTimeOutLoad_er = "";
+  errorsLoad.value.tunnelTimeInLoad_er = "";
+  errorsLoad.value.tunnelTimeOutLoad_er = "";
+  errorsLoad.value.leaveYardLoad_er = "";
+  errorsLoad.value.timeInLoad_er = "";
+  errorsLoad.value.timeOutLoad_er = "";
+  errorsLoad.value.ticketNumberLoad_er = "";
   errorsLoad.value.grossWeightLoad_er = "";
   errorsLoad.value.tareWeightLoad_er = "";
   errorsLoad.value.tonsLoad_er = "";
-  errorsLoad.value.selectedLandFillLoad_er = "";
-  errorsLoad.value.ticketNumberLoad_er = "";
+  errorsLoad.value.backYardLoad_er = "";
+  errorsLoad.value.imagesLoad_er = "";
   errorsLoad.value.noteLoad_er = "";
-  errorsLoad.value.imageLoad_er = "";
+  errorsLoad.value.preloadedLoad_er = "";
+  errorsLoad.value.preloadedNextDayLoad_er = "";
+  errorsLoad.value.selectedHomeBaseLoad_er = "";
+  errorsLoad.value.selectedOperatorLoad_er = "";
+  errorsLoad.value.selectedSourceLoad_er = "";
+  errorsLoad.value.selectedDestinationLoad_er = "";
+  errorsLoad.value.selectedMaterialLoad_er = "";
 
   let hasError = false;
 
-  if (!selectedRouteLoad.value) {
-    errorsLoad.value.selectedRouteLoad_er = "Required field";
-    hasError = true;
-  }
-
-  if (!timeFirstStopTimeLoad.value) {
-    errorsLoad.value.timeFirstStopTimeLoad_er = "Required field";
+  if (!selectedHomeBaseLoad.value) {
+    errorsLoad.value.selectedHomeBaseLoad_er = "Required field";
     hasError = true;
   }
 
@@ -957,17 +981,28 @@ const HandleLoad = async (event) => {
   const formData = new FormData();
 
   // Add form fields to FormData
-  formData.append("route_id", selectedRouteLoad.value);
-  formData.append("firstStopTime", formatTime(timeFirstStopTimeLoad.value));
-  if (timeLastStopTimeLoad.value) formData.append("lastStopTime", formatTime(timeLastStopTimeLoad.value));
-  if (timeLandtFillTimeInLoad.value) formData.append("landFillTimeIn", formatTime(timeLandtFillTimeInLoad.value));
-  if (timeLandFillTimeOutLoad.value) formData.append("landFillTimeOut", formatTime(timeLandFillTimeOutLoad.value));
-  if (grossWeightLoad.value) formData.append("grossWeight", grossWeightLoad.value.toString());
-  if (tareWeightLoad.value) formData.append("tareWeight", tareWeightLoad.value.toString());
-  if (tonsLoad.value) formData.append("tons", tonsLoad.value.toString());
-  if (selectedLandFillLoad.value) formData.append("landFill_id", selectedLandFillLoad.value);
-  if (ticketNumberLoad.value) formData.append("ticketNumber", ticketNumberLoad.value);
-  if (noteLoad.value) formData.append("note", noteLoad.value);
+
+  if(selectedHomeBaseLoad.value) formData.append("homebase_id", selectedHomeBaseLoad.value);
+  if(selectedOperatorLoad.value) formData.append("operator_id", selectedOperatorLoad.value);
+  if(selectedSourceLoad.value) formData.append("source_id", selectedSourceLoad.value);
+  if(selectedDestinationLoad.value) formData.append("destination_id", selectedDestinationLoad.value);
+  if(selectedMaterialLoad.value) formData.append("material_id", selectedMaterialLoad.value);
+
+  if (tunnelTimeInLoad.value) formData.append("tunnelTimeInLoad", formatTime(tunnelTimeInLoad.value));
+  if (tunnelTimeOutLoad.value) formData.append("tunnelTimeOutLoad", formatTime(tunnelTimeOutLoad.value));
+  if (leaveYardLoad.value) formData.append("leaveYardLoad", formatTime(leaveYardLoad.value));
+  if (timeInLoad.value) formData.append("timeInLoad", formatTime(timeInLoad.value));
+  if (timeOutLoad.value) formData.append("timeOutLoad", formatTime(timeOutLoad.value));
+
+  if(ticketNumberLoad.value) formData.append("ticketNumberLoad", ticketNumberLoad.value);
+  if(grossWeightLoad.value) formData.append("grossWeightLoad", grossWeightLoad.value.toString());
+  if(tareWeightLoad.value) formData.append("tareWeightLoad", tareWeightLoad.value.toString());
+  if(tonsLoad.value) formData.append("tonsLoad", tonsLoad.value.toString());
+  if(backYardLoad.value) formData.append("backYardLoad", formatTime(backYardLoad.value));
+  if (noteLoad.value) formData.append("noteLoad", noteLoad.value);
+  if(preloadedLoad.value) formData.append("preloadedLoad", preloadedLoad.value);
+  if(preloadedNextDayLoad.value) formData.append("preloadedNextDayLoad", preloadedNextDayLoad.value);
+
   formData.append("coversheet_id", coversheet_id);
 
   // Append all selected files to FormData
@@ -1096,19 +1131,24 @@ const EditDowntime = (item) => {
 
 const EditLoad = (item) => {
 
-  selectedRouteLoad.value = item.route_id;
-  timeFirstStopTimeLoad.value = setTimeFromDB(item.firstStopTime);
-
-  timeLastStopTimeLoad.value = item.lastStopTime ? setTimeFromDB(item.lastStopTime) : "";
-  timeLandtFillTimeInLoad.value = item.landFillTimeIn ? setTimeFromDB(item.landFillTimeIn) : "";
-  timeLandFillTimeOutLoad.value = item.landFillTimeOut ? setTimeFromDB(item.landFillTimeOut) : "";
-  grossWeightLoad.value = item.grossWeight ? item.grossWeight.toString() : "";
-  tareWeightLoad.value = item.tareWeight ? item.tareWeight.toString() : "";
-  tonsLoad.value = item.tons ? item.tons.toString() : "";
-  selectedLandFillLoad.value = item.landFill_id ? item.landFill_id : "";
-  ticketNumberLoad.value = item.ticketNumber ? item.ticketNumber : "";
-  noteLoad.value = item.note ? item.note : "";
-
+  tunnelTimeInLoad.value = setTimeFromDB(item.tunnelTimeInLoad);
+  tunnelTimeOutLoad.value = setTimeFromDB(item.tunnelTimeOutLoad);
+  leaveYardLoad.value = setTimeFromDB(item.leaveYardLoad);
+  timeInLoad.value = setTimeFromDB(item.timeInLoad);
+  timeOutLoad.value = setTimeFromDB(item.timeOutLoad);
+  ticketNumberLoad.value = item.ticketNumberLoad || "";
+  grossWeightLoad.value = item.grossWeightLoad ? item.grossWeightLoad.toString() : "";
+  tareWeightLoad.value = item.tareWeightLoad ? item.tareWeightLoad.toString() : "";
+  tonsLoad.value = item.tonsLoad ? item.tonsLoad.toString() : "";
+  backYardLoad.value = setTimeFromDB(item.backYardLoad);
+  noteLoad.value = item.noteLoad || "";
+  preloadedLoad.value = item.preloadedLoad || false;
+  preloadedNextDayLoad.value = item.preloadedNextDayLoad || false;
+  selectedHomeBaseLoad.value = item.homebase_id || "";
+  selectedOperatorLoad.value = item.operator_id || "";
+  selectedSourceLoad.value = item.source_id || "";
+  selectedDestinationLoad.value = item.destination_id || "";
+  selectedMaterialLoad.value = item.material_id || "";
 
   // Set editing mode
   isEditingLoad.value = true;
@@ -1477,10 +1517,6 @@ const getDenverTimeAsUTCISOString = () => {
                 </div>
 
           
-
-         
-
-
 
               </div>
 
@@ -2036,103 +2072,205 @@ const getDenverTimeAsUTCISOString = () => {
                     <div id="bordered_collapseThree" class="accordion-collapse collapse"
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
+
+                      <div class="row">
+
+                                              <div class="mb-3">
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input" value="" v-model="preloadedLoad"
+                                                        checked>Preloaded
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input" value="" v-model="preloadedNextDayLoad">Preload for next day
+                                                </label>
+                                            </div>
+                         
+                                        </div>
+
+
+
+                      </div>  
+
+
+
+
                         <div class="row">
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Route #</label>
-                            <v-select :options="storeRoute.routes" v-model="selectedRouteLoad"
-                              placeholder="Choose your Route" :reduce="(route) => route.id" label="routeName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedRouteLoad }" />
-                            <small v-if="errorsLoad.selectedRouteLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedRouteLoad_er }}</small>
+
+
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">HomeBase</label>
+                            <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseLoad"
+                              placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id" label="homeBaseName"
+                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseLoad }" />
+                            <small v-if="errorsLoad.selectedHomeBaseLoad_er"
+                              class="text-danger">{{ errorsLoad.selectedHomeBaseLoad_er }}</small>
                           </div>
-                          <div class="mb-3 col-md-3">
+
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Tunnel Time In</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="tunnelTimeInLoad" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.tunnelTimeInLoad_er"
+                              class="text-danger">{{ errorsLoad.tunnelTimeInLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Tunnel Time Out</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="tunnelTimeOutLoad" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.tunnelTimeOutLoad_er"
+                              class="text-danger">{{ errorsLoad.tunnelTimeOutLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Leave Yard</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="leaveYardLoad" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.leaveYardLoad_er"
+                              class="text-danger">{{ errorsLoad.leaveYardLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Operator</label>
+                            <v-select :options="storeOperator.operators" v-model="selectedOperatorLoad"
+                              placeholder="Choose your Operator" :reduce="(operator) => operator.id" label="operatorName"
+                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedOperatorLoad }" />
+                            <small v-if="errorsLoad.selectedOperatorLoad_er"
+                              class="text-danger">{{ errorsLoad.selectedOperatorLoad_er }}</small>
+                          </div>
+
+
+                        </div>
+                        <div class="row">
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Source</label>
+                            <v-select :options="storeSource.sources" v-model="selectedSourceLoad"
+                              placeholder="Choose your Source" :reduce="(source) => source.id" label="sourceName"
+                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedSourceLoad }" />
+                            <small v-if="errorsLoad.selectedSourceLoad_er"
+                              class="text-danger">{{ errorsLoad.selectedSourceLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Destination</label>
+                            <v-select :options="storeDestination.destinations" v-model="selectedDestinationLoad"
+                              placeholder="Choose your Destination" :reduce="(destination) => destination.id" label="destinationName"
+                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedDestinationLoad }" />
+                            <small v-if="errorsLoad.selectedDestinationLoad_er"
+                              class="text-danger">{{ errorsLoad.selectedDestinationLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Material</label>
+                            <v-select :options="storeMaterial.materials" v-model="selectedMaterialLoad"
+                              placeholder="Choose your Material" :reduce="(material) => material.id" label="materialName"
+                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedMaterialLoad }" />
+                            <small v-if="errorsLoad.selectedMaterialLoad_er"
+                              class="text-danger">{{ errorsLoad.selectedMaterialLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Time In</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeInLoad" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.timeInLoad_er"
+                              class="text-danger">{{ errorsLoad.timeInLoad_er }}</small>
+                          </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Time Out</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="timeOutLoad" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.timeOutLoad_er"
+                              class="text-danger">{{ errorsLoad.timeOutLoad_er }}</small>
+                          </div>
+
+
+                        </div>
+
+
+                        <div class="row">
+
+                         <div class="mb-3 col-md-2">
                             <label class="form-label">Ticket #</label>
                             <input type="text" v-model="ticketNumberLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.ticketNumberLoad_er"
                               class="text-danger">{{ errorsLoad.ticketNumberLoad_er }}</small>
                           </div>
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">First Stop Time</label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeFirstStopTimeLoad" time-picker placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeFirstStopTimeLoad_er"
-                              class="text-danger">{{ errorsLoad.timeFirstStopTimeLoad_er }}</small>
-                          </div>
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Last Stop Time</label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeLastStopTimeLoad" time-picker placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeLastStopTimeLoad_er"
-                              class="text-danger">{{ errorsLoad.timeLastStopTimeLoad_er }}</small>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="mb-3 col-md-6">
-                            <label class="form-label">Landfill</label>
-                            <v-select :options="storeLandFill.landfills" v-model="selectedLandFillLoad"
-                              placeholder="Choose your Landfill" :reduce="(landfill) => landfill.id"
-                              label="landfillName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedLandFillLoad }" />
-                            <small v-if="errorsLoad.selectedLandFillLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedLandFillLoad_er }}</small>
-                          </div>
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Landfill Time In</label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeLandtFillTimeInLoad" time-picker placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeLandFillTimeInLoad_er"
-                              class="text-danger">{{ errorsLoad.timeLandFillTimeInLoad_er }}</small>
-                          </div>
-                          <div class="mb-3 col-md-3">
-                            <label class="form-label">Landfill Time Out</label>
-                            <div class="mt-0">
-                              <VueDatePicker v-model="timeLandFillTimeOutLoad" time-picker placeholder="Select Time">
-                                <template #input-icon>
-                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
-                                </template>
-                              </VueDatePicker>
-                            </div>
-                            <small v-if="errorsLoad.timeLandFillTimeOutLoad_er"
-                              class="text-danger">{{ errorsLoad.timeLandFillTimeOutLoad_er }}</small>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="mb-3 col-md-3">
+
+                          <div class="mb-3 col-md-2">
                             <label class="form-label">Gross Weight</label>
                             <input type="number" step="any" v-model="grossWeightLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.grossWeightLoad_er"
                               class="text-danger">{{ errorsLoad.grossWeightLoad_er }}</small>
                           </div>
-                          <div class="mb-3 col-md-3">
+
+                          <div class="mb-3 col-md-2">
                             <label class="form-label">Tare Weight</label>
                             <input type="number" step="any" v-model="tareWeightLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.tareWeightLoad_er"
                               class="text-danger">{{ errorsLoad.tareWeightLoad_er }}</small>
                           </div>
-                          <div class="mb-3 col-md-3">
+
+
+                          <div class="mb-3 col-md-2">
                             <label class="form-label">Tons</label>
                             <input type="number" step="any" v-model="tonsLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{ errorsLoad.tonsLoad_er }}</small>
                           </div>
+
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Back Yard</label>
+                            <div class="mt-0">
+                              <VueDatePicker v-model="backYardLoad" time-picker placeholder="Select Time">
+                                <template #input-icon>
+                                  <img class="input-slot-image" src="../assets/icons/clock2.png" />
+                                </template>
+                              </VueDatePicker>
+                            </div>
+                            <small v-if="errorsLoad.backYardLoad_er"
+                              class="text-danger">{{ errorsLoad.backYardLoad_er }}</small>
+                          </div>
+
+
+
+
+
                         </div>
 
                         <div class="row d-flex align-items-center">
@@ -2168,8 +2306,8 @@ const getDenverTimeAsUTCISOString = () => {
           >
             Capture Another
           </button> -->
-                            <small v-if="errorsLoad.imageLoad_er"
-                              class="text-danger">{{ errorsLoad.imageLoad_er }}</small>
+                            <small v-if="errorsLoad.imagesLoad_er"
+                              class="text-danger">{{ errorsLoad.imagesLoad_er }}</small>
                           </div>
 
 
@@ -2203,31 +2341,27 @@ const getDenverTimeAsUTCISOString = () => {
                               class="table table-bordered header-border table-striped table-hover table-responsive-md">
                               <thead class="thead-primary">
                                 <tr>
-                                  <th>Route #</th>
-                                  <th>First Stop Time</th>
-                                  <th>Last Stop Time</th>
-                                  <th>Landfill Time In</th>
-                                  <th>Landfill Time Out</th>
-                                  <th>Gross Weight</th>
-                                  <th>Tare Weight</th>
-                                  <th>Tons</th>
-                                  <th>Landfill</th>
+                                  <th>HomeBase</th>
+                                  <th>Source</th>
+                                  <th>Destination</th>
+                                  <th>Material</th>
+                                  <th>Tunnel Time In</th>
+                                  <th>Tunnel Time Out</th>
+                                  <th>Operator</th>
                                   <th>Ticket #</th>
                                   <th>Action</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 <tr v-for="(item, index) in loadList" :key="index">
-                                  <td class="td">{{ item.routeName }}</td>
-                                  <td class="td">{{ item.firstStopTime }}</td>
-                                  <td class="td">{{ item.lastStopTime }}</td>
-                                  <td class="td">{{ item.landFillTimeIn }}</td>
-                                  <td class="td">{{ item.landFillTimeOut }}</td>
-                                  <td class="td">{{ item.grossWeight }}</td>
-                                  <td class="td">{{ item.tareWeight }}</td>
-                                  <td class="td">{{ item.tons }}</td>
-                                  <td class="td">{{ item.landfillName }}</td>
-                                  <td class="td">{{ item.ticketNumber }}</td>
+                                  <td class="td">{{ item.homeBaseName }}</td>
+                                  <td class="td">{{ item.sourceName }}</td>
+                                  <td class="td">{{ item.destinationName }}</td>
+                                  <td class="td">{{ item.materialName }}</td>
+                                  <td class="td">{{ item.tunnelTimeInLoad }}</td>
+                                  <td class="td">{{ item.tunnelTimeOutLoad }}</td>
+                                  <td class="td">{{ item.operatorName }}</td>
+                                  <td class="td">{{ item.ticketNumberLoad }}</td>
                                   <td>
                                     <div>
                                       <a @click="EditLoad(item)" class="btn btn-primary shadow btn-xs sharp me-1"><i
