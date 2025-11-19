@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch  } from "vue";
 
 import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 const router = useRouter() // Instanciamos el router
@@ -85,8 +85,8 @@ const timePreTripEnd = ref("");
 const timePostTripStart = ref("");
 const timePostTripEnd = ref("");
 
-const truckStartMiles = ref(""); 
-const truckEndMiles = ref(""); 
+const truckStartMiles = ref("");
+const truckEndMiles = ref("");
 const truckStartHours = ref("");
 const truckEndHours = ref("");
 
@@ -122,7 +122,7 @@ const errors = ref({
   trailerEndMiles_er: "",
   fuel_er: "",
   dieselExhaustFluid_er: "",
-  
+
 });
 
 // Modo de edición de la informaciongeneral para el coversheet
@@ -143,16 +143,16 @@ const selectedTrailerSpareTruckInfo = ref("");
 
 const timeLeaveYardSpareTruckInfo = ref("");
 const timeBackInYardSpareTruckInfo = ref("");
-const fuelSpareTruckInfo= ref("");
-const dieselExhaustFluidSpareTruckInfo= ref("");
-    
-const truckStartMilesSpareTruckInfo = ref("");
-const truckEndMilesSpareTruckInfo= ref("");
-const truckStartHoursSpareTruckInfo= ref("");
-const truckEndHoursSpareTruckInfo= ref("");
+const fuelSpareTruckInfo = ref("");
+const dieselExhaustFluidSpareTruckInfo = ref("");
 
-const trailerStartMilesSpareTruckInfo= ref("");
-const trailerEndMilesSpareTruckInfo= ref("");
+const truckStartMilesSpareTruckInfo = ref("");
+const truckEndMilesSpareTruckInfo = ref("");
+const truckStartHoursSpareTruckInfo = ref("");
+const truckEndHoursSpareTruckInfo = ref("");
+
+const trailerStartMilesSpareTruckInfo = ref("");
+const trailerEndMilesSpareTruckInfo = ref("");
 
 
 
@@ -183,7 +183,7 @@ const errorsSpareTruckInfo = ref({
   spareTrailerSpareTruckInfo_er: "",
   trailerStartMilesSpareTruckInfo_er: "",
   trailerEndMilesSpareTruckInfo_er: "",
-  
+
 });
 
 // Downtime
@@ -256,6 +256,23 @@ const selectedDestinationLoad = ref("");
 const selectedMaterialLoad = ref("");
 
 const isLoadingLoad = ref(false); // To show loading spinner when fetching load info
+
+
+// Agregar después de las declaraciones de preloadedLoad y preloadedNextDayLoad
+
+// Watch para preloadedLoad
+watch(preloadedLoad, (newValue) => {
+  if (newValue && preloadedNextDayLoad.value) {
+    preloadedNextDayLoad.value = false;
+  }
+});
+
+// Watch para preloadedNextDayLoad
+watch(preloadedNextDayLoad, (newValue) => {
+  if (newValue && preloadedLoad.value) {
+    preloadedLoad.value = false;
+  }
+});
 
 
 const errorsLoad = ref({
@@ -366,14 +383,14 @@ onMounted(() => {
       fuel.value = coversheet.fuel;
       dieselExhaustFluid.value = coversheet.dieselExhaustFluid;
       notes.value = coversheet.notes;
-      
-      
-      
+
+
+
 
 
       selectedTruckDownTime.value = coversheet.truck_id;
       selectedTrailerDownTime.value = coversheet.trailer_id;
-      
+
 
       handleVisibleAcordion();
       loadSpareTruckInfo();
@@ -403,7 +420,7 @@ const onSubmit = async (event) => {
 
   // Limpiar errores anteriores
   // errors.value.route_er = "";
-    // errors.value.leaveYard_er = "";
+  // errors.value.leaveYard_er = "";
   // errors.value.backInYard_er = "";
   // errors.value.startMiles_er = "";
   // errors.value.endMiles_er = "";
@@ -429,9 +446,9 @@ const onSubmit = async (event) => {
   errors.value.trailerEndMiles_er = "";
   errors.value.fuel_er = "";
   errors.value.dieselExhaustFluid_er = "";
-  
-  
- 
+
+
+
 
   let hasError = false;
 
@@ -604,7 +621,7 @@ const resetForm = () => {
   // startMiles.value = "";
   // endMiles.value = "";
   // selectedRoute.value = "";
-  
+
   formSubmitted.value = false;
 };
 
@@ -704,7 +721,7 @@ const HandleSpareTruckInfo = async (event) => {
 
   let hasError = false;
 
-  if (!selectedHomeBaseSpareTruckInfo .value) {
+  if (!selectedHomeBaseSpareTruckInfo.value) {
     errorsSpareTruckInfo.value.homebaseSpareTruckInfo_er = "Required field";
     hasError = true;
   }
@@ -982,11 +999,11 @@ const HandleLoad = async (event) => {
 
   // Add form fields to FormData
 
-  if(selectedHomeBaseLoad.value) formData.append("homebase_id", selectedHomeBaseLoad.value);
-  if(selectedOperatorLoad.value) formData.append("operator_id", selectedOperatorLoad.value);
-  if(selectedSourceLoad.value) formData.append("source_id", selectedSourceLoad.value);
-  if(selectedDestinationLoad.value) formData.append("destination_id", selectedDestinationLoad.value);
-  if(selectedMaterialLoad.value) formData.append("material_id", selectedMaterialLoad.value);
+  if (selectedHomeBaseLoad.value) formData.append("homebase_id", selectedHomeBaseLoad.value);
+  if (selectedOperatorLoad.value) formData.append("operator_id", selectedOperatorLoad.value);
+  if (selectedSourceLoad.value) formData.append("source_id", selectedSourceLoad.value);
+  if (selectedDestinationLoad.value) formData.append("destination_id", selectedDestinationLoad.value);
+  if (selectedMaterialLoad.value) formData.append("material_id", selectedMaterialLoad.value);
 
   if (tunnelTimeInLoad.value) formData.append("tunnelTimeInLoad", formatTime(tunnelTimeInLoad.value));
   if (tunnelTimeOutLoad.value) formData.append("tunnelTimeOutLoad", formatTime(tunnelTimeOutLoad.value));
@@ -994,14 +1011,14 @@ const HandleLoad = async (event) => {
   if (timeInLoad.value) formData.append("timeInLoad", formatTime(timeInLoad.value));
   if (timeOutLoad.value) formData.append("timeOutLoad", formatTime(timeOutLoad.value));
 
-  if(ticketNumberLoad.value) formData.append("ticketNumberLoad", ticketNumberLoad.value);
-  if(grossWeightLoad.value) formData.append("grossWeightLoad", grossWeightLoad.value.toString());
-  if(tareWeightLoad.value) formData.append("tareWeightLoad", tareWeightLoad.value.toString());
-  if(tonsLoad.value) formData.append("tonsLoad", tonsLoad.value.toString());
-  if(backYardLoad.value) formData.append("backYardLoad", formatTime(backYardLoad.value));
+  if (ticketNumberLoad.value) formData.append("ticketNumberLoad", ticketNumberLoad.value);
+  if (grossWeightLoad.value) formData.append("grossWeightLoad", grossWeightLoad.value.toString());
+  if (tareWeightLoad.value) formData.append("tareWeightLoad", tareWeightLoad.value.toString());
+  if (tonsLoad.value) formData.append("tonsLoad", tonsLoad.value.toString());
+  if (backYardLoad.value) formData.append("backYardLoad", formatTime(backYardLoad.value));
   if (noteLoad.value) formData.append("noteLoad", noteLoad.value);
-  if(preloadedLoad.value) formData.append("preloadedLoad", preloadedLoad.value);
-  if(preloadedNextDayLoad.value) formData.append("preloadedNextDayLoad", preloadedNextDayLoad.value);
+  if (preloadedLoad.value) formData.append("preloadedLoad", preloadedLoad.value);
+  if (preloadedNextDayLoad.value) formData.append("preloadedNextDayLoad", preloadedNextDayLoad.value);
 
   formData.append("coversheet_id", coversheet_id);
 
@@ -1090,21 +1107,21 @@ const HandleLoad = async (event) => {
 
 const EditSpareTruckInfo = (item) => {
 
-selectedHomeBaseSpareTruckInfo.value = item.homebase_id;
-timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.timeLeaveYardSpareTruckInfo);
-timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.timeBackInYardSpareTruckInfo);
-fuelSpareTruckInfo.value = item.fuelSpareTruckInfo;
-dieselExhaustFluidSpareTruckInfo.value = item.dieselExhaustFluidSpareTruckInfo;
+  selectedHomeBaseSpareTruckInfo.value = item.homebase_id;
+  timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.timeLeaveYardSpareTruckInfo);
+  timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.timeBackInYardSpareTruckInfo);
+  fuelSpareTruckInfo.value = item.fuelSpareTruckInfo;
+  dieselExhaustFluidSpareTruckInfo.value = item.dieselExhaustFluidSpareTruckInfo;
 
-selectedTruckSpareTruckInfo.value = item.truck_id;
-truckStartMilesSpareTruckInfo.value = item.truckStartMilesSpareTruckInfo;
-truckEndMilesSpareTruckInfo.value = item.truckEndMilesSpareTruckInfo;
-truckStartHoursSpareTruckInfo.value = item.truckStartHoursSpareTruckInfo;
-truckEndHoursSpareTruckInfo.value = item.truckEndHoursSpareTruckInfo;
+  selectedTruckSpareTruckInfo.value = item.truck_id;
+  truckStartMilesSpareTruckInfo.value = item.truckStartMilesSpareTruckInfo;
+  truckEndMilesSpareTruckInfo.value = item.truckEndMilesSpareTruckInfo;
+  truckStartHoursSpareTruckInfo.value = item.truckStartHoursSpareTruckInfo;
+  truckEndHoursSpareTruckInfo.value = item.truckEndHoursSpareTruckInfo;
 
-selectedTrailerSpareTruckInfo.value = item.trailer_id;
-trailerStartMilesSpareTruckInfo.value = item.trailerStartMilesSpareTruckInfo;
-trailerEndMilesSpareTruckInfo.value = item.trailerEndMilesSpareTruckInfo;
+  selectedTrailerSpareTruckInfo.value = item.trailer_id;
+  trailerStartMilesSpareTruckInfo.value = item.trailerStartMilesSpareTruckInfo;
+  trailerEndMilesSpareTruckInfo.value = item.trailerEndMilesSpareTruckInfo;
 
   // Set editing mode
   isEditingSpareTruckInfo.value = true;
@@ -1121,7 +1138,7 @@ const EditDowntime = (item) => {
   truckDownTimeEndDownTime.value = setTimeFromDB(item.truckDownTimeEndDownTime);
   trailerDownTimeStartDownTime.value = setTimeFromDB(item.trailerDownTimeStartDownTime);
   trailerDownTimeEndDownTime.value = setTimeFromDB(item.trailerDownTimeEndDownTime);
-  downTimeReasonDownTime.value = item.downTimeReasonDownTime || ""; 
+  downTimeReasonDownTime.value = item.downTimeReasonDownTime || "";
 
 
   // Set editing mode
@@ -1357,7 +1374,7 @@ const getDenverTimeAsUTCISOString = () => {
                     class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedHomeBase }" />
                   <small v-if="errors.homebase_er" class="text-danger">{{
                     errors.homebase_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
@@ -1367,7 +1384,7 @@ const getDenverTimeAsUTCISOString = () => {
                     :class="{ 'is-invalid': formSubmitted && !selectedTruck }" />
                   <small v-if="errors.truck_er" class="text-danger">{{
                     errors.truck_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
@@ -1377,7 +1394,7 @@ const getDenverTimeAsUTCISOString = () => {
                     :class="{ 'is-invalid': formSubmitted && !selectedTrailer }" />
                   <small v-if="errors.trailer_er" class="text-danger">{{
                     errors.trailer_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-5">
@@ -1387,7 +1404,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <small v-if="errors.trainee_er" class="text-danger">{{ errors.trainee_er }}</small>
                 </div>
 
-       
+
 
               </div>
 
@@ -1404,7 +1421,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockIn_er" class="text-danger">{{
                     errors.clockIn_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1418,7 +1435,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockOut_er" class="text-danger">{{
                     errors.clockOut_er
-                    }}</small>
+                  }}</small>
                 </div>
 
 
@@ -1433,7 +1450,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockInTrainee_er" class="text-danger">{{
                     errors.clockInTrainee_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1447,17 +1464,17 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockOutTrainee_er" class="text-danger">{{
                     errors.clockOutTrainee_er
-                    }}</small>
+                  }}</small>
                 </div>
 
-     
 
-          
+
+
 
 
               </div>
 
-                  <div class="row">
+              <div class="row">
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Pre Trip Start</label>
                   <div class="mt-0">
@@ -1469,7 +1486,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.preTripStart_er" class="text-danger">{{
                     errors.preTripStart_er
-                    }}</small>
+                  }}</small>
                 </div>
 
 
@@ -1485,7 +1502,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.preTripEnd_er" class="text-danger">{{
                     errors.preTripEnd_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1499,7 +1516,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.postTripStart_er" class="text-danger">{{
                     errors.postTripStart_er
-                    }}</small>
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1513,10 +1530,10 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.postTripEnd_er" class="text-danger">{{
                     errors.postTripEnd_er
-                    }}</small>
+                  }}</small>
                 </div>
 
-          
+
 
               </div>
 
@@ -1555,12 +1572,13 @@ const getDenverTimeAsUTCISOString = () => {
 
               </div>
 
-               <div class="row">
+              <div class="row">
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Trailer Start Miles</label>
                   <input type="number" step="any" v-model="trailerStartMiles"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.trailerStartMiles_er" class="text-danger">{{ errors.trailerStartMiles_er }}</small>
+                  <small v-if="errors.trailerStartMiles_er" class="text-danger">{{ errors.trailerStartMiles_er
+                  }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1582,7 +1600,8 @@ const getDenverTimeAsUTCISOString = () => {
                   <label class="form-label">DEF</label>
                   <input type="number" step="any" v-model="dieselExhaustFluid"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
-                  <small v-if="errors.dieselExhaustFluid_er" class="text-danger">{{ errors.dieselExhaustFluid_er }}</small>
+                  <small v-if="errors.dieselExhaustFluid_er" class="text-danger">{{ errors.dieselExhaustFluid_er
+                  }}</small>
                 </div>
 
 
@@ -1645,11 +1664,12 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">HomeBase</label>
                             <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseSpareTruckInfo"
-                              placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id" label="homeBaseName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseSpareTruckInfo }" />
+                              placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id"
+                              label="homeBaseName" class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseSpareTruckInfo }" />
                             <small v-if="errorsSpareTruckInfo.homebaseSpareTruckInfo_er" class="text-danger">{{
                               errorsSpareTruckInfo.homebaseSpareTruckInfo_er
-                              }}</small>
+                            }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -1690,8 +1710,8 @@ const getDenverTimeAsUTCISOString = () => {
                             <label class="form-label">Fuel</label>
                             <input type="number" step="any" v-model="fuelSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.fuelSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.fuelSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.fuelSpareTruckInfo_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -1699,58 +1719,60 @@ const getDenverTimeAsUTCISOString = () => {
                             <input type="number" step="any" v-model="dieselExhaustFluidSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
                             <small v-if="errorsSpareTruckInfo.dieselExhaustFluidSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.dieselExhaustFluidSpareTruckInfo_er }}</small>
+                              class="text-danger">{{
+                                errorsSpareTruckInfo.dieselExhaustFluidSpareTruckInfo_er }}</small>
                           </div>
 
-         
+
                         </div>
 
                         <div class="row">
 
-                        <div class="mb-3 col-md-2">
-                          <label class="form-label">Spare Truck #</label>
-                          <v-select :options="storeTruck.trucks" v-model="selectedTruckSpareTruckInfo" placeholder="Choose your Truck"
-                            :reduce="(truck) => truck.id" label="truckNumber" class="form-control p-0"/>
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Spare Truck #</label>
+                            <v-select :options="storeTruck.trucks" v-model="selectedTruckSpareTruckInfo"
+                              placeholder="Choose your Truck" :reduce="(truck) => truck.id" label="truckNumber"
+                              class="form-control p-0" />
 
-                          <!-- <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{
+                            <!-- <small v-if="errorsSpareTruckInfo.spareTruckSpareTruckInfo_er" class="text-danger">{{
                             errorsSpareTruckInfo.spareTruckSpareTruckInfo_er
                             }}</small> -->
 
-                        </div>
+                          </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Truck Start Miles</label>
                             <input type="number" step="any" v-model="truckStartMilesSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.truckStartMilesSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.truckStartMilesSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.truckStartMilesSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.truckStartMilesSpareTruckInfo_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Truck End Miles</label>
                             <input type="number" step="any" v-model="truckEndMilesSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.truckEndMilesSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.truckEndMilesSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.truckEndMilesSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.truckEndMilesSpareTruckInfo_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Truck Start Hours</label>
                             <input type="number" step="any" v-model="truckStartHoursSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.truckStartHoursSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.truckStartHoursSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.truckStartHoursSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.truckStartHoursSpareTruckInfo_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Truck End Hours</label>
                             <input type="number" step="any" v-model="truckEndHoursSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.truckEndHoursSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.truckEndHoursSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.truckEndHoursSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.truckEndHoursSpareTruckInfo_er }}</small>
                           </div>
 
-                  
+
                           <!-- <div class="mb-4 col-md-3 align-self-end">
                             <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;"
                               @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
@@ -1765,35 +1787,36 @@ const getDenverTimeAsUTCISOString = () => {
 
                         </div>
 
-                        <div class="row"> 
+                        <div class="row">
 
-                        <div class="mb-3 col-md-2">
-                          <label class="form-label">Spare Trailer #</label>
-                          <v-select :options="storeTrailer.trailers" v-model="selectedTrailerSpareTruckInfo" placeholder="Choose your Truck"
-                            :reduce="(trailer) => trailer.id" label="trailerNumber" class="form-control p-0"/>
+                          <div class="mb-3 col-md-2">
+                            <label class="form-label">Spare Trailer #</label>
+                            <v-select :options="storeTrailer.trailers" v-model="selectedTrailerSpareTruckInfo"
+                              placeholder="Choose your Truck" :reduce="(trailer) => trailer.id" label="trailerNumber"
+                              class="form-control p-0" />
 
-                          <!-- <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
+                            <!-- <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
                             errors.spareTrailerSpareTruckInfo_er
                             }}</small> -->
 
-                        </div>
+                          </div>
 
-              
+
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Trailer Start Miles</label>
                             <input type="number" step="any" v-model="trailerStartMilesSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.trailerStartMilesSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.trailerStartMilesSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.trailerStartMilesSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.trailerStartMilesSpareTruckInfo_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Trailer End Miles</label>
                             <input type="number" step="any" v-model="trailerEndMilesSpareTruckInfo"
                               class="form-control form-control-lg border border-primary" style="color: black;" />
-                            <small v-if="errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er"
-                              class="text-danger">{{ errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er }}</small>
+                            <small v-if="errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er" class="text-danger">{{
+                              errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er }}</small>
                           </div>
 
                           <div class="mb-4 col-md-3 align-self-end">
@@ -1805,8 +1828,8 @@ const getDenverTimeAsUTCISOString = () => {
                               </span>
                             </button>
                           </div>
-                        
-                        
+
+
                         </div>
 
                         <div class="row">
@@ -1874,8 +1897,8 @@ const getDenverTimeAsUTCISOString = () => {
                               placeholder="Choose your Truck" :reduce="(truck) => truck.id" label="truckNumber"
                               class="form-control p-0"
                               :class="{ 'is-invalid': formSubmitted && !selectedTruckDownTime }" />
-                            <small v-if="errorsDowntime.selectedTruckDownTime_er"
-                              class="text-danger">{{ errorsDowntime.selectedTruckDownTime_er }}</small>
+                            <small v-if="errorsDowntime.selectedTruckDownTime_er" class="text-danger">{{
+                              errorsDowntime.selectedTruckDownTime_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-3">
@@ -1887,8 +1910,8 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsDowntime.truckDownTimeStartDownTime_er"
-                              class="text-danger">{{ errorsDowntime.truckDownTimeStartDownTime_er }}</small>
+                            <small v-if="errorsDowntime.truckDownTimeStartDownTime_er" class="text-danger">{{
+                              errorsDowntime.truckDownTimeStartDownTime_er }}</small>
                           </div>
 
 
@@ -1901,20 +1924,20 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsDowntime.truckDownTimeEndDownTime_er"
-                              class="text-danger">{{ errorsDowntime.truckDownTimeEndDownTime_er }}</small>
+                            <small v-if="errorsDowntime.truckDownTimeEndDownTime_er" class="text-danger">{{
+                              errorsDowntime.truckDownTimeEndDownTime_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Type</label>
                             <v-select :options="storeTypeDowntime.typeDownTimes" v-model="selectedTypeTruckDownTime"
-                              placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id" label="typeDownTimeName"
-                              class="form-control p-0"
+                              placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id"
+                              label="typeDownTimeName" class="form-control p-0"
                               :class="{ 'is-invalid': formSubmitted && !selectedTypeTruckDownTime }" />
-                            <small v-if="errorsDowntime.selectedTypeTruckDownTime_er"
-                              class="text-danger">{{ errorsDowntime.selectedTypeTruckDownTime_er }}</small>
+                            <small v-if="errorsDowntime.selectedTypeTruckDownTime_er" class="text-danger">{{
+                              errorsDowntime.selectedTypeTruckDownTime_er }}</small>
                           </div>
-                          
+
 
                         </div>
 
@@ -1925,21 +1948,22 @@ const getDenverTimeAsUTCISOString = () => {
                               placeholder="Choose your Trailer" :reduce="(trailer) => trailer.id" label="trailerNumber"
                               class="form-control p-0"
                               :class="{ 'is-invalid': formSubmitted && !selectedTrailerDownTime }" />
-                            <small v-if="errorsDowntime.selectedTrailerDownTime_er"
-                              class="text-danger">{{ errorsDowntime.selectedTrailerDownTime_er }}</small>
+                            <small v-if="errorsDowntime.selectedTrailerDownTime_er" class="text-danger">{{
+                              errorsDowntime.selectedTrailerDownTime_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Trailer Downtime Start</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="trailerDownTimeStartDownTime" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="trailerDownTimeStartDownTime" time-picker
+                                placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsDowntime.trailerDownTimeStartDownTime_er"
-                              class="text-danger">{{ errorsDowntime.trailerDownTimeStartDownTime_er }}</small>
+                            <small v-if="errorsDowntime.trailerDownTimeStartDownTime_er" class="text-danger">{{
+                              errorsDowntime.trailerDownTimeStartDownTime_er }}</small>
                           </div>
 
 
@@ -1952,21 +1976,21 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsDowntime.trailerDownTimeEndDownTime_er"
-                              class="text-danger">{{ errorsDowntime.trailerDownTimeEndDownTime_er }}</small>
+                            <small v-if="errorsDowntime.trailerDownTimeEndDownTime_er" class="text-danger">{{
+                              errorsDowntime.trailerDownTimeEndDownTime_er }}</small>
                           </div>
 
-           
+
                           <div class="mb-3 col-md-3">
                             <label class="form-label">Type</label>
                             <v-select :options="storeTypeDowntime.typeDownTimes" v-model="selectedTypeTrailerDownTime"
-                              placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id" label="typeDownTimeName"
-                              class="form-control p-0"
+                              placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id"
+                              label="typeDownTimeName" class="form-control p-0"
                               :class="{ 'is-invalid': formSubmitted && !selectedTypeTrailerDownTime }" />
-                            <small v-if="errorsDowntime.selectedTypeTrailerDownTime_er"
-                              class="text-danger">{{ errorsDowntime.selectedTypeTrailerDownTime_er }}</small>
+                            <small v-if="errorsDowntime.selectedTypeTrailerDownTime_er" class="text-danger">{{
+                              errorsDowntime.selectedTypeTrailerDownTime_er }}</small>
                           </div>
-                          
+
 
                         </div>
 
@@ -1984,8 +2008,8 @@ const getDenverTimeAsUTCISOString = () => {
                             <label class="form-label">Downtime Reason</label>
                             <input type="text" v-model="downTimeReasonDownTime"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsDowntime.downTimeReasonDownTime_er"
-                              class="text-danger">{{ errorsDowntime.downTimeReasonDownTime_er }}</small>
+                            <small v-if="errorsDowntime.downTimeReasonDownTime_er" class="text-danger">{{
+                              errorsDowntime.downTimeReasonDownTime_er }}</small>
                           </div>
 
                           <div class="mb-4 col-md-3 align-self-end">
@@ -2073,26 +2097,26 @@ const getDenverTimeAsUTCISOString = () => {
                       data-bs-parent="#accordion-two">
                       <div class="accordion-body">
 
-                      <div class="row">
+                        <div class="row">
 
-                                              <div class="mb-3">
-                                            <div class="form-check form-check-inline">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" value="" v-model="preloadedLoad"
-                                                        checked>Preloaded
-                                                </label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input" value="" v-model="preloadedNextDayLoad">Preload for next day
-                                                </label>
-                                            </div>
-                         
-                                        </div>
+                          <div class="mb-3">
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" v-model="preloadedLoad"
+                                  > Preloaded
+                              </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" v-model="preloadedNextDayLoad"
+                                  > Preload for next day
+                              </label>
+                            </div>
+                          </div>
 
 
 
-                      </div>  
+                        </div>
 
 
 
@@ -2104,10 +2128,11 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">HomeBase</label>
                             <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseLoad"
-                              placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id" label="homeBaseName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseLoad }" />
-                            <small v-if="errorsLoad.selectedHomeBaseLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedHomeBaseLoad_er }}</small>
+                              placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id"
+                              label="homeBaseName" class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseLoad }" />
+                            <small v-if="errorsLoad.selectedHomeBaseLoad_er" class="text-danger">{{
+                              errorsLoad.selectedHomeBaseLoad_er }}</small>
                           </div>
 
 
@@ -2120,8 +2145,8 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsLoad.tunnelTimeInLoad_er"
-                              class="text-danger">{{ errorsLoad.tunnelTimeInLoad_er }}</small>
+                            <small v-if="errorsLoad.tunnelTimeInLoad_er" class="text-danger">{{
+                              errorsLoad.tunnelTimeInLoad_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2133,8 +2158,8 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsLoad.tunnelTimeOutLoad_er"
-                              class="text-danger">{{ errorsLoad.tunnelTimeOutLoad_er }}</small>
+                            <small v-if="errorsLoad.tunnelTimeOutLoad_er" class="text-danger">{{
+                              errorsLoad.tunnelTimeOutLoad_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2146,17 +2171,18 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsLoad.leaveYardLoad_er"
-                              class="text-danger">{{ errorsLoad.leaveYardLoad_er }}</small>
+                            <small v-if="errorsLoad.leaveYardLoad_er" class="text-danger">{{ errorsLoad.leaveYardLoad_er
+                            }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Operator</label>
                             <v-select :options="storeOperator.operators" v-model="selectedOperatorLoad"
-                              placeholder="Choose your Operator" :reduce="(operator) => operator.id" label="operatorName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedOperatorLoad }" />
-                            <small v-if="errorsLoad.selectedOperatorLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedOperatorLoad_er }}</small>
+                              placeholder="Choose your Operator" :reduce="(operator) => operator.id"
+                              label="operatorName" class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedOperatorLoad }" />
+                            <small v-if="errorsLoad.selectedOperatorLoad_er" class="text-danger">{{
+                              errorsLoad.selectedOperatorLoad_er }}</small>
                           </div>
 
 
@@ -2167,27 +2193,30 @@ const getDenverTimeAsUTCISOString = () => {
                             <label class="form-label">Source</label>
                             <v-select :options="storeSource.sources" v-model="selectedSourceLoad"
                               placeholder="Choose your Source" :reduce="(source) => source.id" label="sourceName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedSourceLoad }" />
-                            <small v-if="errorsLoad.selectedSourceLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedSourceLoad_er }}</small>
+                              class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedSourceLoad }" />
+                            <small v-if="errorsLoad.selectedSourceLoad_er" class="text-danger">{{
+                              errorsLoad.selectedSourceLoad_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Destination</label>
                             <v-select :options="storeDestination.destinations" v-model="selectedDestinationLoad"
-                              placeholder="Choose your Destination" :reduce="(destination) => destination.id" label="destinationName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedDestinationLoad }" />
-                            <small v-if="errorsLoad.selectedDestinationLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedDestinationLoad_er }}</small>
+                              placeholder="Choose your Destination" :reduce="(destination) => destination.id"
+                              label="destinationName" class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedDestinationLoad }" />
+                            <small v-if="errorsLoad.selectedDestinationLoad_er" class="text-danger">{{
+                              errorsLoad.selectedDestinationLoad_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Material</label>
                             <v-select :options="storeMaterial.materials" v-model="selectedMaterialLoad"
-                              placeholder="Choose your Material" :reduce="(material) => material.id" label="materialName"
-                              class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedMaterialLoad }" />
-                            <small v-if="errorsLoad.selectedMaterialLoad_er"
-                              class="text-danger">{{ errorsLoad.selectedMaterialLoad_er }}</small>
+                              placeholder="Choose your Material" :reduce="(material) => material.id"
+                              label="materialName" class="form-control p-0"
+                              :class="{ 'is-invalid': formSubmitted && !selectedMaterialLoad }" />
+                            <small v-if="errorsLoad.selectedMaterialLoad_er" class="text-danger">{{
+                              errorsLoad.selectedMaterialLoad_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2199,8 +2228,8 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsLoad.timeInLoad_er"
-                              class="text-danger">{{ errorsLoad.timeInLoad_er }}</small>
+                            <small v-if="errorsLoad.timeInLoad_er" class="text-danger">{{ errorsLoad.timeInLoad_er
+                            }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2212,8 +2241,8 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsLoad.timeOutLoad_er"
-                              class="text-danger">{{ errorsLoad.timeOutLoad_er }}</small>
+                            <small v-if="errorsLoad.timeOutLoad_er" class="text-danger">{{ errorsLoad.timeOutLoad_er
+                            }}</small>
                           </div>
 
 
@@ -2222,28 +2251,30 @@ const getDenverTimeAsUTCISOString = () => {
 
                         <div class="row">
 
-                         <div class="mb-3 col-md-2">
+                          <div class="mb-3 col-md-2">
                             <label class="form-label">Ticket #</label>
                             <input type="text" v-model="ticketNumberLoad"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsLoad.ticketNumberLoad_er"
-                              class="text-danger">{{ errorsLoad.ticketNumberLoad_er }}</small>
+                            <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{
+                              errorsLoad.ticketNumberLoad_er }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Gross Weight</label>
                             <input type="number" step="any" v-model="grossWeightLoad"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsLoad.grossWeightLoad_er"
-                              class="text-danger">{{ errorsLoad.grossWeightLoad_er }}</small>
+                            <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{
+                              errorsLoad.grossWeightLoad_er
+                            }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Tare Weight</label>
                             <input type="number" step="any" v-model="tareWeightLoad"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsLoad.tareWeightLoad_er"
-                              class="text-danger">{{ errorsLoad.tareWeightLoad_er }}</small>
+                            <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{
+                              errorsLoad.tareWeightLoad_er
+                            }}</small>
                           </div>
 
 
@@ -2251,7 +2282,8 @@ const getDenverTimeAsUTCISOString = () => {
                             <label class="form-label">Tons</label>
                             <input type="number" step="any" v-model="tonsLoad"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{ errorsLoad.tonsLoad_er }}</small>
+                            <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{ errorsLoad.tonsLoad_er
+                            }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2263,8 +2295,8 @@ const getDenverTimeAsUTCISOString = () => {
                                 </template>
                               </VueDatePicker>
                             </div>
-                            <small v-if="errorsLoad.backYardLoad_er"
-                              class="text-danger">{{ errorsLoad.backYardLoad_er }}</small>
+                            <small v-if="errorsLoad.backYardLoad_er" class="text-danger">{{ errorsLoad.backYardLoad_er
+                            }}</small>
                           </div>
 
 
@@ -2306,8 +2338,8 @@ const getDenverTimeAsUTCISOString = () => {
           >
             Capture Another
           </button> -->
-                            <small v-if="errorsLoad.imagesLoad_er"
-                              class="text-danger">{{ errorsLoad.imagesLoad_er }}</small>
+                            <small v-if="errorsLoad.imagesLoad_er" class="text-danger">{{ errorsLoad.imagesLoad_er
+                            }}</small>
                           </div>
 
 
@@ -2328,7 +2360,8 @@ const getDenverTimeAsUTCISOString = () => {
                             <label class="form-label">Note</label>
                             <input type="text" v-model="noteLoad"
                               class="form-control form-control-sm border border-primary" />
-                            <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{ errorsLoad.noteLoad_er }}</small>
+                            <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{ errorsLoad.noteLoad_er
+                            }}</small>
                           </div>
 
 
@@ -2450,36 +2483,32 @@ const getDenverTimeAsUTCISOString = () => {
 
 
 .dp__theme_light {
-    --dp-background-color: #ffffff;
-    --dp-text-color: #212121;
-    --dp-hover-color: #f3f3f3;
-    --dp-hover-text-color: #212121;
-    --dp-hover-icon-color: #959595;
-    --dp-primary-color: #1976d2;
-    --dp-primary-disabled-color: #6bacea;
-    --dp-primary-text-color: #f8f5f5;
-    --dp-secondary-color: #c0c4cc;
-    --dp-border-color: #ddd;
-    --dp-menu-border-color: #ddd;
-    --dp-border-color-hover: #aaaeb7;
-    --dp-border-color-focus: #aaaeb7;
-    --dp-disabled-color: #f6f6f6;
-    --dp-scroll-bar-background: #f3f3f3;
-    --dp-scroll-bar-color: #959595;
-    --dp-success-color: #76d275;
-    --dp-success-color-disabled: #a3d9b1;
-    --dp-icon-color: #959595;
-    --dp-danger-color: #ff6f60;
-    --dp-marker-color: #ff6f60;
-    --dp-tooltip-color: #fafafa;
-    --dp-disabled-color-text: #8e8e8e;
-    --dp-highlight-color: rgb(25 118 210 / 10%);
-    --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
-    --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
-    --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
+  --dp-background-color: #ffffff;
+  --dp-text-color: #212121;
+  --dp-hover-color: #f3f3f3;
+  --dp-hover-text-color: #212121;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #1976d2;
+  --dp-primary-disabled-color: #6bacea;
+  --dp-primary-text-color: #f8f5f5;
+  --dp-secondary-color: #c0c4cc;
+  --dp-border-color: #ddd;
+  --dp-menu-border-color: #ddd;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-border-color-focus: #aaaeb7;
+  --dp-disabled-color: #f6f6f6;
+  --dp-scroll-bar-background: #f3f3f3;
+  --dp-scroll-bar-color: #959595;
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #ff6f60;
+  --dp-marker-color: #ff6f60;
+  --dp-tooltip-color: #fafafa;
+  --dp-disabled-color-text: #8e8e8e;
+  --dp-highlight-color: rgb(25 118 210 / 10%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
+  --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
 }
-
-
-
-
 </style>
