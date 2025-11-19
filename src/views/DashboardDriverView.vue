@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch  } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 const router = useRouter() // Instanciamos el router
@@ -256,6 +256,8 @@ const selectedDestinationLoad = ref("");
 const selectedMaterialLoad = ref("");
 
 const isLoadingLoad = ref(false); // To show loading spinner when fetching load info
+const formSubmittedLoad = ref(false); // To track if Load form has been submitted
+
 
 
 // Agregar después de las declaraciones de preloadedLoad y preloadedNextDayLoad
@@ -696,6 +698,7 @@ const resetLoad = () => {
   }
   isEditingLoad.value = false;
   selectedLoadId.value = null;
+  formSubmittedLoad.value = false;
 };
 
 // Handle form submission Spare Truck Info (Add or Edit)
@@ -959,6 +962,7 @@ const HandleDowntime = async (event) => {
 // Handle form submission for Load
 const HandleLoad = async (event) => {
   event.preventDefault();
+  formSubmittedLoad.value = true;
 
   // Clear previous errors
   errorsLoad.value.tunnelTimeInLoad_er = "";
@@ -1148,16 +1152,18 @@ const EditDowntime = (item) => {
 
 const EditLoad = (item) => {
 
-  tunnelTimeInLoad.value = setTimeFromDB(item.tunnelTimeInLoad);
-  tunnelTimeOutLoad.value = setTimeFromDB(item.tunnelTimeOutLoad);
-  leaveYardLoad.value = setTimeFromDB(item.leaveYardLoad);
-  timeInLoad.value = setTimeFromDB(item.timeInLoad);
-  timeOutLoad.value = setTimeFromDB(item.timeOutLoad);
+  tunnelTimeInLoad.value = item.tunnelTimeInLoad ? setTimeFromDB(item.tunnelTimeInLoad) : "";
+  tunnelTimeOutLoad.value = item.tunnelTimeOutLoad ? setTimeFromDB(item.tunnelTimeOutLoad) : "";
+  leaveYardLoad.value = item.leaveYardLoad ? setTimeFromDB(item.leaveYardLoad) : "";
+  timeInLoad.value = item.timeInLoad ? setTimeFromDB(item.timeInLoad) : "";
+  timeOutLoad.value = item.timeOutLoad ? setTimeFromDB(item.timeOutLoad) : "";
+
+
   ticketNumberLoad.value = item.ticketNumberLoad || "";
   grossWeightLoad.value = item.grossWeightLoad ? item.grossWeightLoad.toString() : "";
   tareWeightLoad.value = item.tareWeightLoad ? item.tareWeightLoad.toString() : "";
   tonsLoad.value = item.tonsLoad ? item.tonsLoad.toString() : "";
-  backYardLoad.value = setTimeFromDB(item.backYardLoad);
+  backYardLoad.value = item.backYardLoad ? setTimeFromDB(item.backYardLoad) : "";
   noteLoad.value = item.noteLoad || "";
   preloadedLoad.value = item.preloadedLoad || false;
   preloadedNextDayLoad.value = item.preloadedNextDayLoad || false;
@@ -1374,7 +1380,7 @@ const getDenverTimeAsUTCISOString = () => {
                     class="form-control p-0" :class="{ 'is-invalid': formSubmitted && !selectedHomeBase }" />
                   <small v-if="errors.homebase_er" class="text-danger">{{
                     errors.homebase_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
@@ -1384,7 +1390,7 @@ const getDenverTimeAsUTCISOString = () => {
                     :class="{ 'is-invalid': formSubmitted && !selectedTruck }" />
                   <small v-if="errors.truck_er" class="text-danger">{{
                     errors.truck_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-2">
@@ -1394,7 +1400,7 @@ const getDenverTimeAsUTCISOString = () => {
                     :class="{ 'is-invalid': formSubmitted && !selectedTrailer }" />
                   <small v-if="errors.trailer_er" class="text-danger">{{
                     errors.trailer_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-5">
@@ -1421,7 +1427,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockIn_er" class="text-danger">{{
                     errors.clockIn_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1435,7 +1441,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockOut_er" class="text-danger">{{
                     errors.clockOut_er
-                  }}</small>
+                    }}</small>
                 </div>
 
 
@@ -1450,7 +1456,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockInTrainee_er" class="text-danger">{{
                     errors.clockInTrainee_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1464,7 +1470,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.clockOutTrainee_er" class="text-danger">{{
                     errors.clockOutTrainee_er
-                  }}</small>
+                    }}</small>
                 </div>
 
 
@@ -1486,7 +1492,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.preTripStart_er" class="text-danger">{{
                     errors.preTripStart_er
-                  }}</small>
+                    }}</small>
                 </div>
 
 
@@ -1502,7 +1508,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.preTripEnd_er" class="text-danger">{{
                     errors.preTripEnd_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1516,7 +1522,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.postTripStart_er" class="text-danger">{{
                     errors.postTripStart_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1530,7 +1536,7 @@ const getDenverTimeAsUTCISOString = () => {
                   </div>
                   <small v-if="errors.postTripEnd_er" class="text-danger">{{
                     errors.postTripEnd_er
-                  }}</small>
+                    }}</small>
                 </div>
 
 
@@ -1578,7 +1584,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <input type="number" step="any" v-model="trailerStartMiles"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
                   <small v-if="errors.trailerStartMiles_er" class="text-danger">{{ errors.trailerStartMiles_er
-                  }}</small>
+                    }}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
@@ -1601,7 +1607,7 @@ const getDenverTimeAsUTCISOString = () => {
                   <input type="number" step="any" v-model="dieselExhaustFluid"
                     class="form-control form-control-lg border border-primary" style="color: black;" />
                   <small v-if="errors.dieselExhaustFluid_er" class="text-danger">{{ errors.dieselExhaustFluid_er
-                  }}</small>
+                    }}</small>
                 </div>
 
 
@@ -1669,7 +1675,7 @@ const getDenverTimeAsUTCISOString = () => {
                               :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseSpareTruckInfo }" />
                             <small v-if="errorsSpareTruckInfo.homebaseSpareTruckInfo_er" class="text-danger">{{
                               errorsSpareTruckInfo.homebaseSpareTruckInfo_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -1686,7 +1692,7 @@ const getDenverTimeAsUTCISOString = () => {
                               errorsSpareTruckInfo.leaveYardSpareTruckInfo_er
                             " class="text-danger">{{
                               errorsSpareTruckInfo.leaveYardSpareTruckInfo_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -1703,7 +1709,7 @@ const getDenverTimeAsUTCISOString = () => {
                               errorsSpareTruckInfo.backInYardSpareTruckInfo_er
                             " class="text-danger">{{
                               errorsSpareTruckInfo.backInYardSpareTruckInfo_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2102,14 +2108,14 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3">
                             <div class="form-check form-check-inline">
                               <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" v-model="preloadedLoad"
-                                  > Preloaded
+                                <input type="checkbox" class="form-check-input" v-model="preloadedLoad"> Preloaded
                               </label>
                             </div>
                             <div class="form-check form-check-inline">
                               <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" v-model="preloadedNextDayLoad"
-                                  > Preload for next day
+                                <input type="checkbox" class="form-check-input" v-model="preloadedNextDayLoad"> Preload
+                                for
+                                next day
                               </label>
                             </div>
                           </div>
@@ -2130,7 +2136,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseLoad"
                               placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id"
                               label="homeBaseName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseLoad }" />
+                              :class="{ 'is-invalid': formSubmittedLoad && !selectedHomeBaseLoad }" />
                             <small v-if="errorsLoad.selectedHomeBaseLoad_er" class="text-danger">{{
                               errorsLoad.selectedHomeBaseLoad_er }}</small>
                           </div>
@@ -2172,7 +2178,7 @@ const getDenverTimeAsUTCISOString = () => {
                               </VueDatePicker>
                             </div>
                             <small v-if="errorsLoad.leaveYardLoad_er" class="text-danger">{{ errorsLoad.leaveYardLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2180,11 +2186,10 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeOperator.operators" v-model="selectedOperatorLoad"
                               placeholder="Choose your Operator" :reduce="(operator) => operator.id"
                               label="operatorName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedOperatorLoad }" />
+                               />
                             <small v-if="errorsLoad.selectedOperatorLoad_er" class="text-danger">{{
                               errorsLoad.selectedOperatorLoad_er }}</small>
                           </div>
-
 
                         </div>
                         <div class="row">
@@ -2194,7 +2199,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeSource.sources" v-model="selectedSourceLoad"
                               placeholder="Choose your Source" :reduce="(source) => source.id" label="sourceName"
                               class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedSourceLoad }" />
+                               />
                             <small v-if="errorsLoad.selectedSourceLoad_er" class="text-danger">{{
                               errorsLoad.selectedSourceLoad_er }}</small>
                           </div>
@@ -2204,7 +2209,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeDestination.destinations" v-model="selectedDestinationLoad"
                               placeholder="Choose your Destination" :reduce="(destination) => destination.id"
                               label="destinationName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedDestinationLoad }" />
+                               />
                             <small v-if="errorsLoad.selectedDestinationLoad_er" class="text-danger">{{
                               errorsLoad.selectedDestinationLoad_er }}</small>
                           </div>
@@ -2214,7 +2219,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeMaterial.materials" v-model="selectedMaterialLoad"
                               placeholder="Choose your Material" :reduce="(material) => material.id"
                               label="materialName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedMaterialLoad }" />
+                               />
                             <small v-if="errorsLoad.selectedMaterialLoad_er" class="text-danger">{{
                               errorsLoad.selectedMaterialLoad_er }}</small>
                           </div>
@@ -2229,7 +2234,7 @@ const getDenverTimeAsUTCISOString = () => {
                               </VueDatePicker>
                             </div>
                             <small v-if="errorsLoad.timeInLoad_er" class="text-danger">{{ errorsLoad.timeInLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2242,7 +2247,7 @@ const getDenverTimeAsUTCISOString = () => {
                               </VueDatePicker>
                             </div>
                             <small v-if="errorsLoad.timeOutLoad_er" class="text-danger">{{ errorsLoad.timeOutLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
 
@@ -2265,7 +2270,7 @@ const getDenverTimeAsUTCISOString = () => {
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{
                               errorsLoad.grossWeightLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2274,7 +2279,7 @@ const getDenverTimeAsUTCISOString = () => {
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{
                               errorsLoad.tareWeightLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
 
@@ -2283,7 +2288,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <input type="number" step="any" v-model="tonsLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{ errorsLoad.tonsLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
                           <div class="mb-3 col-md-2">
@@ -2296,7 +2301,7 @@ const getDenverTimeAsUTCISOString = () => {
                               </VueDatePicker>
                             </div>
                             <small v-if="errorsLoad.backYardLoad_er" class="text-danger">{{ errorsLoad.backYardLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
 
@@ -2339,7 +2344,7 @@ const getDenverTimeAsUTCISOString = () => {
             Capture Another
           </button> -->
                             <small v-if="errorsLoad.imagesLoad_er" class="text-danger">{{ errorsLoad.imagesLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
 
@@ -2361,7 +2366,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <input type="text" v-model="noteLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.noteLoad_er" class="text-danger">{{ errorsLoad.noteLoad_er
-                            }}</small>
+                              }}</small>
                           </div>
 
 
@@ -2480,7 +2485,11 @@ const getDenverTimeAsUTCISOString = () => {
   padding: 0.375rem 0.75rem !important;
 }
 
-
+/* Borde rojo cuando el campo es inválido */
+.v-select.is-invalid .vs__dropdown-toggle {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
 
 .dp__theme_light {
   --dp-background-color: #ffffff;
