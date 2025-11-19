@@ -136,7 +136,7 @@ const spareTruckList = ref([]);
 const isEditingSpareTruckInfo = ref(false); // To track if we are editing a spare truck record
 const selectedSpareTruckId = ref(null); // To store the ID of the spare truck being edited
 
-const selectedHomeBaseSpareTruckInfo = ref("");
+// const selectedHomeBaseSpareTruckInfo = ref("");
 const selectedTruckSpareTruckInfo = ref("");
 const selectedTrailerSpareTruckInfo = ref("");
 
@@ -157,6 +157,7 @@ const trailerEndMilesSpareTruckInfo = ref("");
 
 
 const isLoadingSpareTruckInfo = ref(false); // To show loading spinner when fetching spare truck info
+const formSubmittedSpareTruckInfo = ref(false); // Para Spare Truck Info
 
 // Si quieres mostrar la hora actual en el input de Spare Truck Info
 // const timeLeaveYardSpareTruckInfo = ref({
@@ -207,6 +208,7 @@ const downTimeReasonDownTime = ref("");
 
 
 const isLoadingDowntime = ref(false); // To show loading spinner when fetching downtime info
+const formSubmittedDowntime = ref(false); // To track if Downtime form has been submitted
 
 
 
@@ -246,10 +248,10 @@ const tonsLoad = ref("");
 const backYardLoad = ref("");
 const imagesLoad = ref([]); // Se tiene que pasar como images en el formdata
 const noteLoad = ref(""); // Se tiene que pasar como note en el formdata
-const preloadedLoad = ref("");
-const preloadedNextDayLoad = ref("");
+const preloadedLoad = ref(false); // Lo Inicializamos en false
+const preloadedNextDayLoad = ref(false); // Lo Inicializamos en false
 
-const selectedHomeBaseLoad = ref("");
+// const selectedHomeBaseLoad = ref("");
 const selectedOperatorLoad = ref("");
 const selectedSourceLoad = ref("");
 const selectedDestinationLoad = ref("");
@@ -276,6 +278,36 @@ watch(preloadedNextDayLoad, (newValue) => {
   }
 });
 
+// Watch para deshabilitar campos cuando Preloaded está seleccionado
+watch(preloadedLoad, (newValue) => {
+  if (newValue) {
+    // Si se selecciona Preloaded, reseteamos los siguientes campos
+    tunnelTimeInLoad.value = "";
+    tunnelTimeOutLoad.value = "";
+    selectedOperatorLoad.value = "";
+  }
+});
+
+// Watch para deshabilitar campos cuando preloadedNextDayLoad está seleccionado
+watch(preloadedNextDayLoad, (newValue) => {
+  if (newValue) {
+    // Si se selecciona preloadedNextDayLoad, reseteamos los siguientes campos
+    leaveYardLoad.value = "";
+    selectedSourceLoad.value = "";
+    selectedDestinationLoad.value = "";
+    selectedMaterialLoad.value = "";
+    timeInLoad.value = "";
+    timeOutLoad.value = "";
+    ticketNumberLoad.value = "";
+    grossWeightLoad.value = "";
+    tareWeightLoad.value = "";
+    tonsLoad.value = "";
+    backYardLoad.value = "";
+
+  }
+});
+
+
 
 const errorsLoad = ref({
   tunnelTimeInLoad_er: "",
@@ -292,7 +324,7 @@ const errorsLoad = ref({
   noteLoad_er: "",
   preloadedLoad_er: "",
   preloadedNextDayLoad_er: "",
-  selectedHomeBaseLoad_er: "",
+  // selectedHomeBaseLoad_er: "",
   selectedOperatorLoad_er: "",
   selectedSourceLoad_er: "",
   selectedDestinationLoad_er: "",
@@ -630,7 +662,7 @@ const resetForm = () => {
 // Reset Spare Truck Info form
 const resetSpareTruckInfo = () => {
 
-  selectedHomeBaseSpareTruckInfo.value = "";
+  // selectedHomeBaseSpareTruckInfo.value = "";
   selectedTruckSpareTruckInfo.value = "";
   selectedTrailerSpareTruckInfo.value = "";
 
@@ -650,6 +682,8 @@ const resetSpareTruckInfo = () => {
   selectedSpareTruckId.value = null;
   isEditingSpareTruckInfo.value = false;
 
+  formSubmittedSpareTruckInfo.value = false;
+
 };
 
 const resetDowntime = () => {
@@ -668,6 +702,8 @@ const resetDowntime = () => {
   selectedDowntimeId.value = null;
   isEditingDowntime.value = false;
 
+  formSubmittedDowntime.value = false;
+
 };
 
 const resetLoad = () => {
@@ -683,9 +719,9 @@ const resetLoad = () => {
   tonsLoad.value = "";
   backYardLoad.value = "";
   noteLoad.value = "";
-  preloadedLoad.value = "";
-  preloadedNextDayLoad.value = "";
-  selectedHomeBaseLoad.value = "";
+  preloadedLoad.value = false;
+  preloadedNextDayLoad.value = false;
+  // selectedHomeBaseLoad.value = "";
   selectedOperatorLoad.value = "";
   selectedSourceLoad.value = "";
   selectedDestinationLoad.value = "";
@@ -704,6 +740,7 @@ const resetLoad = () => {
 // Handle form submission Spare Truck Info (Add or Edit)
 const HandleSpareTruckInfo = async (event) => {
   event.preventDefault();
+  formSubmittedSpareTruckInfo.value = true;
 
   // Limpiar errores anteriores
   errorsSpareTruckInfo.value.homebaseSpareTruckInfo_er = "";
@@ -724,10 +761,10 @@ const HandleSpareTruckInfo = async (event) => {
 
   let hasError = false;
 
-  if (!selectedHomeBaseSpareTruckInfo.value) {
-    errorsSpareTruckInfo.value.homebaseSpareTruckInfo_er = "Required field";
-    hasError = true;
-  }
+  // if (!selectedHomeBaseSpareTruckInfo.value) {
+  //   errorsSpareTruckInfo.value.homebaseSpareTruckInfo_er = "Required field";
+  //   hasError = true;
+  // }
 
 
 
@@ -739,7 +776,7 @@ const HandleSpareTruckInfo = async (event) => {
 
   const spareTruckInfo = {
 
-    homebase_id: selectedHomeBaseSpareTruckInfo.value,
+    // homebase_id: selectedHomeBaseSpareTruckInfo.value,
     timeLeaveYardSpareTruckInfo: formatTime(timeLeaveYardSpareTruckInfo.value) || "",
     timeBackInYardSpareTruckInfo: formatTime(timeBackInYardSpareTruckInfo.value) || "",
     fuelSpareTruckInfo: fuelSpareTruckInfo.value.toString() || "",
@@ -840,6 +877,7 @@ const HandleSpareTruckInfo = async (event) => {
 // Handle form submission Downtime
 const HandleDowntime = async (event) => {
   event.preventDefault();
+  formSubmittedDowntime.value = true;
 
   // Limpiar errores anteriores
 
@@ -856,10 +894,10 @@ const HandleDowntime = async (event) => {
 
   let hasError = false;
 
-  // if (!selectedTruckDownTime.value) {
-  //   errorsDowntime.value.selectedTruckDownTime_er = "Required field";
-  //   hasError = true;
-  // }
+  if (!downTimeReasonDownTime.value) {
+    errorsDowntime.value.downTimeReasonDownTime_er = "Required field";
+    hasError = true;
+  }
 
 
   if (hasError) {
@@ -979,7 +1017,7 @@ const HandleLoad = async (event) => {
   errorsLoad.value.noteLoad_er = "";
   errorsLoad.value.preloadedLoad_er = "";
   errorsLoad.value.preloadedNextDayLoad_er = "";
-  errorsLoad.value.selectedHomeBaseLoad_er = "";
+  // errorsLoad.value.selectedHomeBaseLoad_er = "";
   errorsLoad.value.selectedOperatorLoad_er = "";
   errorsLoad.value.selectedSourceLoad_er = "";
   errorsLoad.value.selectedDestinationLoad_er = "";
@@ -987,8 +1025,13 @@ const HandleLoad = async (event) => {
 
   let hasError = false;
 
-  if (!selectedHomeBaseLoad.value) {
-    errorsLoad.value.selectedHomeBaseLoad_er = "Required field";
+  if (!selectedSourceLoad.value) {
+    errorsLoad.value.selectedSourceLoad_er = "Required field";
+    hasError = true;
+  }
+
+    if (!selectedMaterialLoad.value) {
+    errorsLoad.value.selectedMaterialLoad_er = "Required field";
     hasError = true;
   }
 
@@ -1003,7 +1046,7 @@ const HandleLoad = async (event) => {
 
   // Add form fields to FormData
 
-  if (selectedHomeBaseLoad.value) formData.append("homebase_id", selectedHomeBaseLoad.value);
+  // if (selectedHomeBaseLoad.value) formData.append("homebase_id", selectedHomeBaseLoad.value);
   if (selectedOperatorLoad.value) formData.append("operator_id", selectedOperatorLoad.value);
   if (selectedSourceLoad.value) formData.append("source_id", selectedSourceLoad.value);
   if (selectedDestinationLoad.value) formData.append("destination_id", selectedDestinationLoad.value);
@@ -1111,7 +1154,7 @@ const HandleLoad = async (event) => {
 
 const EditSpareTruckInfo = (item) => {
 
-  selectedHomeBaseSpareTruckInfo.value = item.homebase_id;
+  // selectedHomeBaseSpareTruckInfo.value = item.homebase_id;
   timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.timeLeaveYardSpareTruckInfo);
   timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.timeBackInYardSpareTruckInfo);
   fuelSpareTruckInfo.value = item.fuelSpareTruckInfo;
@@ -1167,7 +1210,7 @@ const EditLoad = (item) => {
   noteLoad.value = item.noteLoad || "";
   preloadedLoad.value = item.preloadedLoad || false;
   preloadedNextDayLoad.value = item.preloadedNextDayLoad || false;
-  selectedHomeBaseLoad.value = item.homebase_id || "";
+  // selectedHomeBaseLoad.value = item.homebase_id || "";
   selectedOperatorLoad.value = item.operator_id || "";
   selectedSourceLoad.value = item.source_id || "";
   selectedDestinationLoad.value = item.destination_id || "";
@@ -1667,16 +1710,17 @@ const getDenverTimeAsUTCISOString = () => {
 
                         <div class="row">
 
-                          <div class="mb-3 col-md-2">
+                          <!-- <div class="mb-3 col-md-2">
+
                             <label class="form-label">HomeBase</label>
                             <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseSpareTruckInfo"
                               placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id"
                               label="homeBaseName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedHomeBaseSpareTruckInfo }" />
+                              :class="{ 'is-invalid': formSubmittedSpareTruckInfo  && !selectedHomeBaseSpareTruckInfo }" />
                             <small v-if="errorsSpareTruckInfo.homebaseSpareTruckInfo_er" class="text-danger">{{
                               errorsSpareTruckInfo.homebaseSpareTruckInfo_er
                               }}</small>
-                          </div>
+                          </div> -->
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Leave Yard</label>
@@ -1779,17 +1823,6 @@ const getDenverTimeAsUTCISOString = () => {
                           </div>
 
 
-                          <!-- <div class="mb-4 col-md-3 align-self-end">
-                            <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;"
-                              @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
-                              {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
-                              <span class="btn-icon-end">
-                                <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
-                              </span>
-                            </button>
-                          </div> -->
-
-
 
                         </div>
 
@@ -1801,9 +1834,7 @@ const getDenverTimeAsUTCISOString = () => {
                               placeholder="Choose your Truck" :reduce="(trailer) => trailer.id" label="trailerNumber"
                               class="form-control p-0" />
 
-                            <!-- <small v-if="errorsSpareTruckInfo.spareTrailerSpareTruckInfo_er" class="text-danger">{{
-                            errors.spareTrailerSpareTruckInfo_er
-                            }}</small> -->
+                 
 
                           </div>
 
@@ -1846,7 +1877,7 @@ const getDenverTimeAsUTCISOString = () => {
                               <thead class="thead-primary">
                                 <tr>
                                   <!-- <th style="width:50px;"></th> -->
-                                  <th>HomeBase</th>
+                                  <!-- <th>HomeBase</th> -->
                                   <th>Spare Truck</th>
                                   <th>Spare Trailer</th>
                                   <th>Leave Yard</th>
@@ -1859,7 +1890,7 @@ const getDenverTimeAsUTCISOString = () => {
                               <tbody>
                                 <tr v-for="(item, index) in spareTruckList" :key="index">
                                   <!-- <td></td> -->
-                                  <td class="td">{{ item.homeBaseName }}</td>
+                                  <!-- <td class="td">{{ item.homeBaseName }}</td> -->
                                   <td class="td">{{ item.truckNumber }}</td>
                                   <td class="td">{{ item.trailerNumber }}</td>
                                   <td class="td">{{ item.timeLeaveYardSpareTruckInfo }}</td>
@@ -1902,7 +1933,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeTruck.trucks" v-model="selectedTruckDownTime"
                               placeholder="Choose your Truck" :reduce="(truck) => truck.id" label="truckNumber"
                               class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedTruckDownTime }" />
+                              :class="{ 'is-invalid': formSubmittedDowntime && !selectedTruckDownTime }" />
                             <small v-if="errorsDowntime.selectedTruckDownTime_er" class="text-danger">{{
                               errorsDowntime.selectedTruckDownTime_er }}</small>
                           </div>
@@ -1939,7 +1970,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeTypeDowntime.typeDownTimes" v-model="selectedTypeTruckDownTime"
                               placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id"
                               label="typeDownTimeName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedTypeTruckDownTime }" />
+                               />
                             <small v-if="errorsDowntime.selectedTypeTruckDownTime_er" class="text-danger">{{
                               errorsDowntime.selectedTypeTruckDownTime_er }}</small>
                           </div>
@@ -1953,7 +1984,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeTrailer.trailers" v-model="selectedTrailerDownTime"
                               placeholder="Choose your Trailer" :reduce="(trailer) => trailer.id" label="trailerNumber"
                               class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedTrailerDownTime }" />
+                              :class="{ 'is-invalid': formSubmittedDowntime && !selectedTrailerDownTime }" />
                             <small v-if="errorsDowntime.selectedTrailerDownTime_er" class="text-danger">{{
                               errorsDowntime.selectedTrailerDownTime_er }}</small>
                           </div>
@@ -1992,7 +2023,7 @@ const getDenverTimeAsUTCISOString = () => {
                             <v-select :options="storeTypeDowntime.typeDownTimes" v-model="selectedTypeTrailerDownTime"
                               placeholder="Choose your Type" :reduce="(typedowntimes) => typedowntimes.id"
                               label="typeDownTimeName" class="form-control p-0"
-                              :class="{ 'is-invalid': formSubmitted && !selectedTypeTrailerDownTime }" />
+                               />
                             <small v-if="errorsDowntime.selectedTypeTrailerDownTime_er" class="text-danger">{{
                               errorsDowntime.selectedTypeTrailerDownTime_er }}</small>
                           </div>
@@ -2003,12 +2034,6 @@ const getDenverTimeAsUTCISOString = () => {
 
 
                         <div class="row">
-
-
-
-
-
-
 
                           <div class="mb-3 col-md-9">
                             <label class="form-label">Downtime Reason</label>
@@ -2131,7 +2156,7 @@ const getDenverTimeAsUTCISOString = () => {
 
 
 
-                          <div class="mb-3 col-md-2">
+                          <!-- <div class="mb-3 col-md-2">
                             <label class="form-label">HomeBase</label>
                             <v-select :options="storeHomeBase.homebases" v-model="selectedHomeBaseLoad"
                               placeholder="Choose your HomeBase" :reduce="(homebase) => homebase.id"
@@ -2139,13 +2164,13 @@ const getDenverTimeAsUTCISOString = () => {
                               :class="{ 'is-invalid': formSubmittedLoad && !selectedHomeBaseLoad }" />
                             <small v-if="errorsLoad.selectedHomeBaseLoad_er" class="text-danger">{{
                               errorsLoad.selectedHomeBaseLoad_er }}</small>
-                          </div>
+                          </div> -->
 
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Tunnel Time In</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="tunnelTimeInLoad" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="tunnelTimeInLoad" :disabled="preloadedLoad" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
@@ -2158,7 +2183,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Tunnel Time Out</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="tunnelTimeOutLoad" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="tunnelTimeOutLoad" :disabled="preloadedLoad" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
@@ -2171,7 +2196,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Leave Yard</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="leaveYardLoad" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="leaveYardLoad" :disabled="preloadedNextDayLoad" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
@@ -2183,7 +2208,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Operator</label>
-                            <v-select :options="storeOperator.operators" v-model="selectedOperatorLoad"
+                            <v-select :options="storeOperator.operators" v-model="selectedOperatorLoad" :disabled="preloadedLoad"
                               placeholder="Choose your Operator" :reduce="(operator) => operator.id"
                               label="operatorName" class="form-control p-0"
                                />
@@ -2206,7 +2231,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Destination</label>
-                            <v-select :options="storeDestination.destinations" v-model="selectedDestinationLoad"
+                            <v-select :options="storeDestination.destinations" :disabled="preloadedNextDayLoad" v-model="selectedDestinationLoad"
                               placeholder="Choose your Destination" :reduce="(destination) => destination.id"
                               label="destinationName" class="form-control p-0"
                                />
@@ -2227,7 +2252,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Time In</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="timeInLoad" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="timeInLoad" :disabled="preloadedNextDayLoad" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
@@ -2240,7 +2265,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Time Out</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="timeOutLoad" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="timeOutLoad" :disabled="preloadedNextDayLoad" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
@@ -2258,7 +2283,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Ticket #</label>
-                            <input type="text" v-model="ticketNumberLoad"
+                            <input type="text" v-model="ticketNumberLoad" :disabled="preloadedNextDayLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.ticketNumberLoad_er" class="text-danger">{{
                               errorsLoad.ticketNumberLoad_er }}</small>
@@ -2266,7 +2291,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Gross Weight</label>
-                            <input type="number" step="any" v-model="grossWeightLoad"
+                            <input type="number" step="any" v-model="grossWeightLoad" :disabled="preloadedNextDayLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.grossWeightLoad_er" class="text-danger">{{
                               errorsLoad.grossWeightLoad_er
@@ -2275,7 +2300,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Tare Weight</label>
-                            <input type="number" step="any" v-model="tareWeightLoad"
+                            <input type="number" step="any" v-model="tareWeightLoad" :disabled="preloadedNextDayLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.tareWeightLoad_er" class="text-danger">{{
                               errorsLoad.tareWeightLoad_er
@@ -2285,7 +2310,7 @@ const getDenverTimeAsUTCISOString = () => {
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Tons</label>
-                            <input type="number" step="any" v-model="tonsLoad"
+                            <input type="number" step="any" v-model="tonsLoad" :disabled="preloadedNextDayLoad"
                               class="form-control form-control-sm border border-primary" />
                             <small v-if="errorsLoad.tonsLoad_er" class="text-danger">{{ errorsLoad.tonsLoad_er
                               }}</small>
@@ -2294,7 +2319,7 @@ const getDenverTimeAsUTCISOString = () => {
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Back Yard</label>
                             <div class="mt-0">
-                              <VueDatePicker v-model="backYardLoad" time-picker placeholder="Select Time">
+                              <VueDatePicker v-model="backYardLoad" :disabled="preloadedNextDayLoad" time-picker placeholder="Select Time">
                                 <template #input-icon>
                                   <img class="input-slot-image" src="../assets/icons/clock2.png" />
                                 </template>
@@ -2379,7 +2404,7 @@ const getDenverTimeAsUTCISOString = () => {
                               class="table table-bordered header-border table-striped table-hover table-responsive-md">
                               <thead class="thead-primary">
                                 <tr>
-                                  <th>HomeBase</th>
+                                  <!-- <th>HomeBase</th> -->
                                   <th>Source</th>
                                   <th>Destination</th>
                                   <th>Material</th>
@@ -2392,7 +2417,7 @@ const getDenverTimeAsUTCISOString = () => {
                               </thead>
                               <tbody>
                                 <tr v-for="(item, index) in loadList" :key="index">
-                                  <td class="td">{{ item.homeBaseName }}</td>
+                                  <!-- <td class="td">{{ item.homeBaseName }}</td> -->
                                   <td class="td">{{ item.sourceName }}</td>
                                   <td class="td">{{ item.destinationName }}</td>
                                   <td class="td">{{ item.materialName }}</td>
@@ -2489,6 +2514,54 @@ const getDenverTimeAsUTCISOString = () => {
 .v-select.is-invalid .vs__dropdown-toggle {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Estilos para campos de texto deshabilitados */
+input[type="text"]:disabled,
+input[type="number"]:disabled {
+  background-color: #e9ecef !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.65 !important;
+  border-color: #ced4da !important;
+}
+
+/* Estilos para VueDatePicker deshabilitado */
+.dp__input:disabled {
+  background-color: #e9ecef !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.65 !important;
+  border-color: #ced4da !important;
+}
+
+/* Estilos para v-select deshabilitado */
+.v-select.vs--disabled .vs__dropdown-toggle {
+  background-color: #e9ecef !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.65 !important;
+  border-color: #ced4da !important;
+}
+
+.v-select.vs--disabled .vs__selected {
+  color: #6c757d !important;
+}
+
+.v-select.vs--disabled .vs__search,
+.v-select.vs--disabled .vs__search:focus {
+  background-color: transparent !important;
+  cursor: not-allowed !important;
+}
+
+.v-select.vs--disabled .vs__actions {
+  cursor: not-allowed !important;
+}
+
+.v-select.vs--disabled .vs__clear,
+.v-select.vs--disabled .vs__open-indicator {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
 }
 
 .dp__theme_light {
