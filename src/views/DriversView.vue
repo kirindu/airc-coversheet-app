@@ -320,7 +320,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-    </div>ipad air
+    </div>
   </div>
   <ModalTarget />
 </template>
