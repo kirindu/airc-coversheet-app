@@ -46,8 +46,6 @@ const storeMaterial = useMaterialsStore();
 import { useLandFillsStore } from "@/stores/landfills";
 const storeLandFill = useLandFillsStore();
 
-
-
 import { useTrucksStore } from "@/stores/trucks.js";
 const storeTruck = useTrucksStore();
 
@@ -62,14 +60,6 @@ const user = ref(null);
 
 
 // General Info
-const selectedRoute = ref(""); // Considerar su borrado
-const timeLeaveYard = ref(""); // Considerar su borrado
-const timeBackInYard = ref(""); // Considerar su borrado
-const startMiles = ref(""); // Considerar su borrado
-const endMiles = ref(""); // Considerar su borrado
-
-
-
 const selectedHomeBase = ref("");
 const selectedTruck = ref("");
 const selectedTrailer = ref("");
@@ -1586,8 +1576,6 @@ const getDenverTimeAsUTCISOString = () => {
 
               </div>
 
-
-
               <div class="row">
                 <div class="mb-3 col-md-3">
                   <label class="form-label">Truck Start Miles</label>
@@ -1925,7 +1913,6 @@ const getDenverTimeAsUTCISOString = () => {
                     <div id="bordered_collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordion-two">
                       <div class="accordion-body">
 
-
                         <div class="row">
 
                           <div class="mb-3 col-md-3">
@@ -2031,8 +2018,6 @@ const getDenverTimeAsUTCISOString = () => {
 
                         </div>
 
-
-
                         <div class="row">
 
                           <div class="mb-3 col-md-9">
@@ -2063,9 +2048,6 @@ const getDenverTimeAsUTCISOString = () => {
 
 
                         </div>
-
-
-
 
                         <div class="row">
                           <hr style="color: black" />
@@ -2277,8 +2259,6 @@ const getDenverTimeAsUTCISOString = () => {
 
 
                         </div>
-
-
                         <div class="row">
 
                           <div class="mb-3 col-md-2">
@@ -2383,6 +2363,9 @@ const getDenverTimeAsUTCISOString = () => {
                             </button>
                           </div>
                         </div>
+
+
+
 
                         <div class="row">
 

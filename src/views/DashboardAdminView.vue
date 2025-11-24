@@ -30,6 +30,28 @@ import CoverSheetModal from "@/components/CoverSheetModal.vue";
 import { useRoutesStore } from "@/stores/routes.js";
 const storeRoute = useRoutesStore();
 
+import { useHomeBasesStore } from "@/stores/homebase.js";
+const storeHomeBase = useHomeBasesStore();
+
+import { useOperatorsStore } from "@/stores/operator.js";
+const storeOperator = useOperatorsStore();
+
+import { useSourcesStore } from "@/stores/source.js";
+const storeSource = useSourcesStore();
+
+import { useDestinationsStore } from "@/stores/destination.js";
+const storeDestination = useDestinationsStore();
+
+import { useMaterialsStore } from "@/stores/material.js";
+const storeMaterial = useMaterialsStore();
+
+import { useTrailersStore } from "@/stores/trailers.js";
+const storeTrailer = useTrailersStore();
+
+import { useTypeDownTimeStore } from "@/stores/typeDowntime.js";
+const storeTypeDowntime = useTypeDownTimeStore();
+
+
 import { useLandFillsStore } from "@/stores/landfills";
 const storeLandFill = useLandFillsStore();
 
@@ -56,13 +78,14 @@ const sortCoverSheetList = (key) => {
     let valueB = b[key] || "";
 
     // Convert to number for truckNumber, otherwise treat as string
-    if (key === "truckNumber") {
+    if (key === "truckNumber" || key === "trailerNumber") {
       valueA = parseInt(valueA, 10) || 0;
       valueB = parseInt(valueB, 10) || 0;
     } else if (typeof valueA === "string") {
       valueA = valueA.toLowerCase();
       valueB = valueB.toLowerCase();
     }
+    
 
     if (sortOrder.value === "asc") {
       return valueA > valueB ? 1 : -1;
@@ -93,6 +116,7 @@ if (storedUser) {
 
 // General Info
 const selectedRoute = ref("");
+const selectedTrailer = ref("");
 const selectedTruck = ref("");
 const selectedDriver = ref("");
 
@@ -130,55 +154,11 @@ const SearchCoverSheet = async (event) => {
     const allCoversheets = response.data.data || [];
     const filters = {
       truck_id: selectedTruck.value || null,
+      trailer_id: selectedTrailer.value || null,
       driver_id: selectedDriver.value || null,
     };
     
-    if (selectedRoute.value) {
-      const selectedRouteObj = storeRoute.routes.find(r => r.id === selectedRoute.value);
-      if (selectedRouteObj) {
-        const base = selectedRouteObj.routeName;
-        let matchingRoutes = [];
-        if (base.startsWith('RO') && !base.includes('-')) {
-          const numberStr = base.substring(2);
-          const number = parseInt(numberStr, 10);
-          if (!isNaN(number)) {
-            let group_start;
-            if (number <= 4) {
-              group_start = 1;
-            } else {
-              group_start = Math.floor((number - 5) / 5) * 5 + 5;
-            }
-            if (group_start === number) { // is parent
-              let group_end = number === 1 ? 4 : number + 4;
-              for (let i = group_start; i <= group_end; i++) {
-                const sub_base = `RO${i}`;
-                const subs = storeRoute.routes.filter(
-                  r => r.routeName === sub_base || r.routeName.startsWith(sub_base + '-')
-                );
-                matchingRoutes = matchingRoutes.concat(subs);
-              }
-            } else { // not parent
-              matchingRoutes = storeRoute.routes.filter(
-                r => r.routeName === base || r.routeName.startsWith(base + '-')
-              );
-            }
-          } else {
-            matchingRoutes = storeRoute.routes.filter(
-              r => r.routeName === base || r.routeName.startsWith(base + '-')
-            );
-          }
-        } else {
-          matchingRoutes = storeRoute.routes.filter(
-            r => r.routeName === base || r.routeName.startsWith(base + '-')
-          );
-        }
-        filters.route_ids = matchingRoutes.map(r => r.id);
-      } else {
-        filters.route_ids = null;
-      }
-    } else {
-      filters.route_ids = null;
-    }
+ 
     coverSheetList.value = filterCoversheets(allCoversheets, filters);
   } catch (error) {
     console.error("Error al obtener CoverSheet:", error);
@@ -252,10 +232,10 @@ const formatToYYYYMMDD = (inputDate) => {
 
 const filterCoversheets = (coversheets, filters) => {
   return coversheets.filter((c) => {
-    const matchRoute = !filters.route_ids || filters.route_ids.includes(c.route_id);
+    const matchTrailer = !filters.trailer_id || c.trailer_id === filters.trailer_id;
     const matchTruck = !filters.truck_id || c.truck_id === filters.truck_id;
     const matchDriver = !filters.driver_id || c.driver_id === filters.driver_id;
-    return matchRoute && matchTruck && matchDriver;
+    return matchTrailer && matchTruck && matchDriver;
   });
 };
 
@@ -314,21 +294,7 @@ onMounted(() => {
                 }}</small>
               </div>
 
-              <div class="mb-3 col-md-3">
-                <label class="form-label">Route #</label>
-                <v-select
-                  :options="storeRoute.routes"
-                  v-model="selectedRoute"
-                  placeholder="Choose Route"
-                  :reduce="(route) => route.id"
-                  label="routeName"
-                  class="form-control p-0"
-                  :class="{ 'is-invalid': formSubmitted && !selectedRoute }"
-                />
-                <small v-if="errors.route_er" class="text-danger">{{
-                  errors.route_er
-                }}</small>
-              </div>
+       
 
               <div class="mb-3 col-md-3">
                 <label class="form-label">Truck #</label>
@@ -343,6 +309,22 @@ onMounted(() => {
                 />
                 <small v-if="errors.truck_er" class="text-danger">{{
                   errors.truck_er
+                }}</small>
+              </div>
+
+                <div class="mb-3 col-md-3">
+                <label class="form-label">Trailer #</label>
+                <v-select
+                  :options="storeTrailer.trailers"
+                  v-model="selectedTrailer"
+                  placeholder="Choose Trailer"
+                  :reduce="(trailer) => trailer.id"
+                  label="trailerNumber"
+                  class="form-control p-0"
+                  :class="{ 'is-invalid': formSubmitted && !selectedTrailer }"
+                />
+                <small v-if="errors.trailer_er" class="text-danger">{{
+                  errors.trailer_er
                 }}</small>
               </div>
 
@@ -401,6 +383,7 @@ onMounted(() => {
                 <table class="table table-bordered header-border table-striped table-hover table-responsive-md">
                   <thead class="thead-primary">
                     <tr>
+                    <th>HomeBase</th>
                       <th>
                         <a
                           @click="sortCoverSheetList('driverName')"
@@ -422,15 +405,15 @@ onMounted(() => {
                       </th>
                       <th>
                         <a
-                          @click="sortCoverSheetList('routeName')"
+                          @click="sortCoverSheetList('truckNumber')"
                           style="
                             cursor: pointer;
                             text-decoration: none;
                             color: inherit;
                           "
                         >
-                          Route #
-                          <span v-if="sortKey === 'routeName'">
+                          Truck #
+                          <span v-if="sortKey === 'truck'">
                             <i
                               v-if="sortOrder === 'asc'"
                               class="fa fa-sort-asc"
@@ -448,8 +431,8 @@ onMounted(() => {
                             color: inherit;
                           "
                         >
-                          Truck #
-                          <span v-if="sortKey === 'truckNumber'">
+                          Trailer #
+                          <span v-if="sortKey === 'trailerNumber'">
                             <i
                               v-if="sortOrder === 'asc'"
                               class="fa fa-sort-asc"
@@ -458,12 +441,9 @@ onMounted(() => {
                           </span>
                         </a>
                       </th>
-                      <th>HomeBase</th>
-                      <th>Driver Name</th>
-                      <th>Truck</th>
-                      <th>Trailer</th>
                       <th>Clock In</th>
                       <th>Clock Out</th>
+                      <th>Trainee / Trainer</th>
                       <th>Notes</th>
                       <th>Action</th>
                     </tr>
@@ -475,7 +455,8 @@ onMounted(() => {
                       <td class="td">{{ item.truckNumber }}</td>
                       <td class="td">{{ item.trailerNumber }}</td>
                       <td class="td">{{ item.clockIn }}</td>
-                      <td class="td">{{ item.clockOut }}</td>
+                      <td class="td">{{ item.clockIn }}</td>
+                      <td class="td">{{ item.trainee }}</td>
                       <td class="td">{{ item.notes }}</td>
                       <td>
                         <div>
