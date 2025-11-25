@@ -866,10 +866,10 @@ const HandleLoad = async (event) => {
   if (selectedSourceLoad.value) formData.append("source_id", selectedSourceLoad.value);
   if (selectedDestinationLoad.value) formData.append("destination_id", selectedDestinationLoad.value);
   if (selectedMaterialLoad.value) formData.append("material_id", selectedMaterialLoad.value);
-  if (tunnelTimeInLoad.value) formData.append("tunnelTimeIn", formatTime(tunnelTimeInLoad.value));
-  if (tunnelTimeOutLoad.value) formData.append("tunnelTimeOut", formatTime(tunnelTimeOutLoad.value));
-  if (leaveYardLoad.value) formData.append("leaveYard", formatTime(leaveYardLoad.value));
-  if (timeInLoad.value) formData.append("timeIn", formatTime(timeInLoad.value));
+  if (tunnelTimeInLoad.value) formData.append("tunnelTimeInLoad", formatTime(tunnelTimeInLoad.value));
+  if (tunnelTimeOutLoad.value) formData.append("tunnelTimeOutLoad", formatTime(tunnelTimeOutLoad.value));
+  if (leaveYardLoad.value) formData.append("leaveYardLoad", formatTime(leaveYardLoad.value));
+  if (timeInLoad.value) formData.append("timeInLoad", formatTime(timeInLoad.value));
   if (timeOutLoad.value) formData.append("timeOutLoad", formatTime(timeOutLoad.value));
   if (ticketNumberLoad.value) formData.append("ticketNumberLoad", ticketNumberLoad.value);
   if (grossWeightLoad.value) formData.append("grossWeightLoad", grossWeightLoad.value.toString());

@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router' // Importamos useRouter para manejar la redirección
 
+const links_disabled = ref(true); // Establécelo en `true` para deshabilitar temporalmente
+
 const user = ref(null)
 const router = useRouter() // Instanciamos el router
 
@@ -67,6 +69,8 @@ const logout = () => {
   localStorage.removeItem('COVERSHEET2') // Eliminamos la variable COVERSHEET2 del localStorage
   router.push({ name: 'login' }) // Redirigimos al usuario a la página de login
 }
+
+
 </script>
 
 <template>
@@ -78,31 +82,30 @@ const logout = () => {
 
     <div v-show="menu_visible" class="header-left">
 
-            <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
-              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-drivers' })">Drivers</a>
-            </div>
+      <nav class="main-menu">
+        <a @click.prevent="router.push({ name: 'admin-drivers' })" class="menu-item">Drivers</a>
+        <a @click.prevent="router.push({ name: 'admin-users' })" class="menu-item">Users</a>
+        <a :class="{'disabled-link': links_disabled}" @click.prevent="links_disabled ? null : router.push({ name: 'admin-trailers' })" class="menu-item">Trailers</a>
+        <a :class="{'disabled-link': links_disabled}" @click.prevent="links_disabled ? null : router.push({ name: 'admin-trucks' })" class="menu-item">Trucks</a>
 
-          <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
-              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-users' })">| Users</a>
-            </div>
+        <div class="dropdown-container">
+          <span :class="{'disabled-link': links_disabled}" class="menu-item dropdown-label">
+            Reports
+            <i class="fas fa-caret-down"></i>
+          </span>
 
-            <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
-              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-trailers' })">| Trailers</a>
-            </div>
+<div class="dropdown-menu reports-menu"> 
+    <a  @click.prevent="links_disabled ? null : router.push({ name: 'admin-reports', params: { type: 'single-date' } })">Report by Single Date</a>
+    <a @click.prevent="links_disabled ? null : router.push({ name: 'admin-reports', params: { type: 'date-range' } })">Report by Date Range</a>
+    <a @click.prevent="links_disabled ? null : router.push({ name: 'admin-reports', params: { type: 'driver-name' } })">Report by Driver Name</a>
+  </div>
 
-            <div class="nav-item" style="margin-left: 10px; cursor:pointer;">
-              <a class="nav-link" style="font-size: 15px; color:#00aff0;" @click.prevent="router.push({ name: 'admin-trucks' })">| Trucks</a>
-            </div>
 
-        <div class="nav-item dropdown" style="margin-left: 10px; cursor:pointer;">
-            
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" style="font-size: 15px; color:#00aff0;"> | Reports</a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'single-date' } })">Report by Single Date</a>
-                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'date-range' } })">Report by Date Range</a>
-                <a class="dropdown-item" style="cursor:pointer;" @click.prevent="router.push({ name: 'admin-reports', params: { type: 'driver-name' } })">Report by Driver Name</a>
-              </div>
         </div>
+
+        
+      </nav>
+
 
     </div>
 
@@ -329,5 +332,168 @@ const logout = () => {
   font-weight: 600;
   letter-spacing: 0.5px;
   white-space: nowrap;
+}
+
+/* Contenedor principal */
+.header-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #d8d4ec;
+  padding: 10px 20px;
+}
+
+/* Izquierda */
+.left-container {
+  display: flex;
+  align-items: center;
+}
+
+.ace-logo {
+  height: 55px;
+  margin-right: 20px;
+}
+
+/* === MENÚ ARREGLADO === */
+.main-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.menu-item {
+  font-size: 18px;
+  font-weight: 500;
+  color: #28a2eb;
+  padding-right: 18px;
+  border-right: 2px solid #28a2eb;
+  cursor: pointer;
+}
+
+.menu-item:last-child {
+  border-right: none;
+}
+
+/* Dropdown - SOLUCIÓN */
+.dropdown-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.reports-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  display: none; /* 🔑 Esta regla oculta el menú por defecto */
+  flex-direction: column;
+  min-width: 180px;
+  padding: 8px 0;
+  z-index: 1000;
+  margin-top: 0;
+}
+
+/* IMPORTANTE: Mantenemos el hover SOLAMENTE para el menú de Reports */
+.dropdown-container:hover .reports-menu,
+.reports-menu:hover {
+  display: flex; /* 🔑 Esta regla lo muestra al hacer hover */
+}
+
+.reports-menu a { /* 💡 También usamos el nuevo selector aquí */
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.2s ease;
+}
+
+.reports-menu a:hover { /* 💡 Y aquí */
+  background: #f0f0f0;
+  color: #28a2eb;
+}
+
+.dropdown-menu a {
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #333;
+  transition: background 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+  background: #f0f0f0;
+  color: #28a2eb;
+}
+
+/* Derecha */
+.right-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.current-date-display {
+  background: #6d51e8;
+  padding: 10px 20px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.current-date-display i {
+  color: #fff;
+}
+
+.date-text {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.user-role {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* --- Nuevos Estilos para Deshabilitar Links --- */
+.disabled-link {
+    color: #a0a0a0 !important; /* Color gris suave */
+    cursor: not-allowed !important; /* Muestra el cursor de prohibido */
+    opacity: 0.7; /* Baja un poco la opacidad */
+}
+
+/* Opcional: Deshabilitar visualmente el separador para los deshabilitados */
+.menu-item.disabled-link {
+    border-right-color: #a0a0a0 !important;
+}
+
+/* Opcional: Asegurar que el menú Reports no se abra con hover si está deshabilitado */
+.dropdown-container:has(.disabled-link):hover .reports-menu {
+    display: none !important;
 }
 </style>

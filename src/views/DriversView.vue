@@ -290,14 +290,14 @@ onMounted(() => {
                   <thead class="thead-primary">
                     <tr>
                       <th style="text-align: center">Name</th>
-                      <th style="text-align: center">Email</th>
+                      <th style="text-align: center">User Name</th>
                       <th style="text-align: center !important">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(item, index) in driverList" :key="index">
                       <td class="td">{{ item.name }}</td>
-                      <td class="td">{{ item.email }}</td>
+                      <td class="td">{{ item.username }}</td>
                       <td>
                         <div class="d-flex gap-1">
                           <a

@@ -229,11 +229,12 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
       position: "top",
       duration: 3000,
     });
+    resetForm(); 
   } finally {
     loading.value = false;
   }
 
-  resetForm(); // Limpiamos el formulario una ves realizado el submit
+  // Limpiamos el formulario una ves realizado el submit
 });
 
 

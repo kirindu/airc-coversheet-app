@@ -57,11 +57,13 @@ const reactiveProps = toRefs(props);
 
 // Driver
 const driverName = ref("");
+const driverUserName = ref("");
 const driverEmail = ref("");
 const driverPassword = ref("");
 
 const errorsDriver = ref({
   name_er: "",
+  username_er: "",
   email_er: "",
   password_er: "",
 });
@@ -75,6 +77,7 @@ const onSubmit = async (event) => {
   // Limpiar errores anteriores
 
   errorsDriver.value.name_er = "";
+  errorsDriver.value.username_er = "";
   errorsDriver.value.email_er = ""; 
   errorsDriver.value.password_er = "";
 
@@ -89,8 +92,8 @@ const onSubmit = async (event) => {
   //   errorsDriver.value.name_er = "";
   // }
 
-  if (!driverEmail.value) {
-    errorsDriver.value.email_er = "Required field";
+  if (!driverUserName.value) {
+    errorsDriver.value.username_er = "Required field";
     hasError = true;
   } 
   
@@ -110,7 +113,8 @@ const onSubmit = async (event) => {
 
   const driverData = {
     name: driverName.value,
-    email: driverEmail.value,
+    username: driverUserName.value,
+    email: "none@aceintermountain.com",  
     password: driverPassword.value,
   };
 
@@ -207,13 +211,13 @@ const logout = () => {
                 </div>
 
                 <div class="mb-3 col-md-3">
-                  <label class="form-label">Email</label>
+                  <label class="form-label">User Name</label>
                   <input
-                    type="email"
-                    v-model="driverEmail"
+                    type="text"
+                    v-model="driverUserName"
                     class="form-control form-control-sm border border-primary"
                   />
-                  <small v-if="errorsDriver.email_er" class="text-danger">{{errorsDriver.email_er}}</small>
+                  <small v-if="errorsDriver.username_er" class="text-danger">{{errorsDriver.username_er}}</small>
                 </div>
 
                 <div class="mb-3 col-md-3">
