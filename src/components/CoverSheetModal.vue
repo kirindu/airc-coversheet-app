@@ -79,6 +79,8 @@ const selectedHomeBase = ref("");
 const selectedTruck = ref("");
 const selectedTrailer = ref("");
 
+const date = ref(new Date());
+
 const timeClockIn = ref("");
 const timeClockOut = ref("");
 const timeClockInTrainee = ref("");
@@ -231,6 +233,7 @@ const selectedOperatorLoad = ref("");
 const selectedSourceLoad = ref("");
 const selectedDestinationLoad = ref("");
 const selectedMaterialLoad = ref("");
+const noteLoad = ref("");
 const formSubmittedLoad = ref(false); // To track if Load form has been submitted
 
 
@@ -339,7 +342,7 @@ const onSubmit = async (event) => {
     fuel: fuel.value.toString() || "",
     dieselExhaustFluid: dieselExhaustFluid.value.toString() || "",
 
-    driver_id: user.value.id,
+    driver_id: reactiveProps.item.value.driver_id,
     notes: notes.value,
   };
 
@@ -528,18 +531,20 @@ const CargamosLoad = async () => {
 const EditSpareTruckInfo = (item) => {
   // Populate the form with the selected Spare Truck Info
 
+  timeLeaveYardSpareTruckInfo.value = setTimeFromDB(item.timeLeaveYardSpareTruckInfo);
+  timeBackInYardSpareTruckInfo.value = setTimeFromDB(item.timeBackInYardSpareTruckInfo);
+  fuelSpareTruckInfo.value = item.fuelSpareTruckInfo;
+  dieselExhaustFluidSpareTruckInfo.value = item.dieselExhaustFluidSpareTruckInfo;
+
   selectedTruckSpareTruckInfo.value = item.truck_id;
+  truckStartMilesSpareTruckInfo.value = item.truckStartMilesSpareTruckInfo;
+  truckEndMilesSpareTruckInfo.value = item.truckEndMilesSpareTruckInfo;
+  truckStartHoursSpareTruckInfo.value = item.truckStartHoursSpareTruckInfo;
+  truckEndHoursSpareTruckInfo.value = item.truckEndHoursSpareTruckInfo;
+
   selectedTrailerSpareTruckInfo.value = item.trailer_id;
-  timeLeaveYardSpareTruckInfo.value = item.leaveYard ? setTimeFromDB(item.leaveYard): "";
-  timeBackInYardSpareTruckInfo.value = item.backInYard ? setTimeFromDB(item.backInYard) : "";
-  fuelSpareTruckInfo.value = item.fuel;
-  dieselExhaustFluidSpareTruckInfo.value = item.dieselExhaustFluid;
-  truckStartMilesSpareTruckInfo.value = item.startMiles;
-  truckEndMilesSpareTruckInfo.value = item.endMiles;
-  truckStartHoursSpareTruckInfo.value = item.startHours;
-  truckEndHoursSpareTruckInfo.value = item.endHours;
-  trailerStartMilesSpareTruckInfo.value = item.trailerStartMiles;
-  trailerEndMilesSpareTruckInfo.value = item.trailerEndMiles;
+  trailerStartMilesSpareTruckInfo.value = item.trailerStartMilesSpareTruckInfo;
+  trailerEndMilesSpareTruckInfo.value = item.trailerEndMilesSpareTruckInfo;
 
 
   selectedSpareTruckId.value = item.id || item._id; // Ensure the ID is captured
@@ -556,7 +561,7 @@ truckDownTimeStartDownTime.value = item.truckDownTimeStartDownTime? setTimeFromD
 truckDownTimeEndDownTime.value = item.truckDownTimeEndDownTime? setTimeFromDB(item.truckDownTimeEndDownTime): "";
 trailerDownTimeStartDownTime.value = item.trailerDownTimeStartDownTime? setTimeFromDB(item.trailerDownTimeStartDownTime): "";
 trailerDownTimeEndDownTime.value = item.trailerDownTimeEndDownTime? setTimeFromDB(item.trailerDownTimeEndDownTime): "";
-downTimeReasonDownTime.value = item.downtimeReason || "";
+downTimeReasonDownTime.value = item.downTimeReasonDownTime || "";
 
 selectedDowntimeId.value = item.id || item._id; // Ensure the ID is captured
 visibleDetailDowntime.value = true; // Show the Downtime details section
@@ -755,7 +760,7 @@ const HandleDowntime = async (event) => {
     truckDownTimeEndDownTime: formatTime(truckDownTimeEndDownTime.value) || "",
     trailerDownTimeStartDownTime: formatTime(trailerDownTimeStartDownTime.value) || "",
     trailerDownTimeEndDownTime: formatTime(trailerDownTimeEndDownTime.value) || "",
-    downtimeReason: downTimeReasonDownTime.value || "",
+    downTimeReasonDownTime: downTimeReasonDownTime.value || "",
   };
 
   try {
@@ -946,9 +951,15 @@ const formatTime = (controlTimeValue) => {
   return `${hours}:${minutes}`;
 };
 
+// const getDenverTimeAsUTCISOString = () => {
+//   const now = DateTime.now().setZone("America/Denver"); // Get current time in Denver
+//   return now.toUTC().toISO(); // Convert to UTC and return ISO string
+// };
+
 const getDenverTimeAsUTCISOString = () => {
-  const now = DateTime.now().setZone("America/Denver"); // Get current time in Denver
-  return now.toUTC().toISO(); // Convert to UTC and return ISO string
+  const denverTime = DateTime.now().setZone('America/Denver');
+  // Mantener la fecha de Denver pero en formato ISO
+  return denverTime.toFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 };
 
 const logout = () => {
@@ -1469,12 +1480,17 @@ const downloadImage = (imageUrl) => {
                               errorsSpareTruckInfo.trailerEndMilesSpareTruckInfo_er }}</small>
                           </div>
 
-                          <div class="mb-4 col-md-3 align-self-end">
-                            <button :disabled="isLoadingSpareTruckInfo" style="margin-bottom: -5px !important;"
-                              @click="HandleSpareTruckInfo" type="button" class="btn btn-info">
-                              {{ isEditingSpareTruckInfo ? "Save" : "Add" }}
+                  <div class="mb-4 col-md-3 align-self-end">
+                            <button
+                              :disabled="isLoadingSpareTruckInfo"
+                              style="margin-bottom: -5px !important"
+                              @click="HandleSpareTruckInfo"
+                              type="button"
+                              class="btn btn-info"
+                            >
+                              Update
                               <span class="btn-icon-end">
-                                <i :class="isEditingSpareTruckInfo ? 'fa fa-save' : 'fa fa-plus'"></i>
+                                <i class="fa fa-save"></i>
                               </span>
                             </button>
                           </div>
@@ -1670,19 +1686,19 @@ const downloadImage = (imageUrl) => {
                               errorsDowntime.downTimeReasonDownTime_er }}</small>
                           </div>
 
-                          <div class="mb-4 col-md-3 align-self-end">
-
-
-
-                            <button :disabled="isLoadingDowntime" style="margin-bottom: -7px !important;"
-                              @click="HandleDowntime" type="button" class="btn btn-info">
-                              {{ isEditingDowntime ? "Save" : "Add" }}
+                           <div class="mb-4 col-md-3 align-self-end">
+                            <button
+                              :disabled="isLoadingDowntime"
+                              style="margin-bottom: -7px !important"
+                              @click="HandleDowntime"
+                              type="button"
+                              class="btn btn-info"
+                            >
+                              Update
                               <span class="btn-icon-end">
-                                <i :class="isEditingDowntime ? 'fa fa-save' : 'fa fa-plus'"></i>
+                                <i class="fa fa-save"></i>
                               </span>
                             </button>
-
-
                           </div>
 
 
@@ -1878,7 +1894,8 @@ const downloadImage = (imageUrl) => {
 
 
                         </div>
-                        <div style="background-color: #cdc2f5" lass="row">
+
+                        <div style="background-color: #cdc2f5" class="row">
 
                           <div class="mb-3 col-md-2">
                             <label class="form-label">Ticket #</label>

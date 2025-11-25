@@ -35,6 +35,26 @@ const user = ref(null);
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 
+// Schema de validación dinámica según el rol
+const validationSchema = computed(() => {
+  if (rol.value === 'Driver') {
+    return yup.object({
+      email: yup
+        .string()
+        .required("Username is required"),
+      password: yup.string().required("Password is required"),
+    });
+  } else {
+    return yup.object({
+      email: yup
+        .string()
+        .email("Invalid email")
+        .required("Email is required"),
+      password: yup.string().required("Password is required"),
+    });
+  }
+});
+
 const {
   defineField,
   errors,
@@ -44,20 +64,33 @@ const {
   setValues,
   meta,
 } = useForm({
-  validationSchema: yup.object({
-    email: yup
-      .string()
-      .email("Invalid email")
-      .required("Email is required"),
-    password: yup.string().required("Password is required"),
-  }),
+  validationSchema,
 });
 
 const [email, emailAttrs] = defineField("email", {
   validateOnModelUpdate: false,
-}); // Con validateOnModelUpdate validamos despues de hacerle click afuera al campo si queremos
+}); 
 const [password, passwordAttrs] = defineField("password", {
   validateOnModelUpdate: false,
+});
+
+// Computed para labels e iconos dinámicos
+const emailLabel = computed(() => {
+  return rol.value === 'Driver' ? 'Username' : 'Email';
+});
+
+const emailIcon = computed(() => {
+  return rol.value === 'Driver' ? 'fa fa-user' : 'fa fa-envelope';
+});
+
+const emailInputType = computed(() => {
+  return rol.value === 'Driver' ? 'text' : 'email';
+});
+
+// Watch para limpiar el campo cuando cambia el rol
+watch(rol, () => {
+  setFieldValue('email', '');
+  setFieldValue('password', '');
 });
 
 // Metodos
@@ -67,7 +100,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
     if (rol.value === 'Driver') {
       const { data } = await UserAPI.loginDriver({
-        email: values.email,
+        username: values.email, // Enviamos como username para Driver
         password: values.password,
       });
 
@@ -135,7 +168,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#ff4949",
                 confirmButtonText: "Yes, continue working with it",
-                cancelButtonText: "Create a new cover sheet", // 👈 texto personalizado
+                cancelButtonText: "Create a new cover sheet",
                 allowOutsideClick: false,
               }).then(async () => {
                 if (alertResult.value.isConfirmed) {
@@ -176,7 +209,7 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
 
        if (rol.value === 'Admin') {
       const { data } = await UserAPI.loginAdmin({
-        email: values.email,
+        email: values.email, // Enviamos como email para Admin
         password: values.password,
       });
 
@@ -270,19 +303,25 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                 <form @submit="onSubmit" autocomplete="off">
 
                   <div class="mb-3">
-                    <label class="mb-1 form-label" for="validationCustomEmail">Email<span
+                    <label class="mb-1 form-label" for="validationCustomEmail">{{ emailLabel }}<span
                         class="text-danger">*</span></label>
-                    <!-- <input v-model="email" v-bind="emailAttrs" type="email" class="form-control" id="validationCustomEmail" requiredautocomplete="off"/> -->
-
 
                     <div class="input-group">
-                      <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
-                      <input v-model="email" v-bind="emailAttrs" type="email" class="form-control"
-                        id="validationCustomEmail" requiredautocomplete="off" />
+                      <span class="input-group-text"> <i :class="emailIcon"></i> </span>
+                      <input 
+                        v-model="email" 
+                        v-bind="emailAttrs" 
+                        :type="emailInputType" 
+                        class="form-control"
+                        id="validationCustomEmail" 
+                        required
+                        autocomplete="off" 
+                      />
                     </div>
 
-                    <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{ errors.email
-                    }}</div>
+                    <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">
+                      {{ errors.email }}
+                    </div>
 
                   </div>
 
@@ -290,16 +329,11 @@ const onSubmit = handleSubmit(async (values, { resetForm }) => {
                     <label class="mb-1 form-label">Password<span class="text-danger">*</span></label>
                     <div class="position-relative">
 
-
-
                       <div class="input-group">
                         <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
                         <input type="password" v-model="password" v-bind="passwordAttrs" class="form-control"
                           id="validationCustomPassword" required autocomplete="off" />
                       </div>
-
-
-
 
                       <div style="width: 100%; margin-top: 0.25rem; font-size: 0.875em; color: #e41a01;">{{
                         errors.password }}</div>

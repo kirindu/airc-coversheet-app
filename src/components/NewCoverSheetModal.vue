@@ -589,7 +589,7 @@ const HandleDowntime = async (event) => {
     truck_id: selectedTruckDowntime.value,
     startTime: formatTime(timeStartTimeDowntime.value),
     endTime: formatTime(timeEndTimeDowntime.value) || "",
-    downtimeReason: downtimeReasonDowntime.value || "",
+    downTimeReasonDownTime: downtimeReasonDowntime.value || "",
     coversheet_id: coversheet_id,
   };
 
@@ -828,7 +828,7 @@ const EditDowntime = (item) => {
   selectedTruckDowntime.value = item.truck_id;
   timeStartTimeDowntime.value = setTimeFromDB(item.startTime);
   timeEndTimeDowntime.value = setTimeFromDB(item.endTime);
-  downtimeReasonDowntime.value = item.downtimeReason;
+  downtimeReasonDowntime.value = item.downTimeReasonDownTime;
 
   // Set editing mode
   isEditingDowntime.value = true;
@@ -1058,10 +1058,18 @@ const logout = () => {
 //   return localDenverDate.toISOString(); // <-- esto lo mandas al backend
 // };
 
+// const getDenverTimeAsUTCISOString = () => {
+//   const now = DateTime.now().setZone('America/Denver'); // Get current time in Denver
+//   return now.toUTC().toISO(); // Convert to UTC and return ISO string
+// };
+
 const getDenverTimeAsUTCISOString = () => {
-  const now = DateTime.now().setZone('America/Denver'); // Get current time in Denver
-  return now.toUTC().toISO(); // Convert to UTC and return ISO string
+  const denverTime = DateTime.now().setZone('America/Denver');
+  // Mantener la fecha de Denver pero en formato ISO
+  return denverTime.toFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 };
+
+
 
 </script>
 
@@ -1569,7 +1577,7 @@ const getDenverTimeAsUTCISOString = () => {
                                   <td class="td">{{ item.truckNumber }}</td>
                                   <td class="td">{{ item.startTime }}</td>
                                   <td class="td">{{ item.endTime }}</td>
-                                  <td class="td">{{ item.downtimeReason }}</td>
+                                  <td class="td">{{ item.downTimeReasonDownTime }}</td>
                                   <td>
                                     <div>
                                       <a @click="EditDowntime(item)"
